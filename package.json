@@ -1,11 +1,11 @@
 {
-  "name": "sos-illus",
-  "version": "0.0.1",
+  "name": "gw-installation",
+  "version": "0.1.0",
   "description": "",
-  "repository": "github:StudioProcess/sos-illus",
+  "repository": "github:StudioProcess/gw-installation",
   "engines": {
-    "node": ">=8.9.0",
-    "npm": ">=5.6.0"
+    "node": ">=16.17.0",
+    "npm": ">=8.19.1"
   },
   "scripts": {
     "start": "browser-sync start --server --port 8080 --no-notify --files index.html app",
