@@ -14,8 +14,9 @@ import ligoPlaneFS from "../shaders/ligoPlaneFS.js";
 
 import {inverseLerpClamped} from "../shared/mathUtils.js";
 
-const W = 1280;
-const H = 800;
+const W = 1920;
+const H = 1080;
+const PX_RATIO = 1;
 
 let RENDERING = false;
 let TILES = 2;
@@ -137,7 +138,7 @@ function setup() {
     // alpha: false
   });
   renderer.setSize( W, H );
-  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setPixelRatio( PX_RATIO );
   document.body.appendChild( renderer.domElement );
 
   scene = new THREE.Scene();
