@@ -2,20 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>sos-illus</title>
-  <link rel="stylesheet" href="app/main.css">
+  <title>gw-installation</title>
+  <link rel="stylesheet" href="./app/main.css">
 </head>
 <body>
-  <style>
-    body { font: 20px system-ui; display:block; }
-    a { color:white; padding:5px; }
-  </style>
-  <a href="/crispr/index.htm">crispr</a><br>
-  <a href="/ligo/index.htm">ligo</a><br>
-  <a href="/ligo-lines/index.htm">ligo-lines</a><br>
-  <a href="/ligo-lines-looping/index.htm">ligo-lines-looping</a><br>
-  <a href="/tess/index.htm">tess</a><br>
-  <a href="/tess-planets/index.htm">tess-planets</a><br>
-  <a href="/tess-planets-loop/index.htm">tess-planets-loop</a><br>
+  <script src="./node_modules/three/build/three.js"></script>
+  <script src="./node_modules/three/examples/js/controls/OrbitControls.js"></script>
+  <!-- <script src="./node_modules/ccapture.js/build/CCapture.all.min.js"></script> -->
+
+  <script src="./vendor/dat.gui.min.js"></script>
+
+  <script src="./shaders/computeWaveHeightFS.js"></script>
+  <script src="./shaders/wavesFS.js"></script>
+
+
+  <script type="module" src="./app/main.js"></script>
 </body>
 </html>
