@@ -16,7 +16,7 @@
   "author": "Martin Grödl <martin@process.studio> (https://process.studio)",
   "license": "AGPL-3.0",
   "dependencies": {
-    "three": "^0.90.0"
+    "three": "^0.144.0"
   },
   "devDependencies": {
     "browser-sync": "^2.27.10"

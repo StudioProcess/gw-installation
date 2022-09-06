@@ -34,9 +34,15 @@ export default function(
   }
 
   const geometry = new THREE.InstancedBufferGeometry();
-  geometry.addAttribute("extrude", new THREE.BufferAttribute(new Float32Array(extrudes), 1));
-  geometry.addAttribute("uvX", new THREE.BufferAttribute(new Float32Array(uvXs), 1));
-  geometry.addAttribute("uvY", new THREE.InstancedBufferAttribute(new Float32Array(uvYs), 1));
+  
+  // Fix for three@latest (0.144)
+  // geometry.addAttribute("extrude", new THREE.BufferAttribute(new Float32Array(extrudes), 1));
+  // geometry.addAttribute("uvX", new THREE.BufferAttribute(new Float32Array(uvXs), 1));
+  // geometry.addAttribute("uvY", new THREE.InstancedBufferAttribute(new Float32Array(uvYs), 1));
+  geometry.setAttribute("extrude", new THREE.BufferAttribute(new Float32Array(extrudes), 1));
+  geometry.setAttribute("uvX", new THREE.BufferAttribute(new Float32Array(uvXs), 1));
+  geometry.setAttribute("uvY", new THREE.InstancedBufferAttribute(new Float32Array(uvYs), 1));
+  // ---
 
   geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(indices), 1));
 

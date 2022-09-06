@@ -51,7 +51,10 @@ const PingPongRunner = (function() {
     });
     this.outputScene = new THREE.Scene();
     const mesh = new THREE.Mesh(
-      new THREE.PlaneBufferGeometry(2.0, 2.0, 1, 1),
+      // Fix for three@latest (0.144):
+      // new THREE.PlaneBufferGeometry(2.0, 2.0, 1, 1),
+      new THREE.PlaneGeometry(2.0, 2.0, 1, 1),
+      // ---
       this.outputMaterial
     );
     mesh.frustumCulled = false;
@@ -61,8 +64,14 @@ const PingPongRunner = (function() {
   PingPongRunner.prototype.render = function() {
     this.uniforms.pingPongInMap.value = this.renderTargets[1 - this.currentTarget].texture;
     this.uniforms.pingPongOutMap.value = this.renderTargets[this.currentTarget].texture;
-    this.renderer.render(this.outputScene, this.camera, this.renderTargets[this.currentTarget], true);
-
+    
+    // Fix for three@0.102:
+    // this.renderer.render(this.outputScene, this.camera, this.renderTargets[this.currentTarget], true);
+    this.renderer.setRenderTarget(this.renderTargets[this.currentTarget]);
+    this.renderer.clear();
+    this.renderer.render(this.outputScene, this.camera);
+    // ---
+    
     this.currentTarget = 1 - this.currentTarget;
   };
 

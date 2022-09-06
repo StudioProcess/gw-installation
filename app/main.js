@@ -160,7 +160,10 @@ function setup() {
   );
 
   const background = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(2.0, 2.0),
+    // Fix for three@latest (0.144):
+    // new THREE.PlaneBufferGeometry(2.0, 2.0),
+    new THREE.PlaneGeometry(2.0, 2.0),
+    // ---
     new THREE.RawShaderMaterial({
       vertexShader: fullscreenVS,
       fragmentShader: backgroundFS,
@@ -237,6 +240,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
     deltaCounter %= fixedFrameRate;
   }
+  renderer.setRenderTarget( null ); // Fix for three@0.102
   renderer.render( scene, camera );
   capture.update( renderer );
 }
