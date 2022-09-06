@@ -13,13 +13,12 @@
     "reinstall": "rm -rf node_modules && npm install"
   },
   "keywords": [],
-  "author": "Process <contact@process.studio> (https://process.studio)",
+  "author": "Martin Grödl <martin@process.studio> (https://process.studio)",
   "license": "AGPL-3.0",
   "dependencies": {
-    "ccapture.js": "^1.0.7",
     "three": "^0.90.0"
   },
   "devDependencies": {
-    "browser-sync": "^2.23.5"
+    "browser-sync": "^2.27.10"
   }
 }
