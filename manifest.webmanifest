@@ -1,0 +1,15 @@
+{
+    "background_color": "black",
+    "description": "Gravitational Waves by Process Studio",
+    "display": "fullscreen",
+    "icons": [
+        {
+            "src": "icons/192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ],
+    "name": "Gravitational Waves",
+    "short_name": "GW",
+    "start_url": "index.html"
+}

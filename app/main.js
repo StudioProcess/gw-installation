@@ -287,3 +287,11 @@ document.addEventListener('keydown', e => {
     capture.startstop( {start:0, duration:loopPeriod} ); // record 1 second
   }
 });
+
+
+// Register service worker to control making site work offline
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('../sw.js').then(() => { 
+    console.log('Service Worker registered');
+  });
+}
