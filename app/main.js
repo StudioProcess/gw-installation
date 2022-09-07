@@ -291,7 +291,8 @@ document.addEventListener('keydown', e => {
 
 // Register service worker to control making site work offline
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('../sw.js').then(() => { 
+  // Service worker URL is relative to web root (not this file)
+  navigator.serviceWorker.register('./sw.js').then(() => { 
     console.log('Service Worker registered');
   });
 }
