@@ -11,7 +11,7 @@
     "start": "browser-sync start --server --port 8080 --no-notify --files index.html app",
     "test": "echo \"Error: no test specified\" && exit 1",
     "reinstall": "rm -rf node_modules && npm install",
-    "hash": "find . -type f -not -path '*/.git/*' -not -path '*/.DS_Store' -not -path './node_modules/*' | xargs shasum -a 256 | shasum -a 256 | cut -d " " -f 1"
+    "hash": "./hash.sh"
   },
   "keywords": [],
   "author": "Martin Grödl <martin@process.studio> (https://process.studio)",
