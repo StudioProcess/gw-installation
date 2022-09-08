@@ -17,6 +17,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
 const W = 1920;
 const H = 1080;
 const PX_RATIO = 1;
+const SW_ENABLED = false;
 
 let RENDERING = false;
 let TILES = 2;
@@ -127,7 +128,10 @@ function main() {
   loop(); // start game loop
 
   tilesaver.init(renderer, scene, camera, TILES);
-  initGui(uniforms);
+  
+  const gui = initGui(uniforms);
+  gui.hide();
+  
 }
 
 
@@ -290,7 +294,7 @@ document.addEventListener('keydown', e => {
 
 
 // Register service worker to control making site work offline
-if ('serviceWorker' in navigator) {
+if (SW_ENABLED && 'serviceWorker' in navigator) {
   // Service worker URL is relative to web root (not this file)
   navigator.serviceWorker.register('./sw.js').then(() => { 
     console.log('Service Worker registered');
