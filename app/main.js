@@ -198,7 +198,23 @@ function setup() {
 
   // onResize();
   // window.addEventListener("resize", onResize);
-
+  
+  // fullscreen button
+  const div = document.createElement('div');
+  div.innerText = '←→';
+  div.style.fontSize = '20px';
+  div.style.width = '40px';
+  div.style.height = '40px';
+  div.style.position = 'fixed';
+  div.style.top = '10px';
+  div.style.left = '10px';
+  div.style.cursor = 'pointer';
+  div.style.rotate = '-45deg';
+  div.style.userSelect = 'none';
+  div.style.webkitUserSelect = 'none';
+  div.addEventListener('click', toggleFullscreen );
+  document.body.appendChild( div );
+  
   clock.start();
 }
 
@@ -250,10 +266,24 @@ function loop(time) { // eslint-disable-line no-unused-vars
 }
 
 
+// Toggles the browser's fullscreen mode on the body element
+// Note: Doesn't work on iPhone
 function toggleFullscreen() {
-    if (!document.webkitFullscreenElement) {
-      document.querySelector('body').webkitRequestFullscreen();
-    } else { document.webkitExitFullscreen(); }
+    // TODO: check latest fullscreen spec: https://caniuse.com/fullscreen
+    console.log('toggle fullscreen');
+    if (document.webkitFullscreenEnabled) { // Chrome, Opera, Safari
+        if (!document.webkitFullscreenElement) {
+            document.querySelector('body').webkitRequestFullscreen();
+        } else { document.webkitExitFullscreen(); }
+    } else if (document.mozFullScreenEnabled) { // Firefox
+        if (!document.mozFullScreenElement) {
+            document.querySelector('body').mozRequestFullScreen();
+        } else { document.mozCancelFullScreen(); }
+    } else if (document.fullscreenEnabled) { // Standard, Edge
+        if (!document.fullscreenElement) {
+            document.querySelector('body').requestFullscreen();
+        } else { document.exitFullscreen(); }
+    }
 }
 
 document.addEventListener('keydown', e => {
