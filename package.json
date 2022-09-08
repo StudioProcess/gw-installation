@@ -8,7 +8,7 @@
     "npm": ">=8.19.1"
   },
   "scripts": {
-    "start": "browser-sync start --server --port 8080 --no-notify --files index.html app",
+    "start": "browser-sync start --server --port 8080 --no-notify --no-ghost-mode --files index.html app",
     "test": "echo \"Error: no test specified\" && exit 1",
     "reinstall": "rm -rf node_modules && npm install",
     "hash": "./hash.sh"

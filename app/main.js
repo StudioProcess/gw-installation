@@ -97,8 +97,8 @@ const uniforms = {
   pointPositions: {
     type: "v3v",
     value: [
-      new THREE.Vector3( 0.5, 0.8, 0.0 ),
-      new THREE.Vector3( 0.5, 0.5, 0.0 )
+      new THREE.Vector3( 0.5, 0.65, 0.0 ),
+      new THREE.Vector3( 0.5, 0.35, 0.0 )
     ]
   },
 
@@ -148,7 +148,7 @@ function setup() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new THREE.OrbitControls( camera, renderer.domElement );
-  camera.position.z = 20;
+  camera.position.z = 1.5;
 
   heightPingPong.setup(
     camera,
@@ -249,6 +249,13 @@ function loop(time) { // eslint-disable-line no-unused-vars
   capture.update( renderer );
 }
 
+
+function toggleFullscreen() {
+    if (!document.webkitFullscreenElement) {
+      document.querySelector('body').webkitRequestFullscreen();
+    } else { document.webkitExitFullscreen(); }
+}
+
 document.addEventListener('keydown', e => {
   if (e.key == ' ') {
     console.log('space');
@@ -269,9 +276,7 @@ document.addEventListener('keydown', e => {
       }
     );
   } else if (e.key == 'f') { // f .. fullscreen
-    if (!document.webkitFullscreenElement) {
-      document.querySelector('body').webkitRequestFullscreen();
-    } else { document.webkitExitFullscreen(); }
+    toggleFullscreen();
   }
 
   else if (e.key == 'c') {
@@ -290,6 +295,12 @@ document.addEventListener('keydown', e => {
 
     capture.startstop( {start:0, duration:loopPeriod} ); // record 1 second
   }
+});
+
+
+document.addEventListener('dblclick', e => {
+  console.log('double click');
+  toggleFullscreen();
 });
 
 
