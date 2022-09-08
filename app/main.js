@@ -136,7 +136,13 @@ function main() {
 
 
 function setup() {
-
+  
+  // check screen
+  const screen_w = screen.width * devicePixelRatio;
+  const screen_h = screen.height * devicePixelRatio;
+  const aspect = screen_w >= screen_h ? screen_w / screen_h : screen_h / screen_w;
+  console.log('screen: %d x %d — 1:%.2f', screen_w, screen_h, aspect);
+  
   renderer = new THREE.WebGLRenderer({
     antialias: true,
     // alpha: false
