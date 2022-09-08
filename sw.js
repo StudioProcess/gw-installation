@@ -2,6 +2,7 @@
 const resources = [
   './',
   './index.html',
+  './manifest.webmanifest',
   './app/main.js',
   './app/main.css',
   './node_modules/three/build/three.js',
