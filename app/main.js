@@ -141,7 +141,8 @@ function setup() {
   const screen_w = screen.width * devicePixelRatio;
   const screen_h = screen.height * devicePixelRatio;
   const aspect = screen_w >= screen_h ? screen_w / screen_h : screen_h / screen_w;
-  console.log('screen: %d x %d — 1:%.2f', screen_w, screen_h, aspect);
+  const orientation = screen_w >= screen_h ? 'landscape' : 'portrait'
+  console.log('screen: %d x %d — 1:%.2f — %s', screen_w, screen_h, aspect, orientation);
   
   renderer = new THREE.WebGLRenderer({
     antialias: true,
