@@ -35,10 +35,27 @@ varying vec2 vUV;
 varying float lineBase;
 
 // https://iquilezles.org/articles/functions/
-float gain(float x, float k) {
-    x = min(1.0, x); // clamp gain value to 1 (Fixes rendering gaps on iOS)
-    float a = 0.5 * pow(2.0 * ((x<0.5) ? x : 1.0-x), k);
-    return (x<0.5) ? a : 1.0 - a;
+// float gain(float x, float k) {
+//     x = min(1.0, x); // Clamp input value to 1.0 (Fixes rendering gaps on iOS)
+//     float a = 0.5 * pow(2.0 * ((x<0.5) ? x : 1.0-x), k);
+//     return (x<0.5) ? a : 1.0 - a;
+// }
+
+// // Perlin and Hoffert: Hypertexture; Computer Graphics, Vol. 3, No. 3, 1989
+// float bias(float t, float a) {
+//     return pow(t, -log(a)/log(2.0));
+// }
+// float gain(float t, float a) {
+//     t = clamp(t, 0.0, 1.0);
+//     return t < 0.5 ? 0.5 * bias(2.0*t, a) : 1.0 - 0.5 * bias(2.0-2.0*t, a);
+// }
+
+// Christophe Schlick: Fast Alternatives to Perlin's Bias and Gain Functions; Graphics Gems 4, 1994
+float gain(float t, float a) {
+    // t = clamp(t, 0.0, 1.0);
+    return t < 0.5 ?
+        t / ( (1.0/a - 2.0) * (1.0 - 2.0*t) + 1.0 ) :
+        ((1.0/a - 2.0)*(1.0 - 2.0*t) - t) / ((1.0/a - 2.0)*(1.0 - 2.0*t) - 1.0);	
 }
 
 vec2 rotate(vec2 v, float a) {
