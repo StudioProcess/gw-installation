@@ -34,8 +34,9 @@ varying vec2 vUV;
 
 varying float lineBase;
 
-float gain(float x, float k) 
-{
+// https://iquilezles.org/articles/functions/
+float gain(float x, float k) {
+    x = min(1.0, x); // clamp gain value to 1 (Fixes rendering gaps on iOS)
     float a = 0.5 * pow(2.0 * ((x<0.5) ? x : 1.0-x), k);
     return (x<0.5) ? a : 1.0 - a;
 }
