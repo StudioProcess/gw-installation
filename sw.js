@@ -13,7 +13,6 @@ const resources = [
   './shaders/fullscreenVS.js',
   './shaders/ligoPlaneFS.js',
   './shaders/ligoPlaneVS.js',
-  './shaders/wavesFS.js',
   './shared/generateGui.js',
   './shared/getInstancedSplineGeometry.js',
   './shared/mathUtils.js',

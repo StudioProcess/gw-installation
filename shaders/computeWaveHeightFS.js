@@ -1,4 +1,4 @@
-const computeHeightFS = `
+export default `
 precision mediump float;
 
 uniform sampler2D pingPongInMap;

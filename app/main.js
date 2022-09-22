@@ -7,6 +7,7 @@ import getInstancedSplineGeometry from "../shared/getInstancedSplineGeometry.js"
 import PingPongRunner from "../shared/pingPongRunner.js";
 
 import fullscreenVS from "../shaders/fullscreenVS.js";
+import computeHeightFS from "../shaders/computeWaveHeightFS.js";
 import backgroundFS from "../shaders/backgroundFS.js";
 
 import ligoPlaneVS from "../shaders/ligoPlaneVS.js";
