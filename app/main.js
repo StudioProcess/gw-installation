@@ -42,6 +42,14 @@ let deltaCounter = fixedFrameRate + 0.1;
 
 let frameRequest;
 
+const cams = [
+  {position: [0, 0, 1.75], rotation: [0, 0, 0]},
+  {position: [0, 0, 4], rotation: [0, 0, 0]},
+  {position: [0, 1.6, 2.45], rotation: [0.716, 0, 0]},
+  {position: [-3.45, -2.0, 1.69], rotation: [0.9, 0, 0]},
+];
+let current_cam = 0;
+
 const uniforms = {
   time: {type: "f", value: 0.0, hideinGui: true},
   aspectRatio: {type: "f", value: W / H, hideinGui: true},
@@ -156,7 +164,7 @@ function setup() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new THREE.OrbitControls( camera, renderer.domElement );
-  camera.position.z = 1.5;
+  next_cam(0);
 
   heightPingPong.setup(
     camera,
@@ -294,6 +302,28 @@ function toggleFullscreen() {
     }
 }
 
+function get_cam_pos() {
+    return {
+        position: camera.position.toArray(),
+        rotation: camera.rotation.toArray(),
+    }
+}
+
+function set_cam_pos(obj) {
+    if (obj.position) { camera.position.fromArray(obj.position); }
+    if (obj.rotation) { camera.rotation.fromArray(obj.rotation); }
+    camera.updateProjectionMatrix();
+    // controls.update();
+}
+
+function next_cam(offset = 1) {
+  current_cam += offset;
+  current_cam %= cams.length;
+  if (current_cam < 0) { current_cam += cams.length; }
+  console.log('cam %i', current_cam);
+  set_cam_pos( cams[current_cam] );
+}
+
 document.addEventListener('keydown', e => {
   if (e.key == ' ') {
     console.log('space');
@@ -317,21 +347,30 @@ document.addEventListener('keydown', e => {
     toggleFullscreen();
   }
 
-  else if (e.key == 'c') {
-    renderer.setSize( W, H );
-
-    camera.aspectRatio = W/H;
-    camera.updateProjectionMatrix();
-
-    capture.startstop(); // start/stop recording
+//   else if (e.key == 'c') {
+//     renderer.setSize( W, H );
+// 
+//     camera.aspectRatio = W/H;
+//     camera.updateProjectionMatrix();
+// 
+//     capture.startstop(); // start/stop recording
+//   }
+//   else if (e.key == 'v') {
+//     renderer.setSize( W, H );
+// 
+//     camera.aspectRatio = W/H;
+//     camera.updateProjectionMatrix();
+// 
+//     capture.startstop( {start:0, duration:loopPeriod} ); // record 1 second
+//   }
+  
+  // log camera position
+  else if (e.key == 'p') {
+    console.log( get_cam_pos() );
   }
-  else if (e.key == 'v') {
-    renderer.setSize( W, H );
-
-    camera.aspectRatio = W/H;
-    camera.updateProjectionMatrix();
-
-    capture.startstop( {start:0, duration:loopPeriod} ); // record 1 second
+  // switch camera position
+  else if (e.key == 'n') {
+    next_cam();
   }
 });
 
