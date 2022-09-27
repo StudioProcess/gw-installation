@@ -43,10 +43,11 @@ let deltaCounter = fixedFrameRate + 0.1;
 let frameRequest;
 
 const cams = [
-  {position: [0, 0, 1.75], rotation: [0, 0, 0]},
-  {position: [0, 0, 4], rotation: [0, 0, 0]},
-  {position: [0, 1.6, 2.45], rotation: [0.716, 0, 0]},
-  {position: [-3.45, -2.0, 1.69], rotation: [0.9, 0, 0]},
+  {position: [0, 0, 1.75], rotation: [0, 0, 0], target: [0,0,0]},
+  {position: [0, 0, 4], rotation: [0, 0, 0], target: [0,0,0]},
+  {"position":[0,1.7609600643905499,3.343492523192335],"rotation":[0.3202709674243868,0,0,"XYZ"],"target":[0.2574544348659495,2.86981734899508,0]},
+  {"position":[-2.134891091259709,-6.178141421651887,4.665403119988329],"rotation":[0,0,0,"XYZ"],"target":[-2.134891091259709,-6.178141421651887,0]},
+  {"position":[-3.8494472591765705,2.4988612220513193,1.8389136367279406],"rotation":[0,0.3816855639874027,0,"XYZ"],"target":[-4.5875407601223905,2.5091210631308254,0]}
 ];
 let current_cam = 0;
 
@@ -287,6 +288,8 @@ function loop(time) { // eslint-disable-line no-unused-vars
   renderer.setRenderTarget( null ); // Fix for three@0.102
   renderer.render( scene, camera );
   capture.update( renderer );
+  
+  controls.target.z = 0; // lock orbit target to plane
 }
 
 
@@ -313,14 +316,16 @@ function toggleFullscreen() {
 function get_cam_pos() {
   return {
     position: camera.position.toArray(),
-    rotation: camera.rotation.toArray()
+    rotation: camera.rotation.toArray(),
+    target: controls.target.toArray(),
   };
 }
 
 function set_cam_pos(obj) {
   if (obj?.position) { camera.position.fromArray(obj.position); }
   if (obj?.rotation) { camera.rotation.fromArray(obj.rotation); }
-  camera.updateProjectionMatrix();
+  if (obj?.target) {controls.target.fromArray(obj.target); };
+  // camera.updateProjectionMatrix();
   // controls.update();
 }
 
@@ -387,8 +392,7 @@ document.addEventListener('keydown', e => {
 //     renderer.setSize( W, H );
 // 
 //     camera.aspectRatio = W/H;
-//     camera.updateProjectionMatrix();
-// 
+//     camera.updateProjectionMatrix();// 
 //     capture.startstop( {start:0, duration:loopPeriod} ); // record 1 second
 //   }
   
