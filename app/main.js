@@ -50,6 +50,13 @@ const cams = [
 ];
 let current_cam = 0;
 
+const colors = [
+  {background: [0.06, 0.11, 0.25], line: [0.24, 0.29, 0.46]},
+  {background: [0.040,0.111,0.225], line: [0.458,0.512,0.764]},
+  {background: [0,0,0], line: [1,1,1]},
+];
+let current_colors = 0;
+
 const uniforms = {
   time: {type: "f", value: 0.0, hideinGui: true},
   aspectRatio: {type: "f", value: W / H, hideinGui: true},
@@ -165,6 +172,7 @@ function setup() {
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new THREE.OrbitControls( camera, renderer.domElement );
   next_cam(0);
+  next_colors(0);
 
   heightPingPong.setup(
     camera,
@@ -303,17 +311,17 @@ function toggleFullscreen() {
 }
 
 function get_cam_pos() {
-    return {
-        position: camera.position.toArray(),
-        rotation: camera.rotation.toArray(),
-    }
+  return {
+    position: camera.position.toArray(),
+    rotation: camera.rotation.toArray()
+  };
 }
 
 function set_cam_pos(obj) {
-    if (obj.position) { camera.position.fromArray(obj.position); }
-    if (obj.rotation) { camera.rotation.fromArray(obj.rotation); }
-    camera.updateProjectionMatrix();
-    // controls.update();
+  if (obj?.position) { camera.position.fromArray(obj.position); }
+  if (obj?.rotation) { camera.rotation.fromArray(obj.rotation); }
+  camera.updateProjectionMatrix();
+  // controls.update();
 }
 
 function next_cam(offset = 1) {
@@ -322,6 +330,26 @@ function next_cam(offset = 1) {
   if (current_cam < 0) { current_cam += cams.length; }
   console.log('cam %i', current_cam);
   set_cam_pos( cams[current_cam] );
+}
+
+function get_colors() {
+  return {
+    background: uniforms.backgroundColor.value,
+    line: uniforms.lineColor.value
+  };
+}
+
+function set_colors(obj) {
+  if (obj?.background) { uniforms.backgroundColor.value = obj.background; }
+  if (obj?.line) { uniforms.lineColor.value = obj.line; }
+}
+
+function next_colors(offset = 1) {
+  current_colors += offset;
+  current_colors %= colors.length;
+  if (current_colors < 0) { current_colors += colors.length; }
+  console.log('colors %i', current_colors);
+  set_colors( colors[current_colors] );
 }
 
 document.addEventListener('keydown', e => {
@@ -366,11 +394,16 @@ document.addEventListener('keydown', e => {
   
   // log camera position
   else if (e.key == 'p') {
-    console.log( get_cam_pos() );
+    console.log( JSON.stringify(get_cam_pos()) );
+    console.log( JSON.stringify(get_colors()) );
   }
   // switch camera position
   else if (e.key == 'n') {
     next_cam();
+  }
+  // switch colors
+  else if (e.key == 'm') {
+    next_colors();
   }
 });
 
