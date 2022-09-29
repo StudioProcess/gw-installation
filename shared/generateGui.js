@@ -1,7 +1,9 @@
+import GUI from '../node_modules/lil-gui/dist/lil-gui.esm.js';
+
 export function initGui(uniforms) {
   const keys = Object.keys(uniforms);
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   for (let i = 0, l = keys.length; i < l; i++) {
     const uniform = uniforms[keys[i]];
@@ -41,29 +43,24 @@ export function addSlider(gui, uniform, name) {
 
 export function addArraySlider(gui, uniform, name) {
   if (uniform.color === true) {
-    const target = {value: uniform.value};
+//     const target = {value: uniform.value};
+// 
+//     for (let i = 0, l = uniform.value.length; i < l; i++) {
+//       target.value[i] = Math.round(target.value[i] * 255.0);
+//     }
 
-    for (let i = 0, l = uniform.value.length; i < l; i++) {
-      target.value[i] = Math.round(target.value[i] * 255.0);
-    }
-
-    gui.addColor(target, "value")
-      .name(name)
-      .onChange((value) => {
-        for (let i = 0, l = uniform.value.length; i < l; i++) {
-          uniform.value[i] = value[i] / 255.0;
-        }
-      });
+    gui.addColor(uniform, "value", 1.0)
+      .name(name);
 
     // auto set colors
-    for (let i = 0, l = uniform.value.length; i < l; i++) {
-      uniform.value[i] = uniform.value[i] / 255.0;
-    }
+    // for (let i = 0, l = uniform.value.length; i < l; i++) {
+    //   uniform.value[i] = uniform.value[i] / 255.0;
+    // }
 
     return;
   }
 
-  const folder = gui.addFolder(name);
+  const folder = gui.addFolder(name).close();
 
   for (let i = 0, l = uniform.value.length; i < l; i++) {
     const index = i;
@@ -109,12 +106,12 @@ export function addArraySlider(gui, uniform, name) {
 }
 
 export function addV3ArraySlider(gui, uniform, name) {
-  const folder = gui.addFolder(name);
+  const folder = gui.addFolder(name).close();
 
   for (let i = 0, l = uniform.value.length; i < l; i++) {
     const index = i;
 
-    const itemFolder = folder.addFolder(i);
+    const itemFolder = folder.addFolder(i).close();
 
     // x
     itemFolder.add(uniform.value[i], "x")
@@ -146,7 +143,7 @@ export function addV3ArraySlider(gui, uniform, name) {
 }
 
 export function addThreeV3Slider(gui, vector, name) {
-  const folder = gui.addFolder(name);
+  const folder = gui.addFolder(name).close();
 
   // x
   folder.add(vector, "x")

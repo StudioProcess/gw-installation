@@ -25,6 +25,7 @@ let TILES = 2;
 
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
+let gui;
 
 const clock = new THREE.Clock();
 
@@ -134,7 +135,7 @@ function main() {
 
   tilesaver.init(renderer, scene, camera, TILES);
   
-  const gui = initGui(uniforms);
+  gui = initGui(uniforms);
   gui.hide();
   
 }
@@ -335,6 +336,8 @@ function get_colors() {
 function set_colors(obj) {
   if (obj?.background) { uniforms.backgroundColor.value = obj.background; }
   if (obj?.line) { uniforms.lineColor.value = obj.line; }
+  gui?.controllers[0].updateDisplay();
+  gui?.controllers[1].updateDisplay();
 }
 
 function next_colors(offset = 1) {
@@ -346,7 +349,10 @@ function next_colors(offset = 1) {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key == ' ') {
+  if (e.key == 'h') {
+    gui?.show(gui._hidden);
+  }
+  else if (e.key == ' ') {
     console.log('space');
     RENDERING = !RENDERING;
 
