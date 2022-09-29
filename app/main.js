@@ -52,9 +52,12 @@ const cams = [
 let current_cam = 0;
 
 const colors = [
-  {background: [0.06, 0.11, 0.25], line: [0.24, 0.29, 0.46]},
-  {background: [0.040,0.111,0.225], line: [0.458,0.512,0.764]},
-  {background: [0,0,0], line: [1,1,1]},
+  {background: [0.06, 0.11, 0.25], line: [0.24, 0.29, 0.46]},   // original
+  {background: [0.040,0.111,0.225], line: [0.458,0.512,0.764]}, // high contrast
+  {background: [0,0,0], line: [1,1,1]},                         // b/w
+  {background: [0.1, 0.08, 0.16], line: [0.31, 0.28, 0.45]},    // violet variation 1
+  {background: [0.8, 0.74, 0.64], line: [0.64, 0.58, 0.51]},    // golden; low contrast
+  {background: [1.0, 1.0, 1.0], line: [1.0, 0.24, 0.24]},       // red-white
 ];
 let current_colors = 0;
 
