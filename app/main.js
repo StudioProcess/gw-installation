@@ -278,6 +278,12 @@ function loop(time) { // eslint-disable-line no-unused-vars
   controls.target.z = 0; // lock orbit target to plane
 }
 
+function reset_simulation() {
+  heightPingPong.resetRenderTargets();
+  uniforms.time.value = 0;
+  clock.start();
+}
+
 
 // Toggles the browser's fullscreen mode on the body element
 // Note: Doesn't work on iPhone
@@ -346,6 +352,8 @@ function next_colors(offset = 1) {
 }
 
 document.addEventListener('keydown', e => {
+  // console.log(e.key);
+  
   if (e.key == 'h') {
     gui?.show(gui._hidden);
   }
@@ -399,6 +407,10 @@ document.addEventListener('keydown', e => {
   // switch colors
   else if (e.key == 'm') {
     next_colors();
+  }
+  // reset simulation
+  else if (e.key == 'Backspace') {
+    reset_simulation();
   }
 });
 

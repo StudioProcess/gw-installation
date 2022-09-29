@@ -17,21 +17,11 @@ const PingPongRunner = (function() {
     
     this.currentTarget = 0;
     this.renderTargets = [];
-
-    for (let i = 0; i < 2; i++) {
-      this.renderTargets[i] = new THREE.WebGLRenderTarget(
-        resolutionX,
-        resolutionY,
-        {
-          // minFilter: THREE.NearestFilter,
-          // magFilter: THREE.NearestFilter,
-          wrapS: THREE.ClampToEdgeWrapping,
-          wrapT: THREE.ClampToEdgeWrapping,
-          depthBuffer: false,
-          type: THREE.HalfFloatType
-        }
-      );
-    }
+    
+    this.resolutionX = resolutionX;
+    this.resolutionY = resolutionY;
+    
+    this.resetRenderTargets();
 
     Object.assign(uniforms, {
       pingPongInMap: {
@@ -74,6 +64,24 @@ const PingPongRunner = (function() {
     
     this.currentTarget = 1 - this.currentTarget;
   };
+  
+  // Can be called externally to reset the simulation
+  PingPongRunner.prototype.resetRenderTargets = function() {
+    for (let i = 0; i < 2; i++) {
+      this.renderTargets[i] = new THREE.WebGLRenderTarget(
+        this.resolutionX,
+        this.resolutionY,
+        {
+          // minFilter: THREE.NearestFilter,
+          // magFilter: THREE.NearestFilter,
+          wrapS: THREE.ClampToEdgeWrapping,
+          wrapT: THREE.ClampToEdgeWrapping,
+          depthBuffer: false,
+          type: THREE.HalfFloatType
+        }
+      );
+    }
+  }
 
   return PingPongRunner;
 })();
