@@ -94,8 +94,6 @@ const uniforms = {
   colorEdge: {type: "f", value: 0.0,  min: -1.0, max: 1.0, step: 0.0001},
   colorEdgeWidth: {type: "f", value: 0.1}, min: -0.2, max: 0.2, step: 0.0001,
 
-
-
   pointPositions: {
     type: "v3v",
     value: [
@@ -103,7 +101,6 @@ const uniforms = {
       new THREE.Vector3( 0.5, 0.35, 0.0 )
     ]
   },
-
   pointFrequencies: {
     type: "2fv",
     value: [
@@ -337,8 +334,8 @@ function get_colors() {
 }
 
 function set_colors(obj) {
-  if (obj?.background) { uniforms.backgroundColor.value = obj.background; }
-  if (obj?.line) { uniforms.lineColor.value = obj.line; }
+  if (obj?.background) { uniforms.backgroundColor.value = Array.from(obj.background); } // copy array
+  if (obj?.line) { uniforms.lineColor.value = Array.from(obj.line); } // copy array
   gui?.controllers[0].updateDisplay();
   gui?.controllers[1].updateDisplay();
 }
