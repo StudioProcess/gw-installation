@@ -19,6 +19,8 @@ const W = 1920;
 const H = 1080;
 const PX_RATIO = 1;
 const SW_ENABLED = false;
+const WALZE = false;
+const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
 let RENDERING = false;
 let TILES = 2;
@@ -28,19 +30,13 @@ let controls; // eslint-disable-line no-unused-vars
 let gui;
 
 const clock = new THREE.Clock();
-
-// *LOOPING*
-const loopPeriod = 10; // in seconds
-let loopValue = 0; // position inside the loop [0..1)
-
 const heightPingPong = new PingPongRunner();
-
 const renderResolutionX = 1024;
 const renderResolutionY = 1024;
 const fixedFrameRate = 1.0 / 24.0;
 // const fixedFrameRate = 1.0 / 60.0;
 let deltaCounter = fixedFrameRate + 0.1;
-
+let walzeLoopValue = 0; // position inside the loop [0..1)
 let frameRequest;
 
 const cams = [
@@ -75,6 +71,11 @@ const uniforms = {
   uvTranslate: {type: "2fv", value: [0.0, 0.0], min: -5.0, max: 5.0, step: 0.0001},
   uvScale: {type: "2fv", value: [1.0, 1.0], min: 0.0, max: 10.0, step: 0.0001},
   uvRotate: {type: "f", value: 0.000, min: -Math.PI, max: Math.PI, step: 0.001},
+  
+  walzeLeft: {type: "f", value: 0.0, min: -0.5, max: 1.5, step: 0.0001, hideinGui: true},
+  walzeRight: {type: "f", value: 1.0, min: -0.5, max: 1.5, step: 0.0001, hideinGui: true},
+  walzeRelDuration: {type: "f", value: 0.33, min: 0.0, max: 1.0, step: 0.0001, hideinGui: true}, // original: value: 0.1, hideinGui: false
+  walzeWidth: {type: "f", value: 0.0, min: 0.0, max: 0.5, step: 0.0001, hideinGui: true}, // original" value: 0.8, hideinGui: false
 
   dotEffect: {type: "f", value: 3.0},
 
@@ -93,12 +94,7 @@ const uniforms = {
   colorEdge: {type: "f", value: 0.0,  min: -1.0, max: 1.0, step: 0.0001},
   colorEdgeWidth: {type: "f", value: 0.1}, min: -0.2, max: 0.2, step: 0.0001,
 
-  walzeLeft: {type: "f", value: 0.0, min: -0.5, max: 1.5, step: 0.0001, hideinGui: true},
-  walzeRight: {type: "f", value: 1.0, min: -0.5, max: 1.5, step: 0.0001, hideinGui: true},
 
-  walzeRelDuration: {type: "f", value: 0.1, min: 0.0, max: 1.0, step: 0.0001},
-
-  walzeWidth: {type: "f", value: 0.8, min: 0.0, max: 0.5, step: 0.0001},
 
   pointPositions: {
     type: "v3v",
@@ -242,10 +238,11 @@ function onResize() {
 
 
 function loop(time) { // eslint-disable-line no-unused-vars
-  loopValue = (time/1000 % loopPeriod) / loopPeriod; // *LOOPING*
-
-  uniforms.walzeRight.value = inverseLerpClamped(0.0, uniforms.walzeRelDuration.value, loopValue);
-  uniforms.walzeLeft.value = inverseLerpClamped(1.0 - uniforms.walzeRelDuration.value, 1.0, loopValue);
+  if (WALZE) {
+    walzeLoopValue = (time/1000 % WALZE_PERIOD) / WALZE_PERIOD;
+    uniforms.walzeRight.value = inverseLerpClamped(0.0, uniforms.walzeRelDuration.value, walzeLoopValue);
+    uniforms.walzeLeft.value = inverseLerpClamped(1.0 - uniforms.walzeRelDuration.value, 1.0, walzeLoopValue);
+  }
 
   // console.log(loopValue, uniforms.walzeLeft.value, uniforms.walzeRight.value);
   // console.log(loopValue, uniforms.walzeRight.value);
