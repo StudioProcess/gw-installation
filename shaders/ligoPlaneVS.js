@@ -10,12 +10,12 @@ uniform float displaceHeight;
 
 uniform float numLines;
 
-uniform vec2 extends;
+uniform vec2 extent;
 
 uniform float lineWeight;
 
 uniform vec2 uvScale;
-uniform float uvRotation;
+uniform float uvRotate;
 uniform vec2 uvTranslate;
 
 uniform float walzeLeft;
@@ -85,7 +85,7 @@ vec2 getNormal(vec2 p0, vec2 p1, vec2 p2) {
 vec2 getTransformedUV(vec2 uv) {
   uv -= 0.5;
   uv *= uvScale;
-  uv = rotate(uv, uvRotation);
+  uv = rotate(uv, uvRotate);
   uv -= uvTranslate;
   uv += 0.5;
   return uv;
@@ -102,11 +102,11 @@ void main()	{
   vec4 vPositionNext = vec4(nextUV, 0.0, 1.0);
 
   vPositionPrev.xy -= 0.5;
-  vPositionPrev.xy *= extends;
+  vPositionPrev.xy *= extent;
   vPosition.xy -= 0.5;
-  vPosition.xy *= extends;
+  vPosition.xy *= extent;
   vPositionNext.xy -= 0.5;
-  vPositionNext.xy *= extends;
+  vPositionNext.xy *= extent;
 
   prevUV = getTransformedUV(prevUV);
   vUV = getTransformedUV(vUV);
