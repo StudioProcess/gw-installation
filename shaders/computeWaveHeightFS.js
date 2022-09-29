@@ -9,7 +9,7 @@ uniform vec2 computeResolution;
 
 uniform float attack;
 uniform float decay;
-uniform float engeryReduce;
+uniform float energyReduce;
 
 uniform float dotEffect;
 
@@ -67,7 +67,7 @@ void main()
 
 
   prevData.r += (prevVel + (attack * (outerAverage - prevData.r))) * decay;
-  prevData.r *= engeryReduce;
+  prevData.r *= energyReduce;
 
   vec2 dist;
   for (int i = 0; i < NUM_POINTS; i++) {

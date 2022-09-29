@@ -89,7 +89,7 @@ const uniforms = {
 
   attack: {type: "f", value: 2.0},
   decay: {type: "f", value: 0.999},
-  engeryReduce: {type: "f", value: 0.9999, min: 0.1, max: 2.0, step: 0.0001},
+  energyReduce: {type: "f", value: 0.9999, min: 0.1, max: 2.0, step: 0.0001},
 
   displaceGain: {type: "f", value: 0.13, min: 0.0, max: 2.0, step: 0.0001},
   displaceHeight: {type: "f", value: 0.2, min: -2.0, max: 2.0, step: 0.0001},
