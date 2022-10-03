@@ -40,6 +40,7 @@ let walzeLoopValue = 0; // position inside the loop [0..1)
 let frameRequest;
 
 const cams = [
+  {"position":[0.0,-10.743654156564656,13.938095455943627],"rotation":[0.6566884115103175,0.0,0.0,"XYZ"],"target":[0,0,0]},
   {position: [0, 0, 1.75], rotation: [0, 0, 0], target: [0,0,0]},
   {position: [0, 0, 4], rotation: [0, 0, 0], target: [0,0,0]},
   {"position":[0,1.7609600643905499,3.343492523192335],"rotation":[0.3202709674243868,0,0,"XYZ"],"target":[0.2574544348659495,2.86981734899508,0]},
@@ -67,45 +68,38 @@ const uniforms = {
   lineColor: {type: "3fv", value: [0.24, 0.29, 0.46], color: true},
   lineWeight: {type: "f", value: 0.0171, min: 0.0, max: 0.1, step: 0.0001},
 
-  extent: {type: "2fv", value: [40.0, 40.0], min: 0.0, max: 100.0, step: 1.0001},
-  uvTranslate: {type: "2fv", value: [0.0, 0.0], min: -5.0, max: 5.0, step: 0.0001},
-  uvScale: {type: "2fv", value: [1.0, 1.0], min: 0.0, max: 10.0, step: 0.0001},
-  uvRotate: {type: "f", value: 0.000, min: -Math.PI, max: Math.PI, step: 0.001},
+  extent: {type: "2fv", value: [40.0, 40.0], min: 0.0, max: 100.0, step: 1.0001},   // plane size
+  uvTranslate: {type: "2fv", value: [0.0, 0.0], min: -5.0, max: 5.0, step: 0.0001}, // x/y position of simulation
+  uvScale: {type: "2fv", value: [1.0, 1.0], min: 0.0, max: 10.0, step: 0.0001},     // x/y scale of simulation
+  uvRotate: {type: "f", value: 0.000, min: -Math.PI, max: Math.PI, step: 0.001},    // rotation of simulation
   
+  // This is for an animated hiding and showing of the animation (`walzeLeft` and `walzeRight` are animated)
   walzeLeft: {type: "f", value: 0.0, min: -0.5, max: 1.5, step: 0.0001, hideinGui: true},
   walzeRight: {type: "f", value: 1.0, min: -0.5, max: 1.5, step: 0.0001, hideinGui: true},
   walzeRelDuration: {type: "f", value: 0.33, min: 0.0, max: 1.0, step: 0.0001, hideinGui: true}, // original: value: 0.1, hideinGui: false
   walzeWidth: {type: "f", value: 0.0, min: 0.0, max: 0.5, step: 0.0001, hideinGui: true}, // original" value: 0.8, hideinGui: false
-
-  dotEffect: {type: "f", value: 3.0},
-
-  attack: {type: "f", value: 2.0},
-  decay: {type: "f", value: 0.999},
-  energyReduce: {type: "f", value: 0.9999, min: 0.1, max: 2.0, step: 0.0001},
-
-  displaceGain: {type: "f", value: 0.13, min: 0.0, max: 2.0, step: 0.0001},
-  displaceHeight: {type: "f", value: 0.2, min: -2.0, max: 2.0, step: 0.0001},
-
-  pointSize: {type: "f", value: 0.01},
-
-  cornerEffect: {type: "f", value: 0.75},
-  averageDivider: {type: "f", value: 7.00001},
-
-  colorEdge: {type: "f", value: 0.0,  min: -1.0, max: 1.0, step: 0.0001},
-  colorEdgeWidth: {type: "f", value: 0.1}, min: -0.2, max: 0.2, step: 0.0001,
-
+  
+  // [0] / x is left-right axis [0.0 .. 1.0]
+  // [1] / y is bottom-top axis [0.0 .. 1.0]
+  // [2] / z is used as some kind of damping factor  // TODO: z seems to reset to 0 when changed in GUI
   pointPositions: {
     type: "v3v",
     value: [
-      new THREE.Vector3( 0.5, 0.65, 0.0 ),
+      new THREE.Vector3( 0.5, 0.50, 0.0 ), // original:  0.5, 0.65, 0.0 
       new THREE.Vector3( 0.5, 0.35, 0.0 )
     ]
   },
+  // This is actually a period.
+  // 1 -> 1.8 Hz
+  // 2 -> 0.9 Hz
+  // 3 -> 0.6 Hz
+  // 4 -> 0.45 Hz
+  // 5 -> 0.36 Hz
   pointFrequencies: {
     type: "2fv",
     value: [
-      0.3,
-      0.4
+      1, // original: 0.3
+      0.0 // original: 0.4
     ]
   },
   pointOnDurations: {
@@ -114,7 +108,25 @@ const uniforms = {
       0.05,
       0.05
     ]
-  }
+  },
+  
+  dotEffect: {type: "f", value: 3.0},
+
+  attack: {type: "f", value: 2.0},
+  decay: {type: "f", value: 0.999},
+  energyReduce: {type: "f", value: 0.9999, min: 0.5, max: 1.0, step: 0.0001}, // original: value: 0.9999, min: 0.1, max: 2.0, step: 0.0001
+
+  displaceGain: {type: "f", value: 0.13, min: 0.0, max: 0.5, step: 0.0001}, // original: value: 0.13, min: 0.0, max: 2.0, step: 0.0001
+  displaceHeight: {type: "f", value: 0.2, min: -2.0, max: 2.0, step: 0.0001},
+
+  pointSize: {type: "f", value: 0.01}, // original: value: 0.01
+
+  cornerEffect: {type: "f", value: 0.75},
+  averageDivider: {type: "f", value: 7},
+  
+  // Not used
+  // colorEdge: {type: "f", value: 0.0,  min: -1.0, max: 1.0, step: 0.0001},
+  // colorEdgeWidth: {type: "f", value: 0.1}, min: -0.2, max: 0.2, step: 0.0001,
 };
 
 main();
