@@ -67,7 +67,7 @@ void main()
 
 
   // prevData.r += (prevVel + (attack * (outerAverage - prevData.r))) * decay;
-  prevData.r += prevVel + (attack * (outerAverage - prevData.r));
+  prevData.r += prevVel + (attack * (outerAverage - prevHeight));
   prevData.r *= energyReduce;
 
   vec2 dist;
