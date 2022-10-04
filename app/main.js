@@ -81,7 +81,7 @@ const uniforms = {
   
   // [0] / x is left-right axis [0.0 .. 1.0]
   // [1] / y is bottom-top axis [0.0 .. 1.0]
-  // [2] / z is used as some kind of damping factor  // TODO: z seems to reset to 0 when changed in GUI
+  // [2] / z is the animated height of the point; driven in loop()
   pointPositions: {
     type: "v3v",
     value: [
