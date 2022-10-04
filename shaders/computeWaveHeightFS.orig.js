@@ -88,11 +88,11 @@ void main()
     );
   }
 
-  // vec3 norm;
-  // norm.x = l - r;
-  // norm.y = b - t;
-  // norm.z = 2.0;
-  // norm = normalize(norm);
+  vec3 norm;
+  norm.x = l - r;
+  norm.y = b - t;
+  norm.z = 2.0;
+  norm = normalize(norm);
 
   prevData.g = (prevData.r - prevHeight); // velocity
 
@@ -101,8 +101,6 @@ void main()
 
   // prevData.r = outerEdges;
 
-	// gl_FragColor = vec4(prevData.rg, norm);
-  
-  gl_FragColor = vec4(prevData.rg, 0.0, 0.0);
+	gl_FragColor = vec4(prevData.rg, norm);
 }
 `;
