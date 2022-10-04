@@ -7,7 +7,7 @@ import getInstancedSplineGeometry from "../shared/getInstancedSplineGeometry.js"
 import PingPongRunner from "../shared/pingPongRunner.js";
 
 import fullscreenVS from "../shaders/fullscreenVS.js";
-import computeHeightFS from "../shaders/computeWaveHeightFS.js";
+import computeWaveHeightFS from "../shaders/computeWaveHeightFS.js";
 import backgroundFS from "../shaders/backgroundFS.js";
 
 import ligoPlaneVS from "../shaders/ligoPlaneVS.js";
@@ -63,14 +63,24 @@ const colors = [
 let current_colors = 0;
 
 const uniforms = {
+  //
+  // Common uniforms:
+  //
   time: {type: "f", value: 0.0, hideinGui: true}, // not used
   aspectRatio: {type: "f", value: W / H, hideinGui: true},
   computeResolution: {type: "2fv", value: [1.0 / renderResolutionX, 1.0 / renderResolutionY], hideinGui: true},
   
+  //
+  // backgroundFS uniforms:
+  //
   backgroundColor: {type: "3fv", value: [0.06, 0.11, 0.25], color: true},
+  
+  //
+  // ligoPlaneVS uniforms:
+  //
   lineColor: {type: "3fv", value: [0.24, 0.29, 0.46], color: true},
   lineWeight: {type: "f", value: 0.0171, min: 0.0, max: 0.1, step: 0.0001},
-
+  
   extent: {type: "2fv", value: [40.0, 40.0], min: 0.0, max: 100.0, step: 1.0001},   // plane size
   uvTranslate: {type: "2fv", value: [0.0, 0.0], min: -5.0, max: 5.0, step: 0.0001}, // x/y position of simulation
   uvScale: {type: "2fv", value: [1.0, 1.0], min: 0.0, max: 10.0, step: 0.0001},     // x/y scale of simulation
@@ -82,6 +92,12 @@ const uniforms = {
   walzeRelDuration: {type: "f", value: 0.33, min: 0.0, max: 1.0, step: 0.0001, hideinGui: true}, // original: value: 0.1, hideinGui: false
   walzeWidth: {type: "f", value: 0.0, min: 0.0, max: 0.5, step: 0.0001, hideinGui: true}, // original" value: 0.8, hideinGui: false
   
+  displaceGain: {type: "f", value: 0.13, min: 0.0, max: 0.5, step: 0.0001}, // original: value: 0.13, min: 0.0, max: 2.0, step: 0.0001
+  displaceHeight: {type: "f", value: 0.2, min: -2.0, max: 2.0, step: 0.0001},
+  
+  //
+  // computeWaveHeightFS uniforms:
+  //
   // [0] / x is left-right axis [0.0 .. 1.0]
   // [1] / y is bottom-top axis [0.0 .. 1.0]
   // [2] / z is the animated height of the point; driven in loop()
@@ -92,12 +108,7 @@ const uniforms = {
       new THREE.Vector3( 0.5, 0.35, 0.0 )
     ]
   },
-  // This is actually a period.
-  // 1 -> 1.8 Hz
-  // 2 -> 0.9 Hz
-  // 3 -> 0.6 Hz
-  // 4 -> 0.45 Hz
-  // 5 -> 0.36 Hz
+  // period in seconds
   pointPeriods: {
     type: "2fv",
     value: [
@@ -105,6 +116,7 @@ const uniforms = {
       0.0 // original: 0.4
     ]
   },
+  // on duration in seconds
   pointOnDurations: {
     type: "2fv",
     value: [
@@ -112,24 +124,15 @@ const uniforms = {
       0.05
     ]
   },
+  pointSize: {type: "f", value: 0.01}, // original: value: 0.01
+  pointEffect: {type: "f", value: 3.0},
   
-  dotEffect: {type: "f", value: 3.0},
-
   attack: {type: "f", value: 2.0},
   // decay: {type: "f", value: 0.999},
   energyReduce: {type: "f", value: 0.9989001, min: 0.5, max: 1.0, step: 0.0001}, // original: value: 0.9999, min: 0.1, max: 2.0, step: 0.0001
-
-  displaceGain: {type: "f", value: 0.13, min: 0.0, max: 0.5, step: 0.0001}, // original: value: 0.13, min: 0.0, max: 2.0, step: 0.0001
-  displaceHeight: {type: "f", value: 0.2, min: -2.0, max: 2.0, step: 0.0001},
-
-  pointSize: {type: "f", value: 0.01}, // original: value: 0.01
-
+  
   cornerEffect: {type: "f", value: 0.75},
   averageDivider: {type: "f", value: 7},
-  
-  // Not used
-  // colorEdge: {type: "f", value: 0.0,  min: -1.0, max: 1.0, step: 0.0001},
-  // colorEdgeWidth: {type: "f", value: 0.1}, min: -0.2, max: 0.2, step: 0.0001,
 };
 
 main();
@@ -176,7 +179,7 @@ function setup() {
     camera,
     renderer,
     fullscreenVS,
-    computeHeightFS,
+    computeWaveHeightFS,
     uniforms,
     {
       NUM_POINTS: uniforms.pointPositions.value.length

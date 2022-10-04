@@ -3,34 +3,29 @@ precision mediump float;
 
 uniform sampler2D pingPongInMap;
 
-uniform vec3 pointPositions[NUM_POINTS];
+uniform vec2  computeResolution;
 uniform float aspectRatio;
-uniform vec2 computeResolution;
-
-uniform float attack;
-// uniform float decay;
-uniform float energyReduce;
-
-uniform float dotEffect;
-
-uniform float pointSize;
 
 uniform float cornerEffect;
 uniform float averageDivider;
 
+uniform float attack;
+uniform float energyReduce;
+
+uniform vec3  pointPositions[NUM_POINTS];
+uniform float pointSize;
+uniform float pointEffect;
+
 varying vec2 vUV;
 
-void main()
+void main() 
 {
-  vec4 prevData = texture2D(pingPongInMap, vUV);
+  vec4  prevData   = texture2D(pingPongInMap, vUV);
+  float prevHeight = prevData[0];
+  float prevVel    = prevData[1];
 
-  // prevData.r = 1.0 - prevData.r;
-
-  float prevHeight = prevData.r;
-  float prevVel = prevData.g;
-
-  vec2 uvXOffset = vec2(computeResolution.x / aspectRatio, 0.0);
-  vec2 uvYOffset = vec2(0.0, computeResolution.y);
+  vec2  uvXOffset  = vec2(computeResolution.x / aspectRatio, 0.0);
+  vec2  uvYOffset  = vec2(0.0, computeResolution.y);
 
   float l = texture2D(pingPongInMap, vUV - uvXOffset).r;
   float r = texture2D(pingPongInMap, vUV + uvXOffset).r;
@@ -46,29 +41,8 @@ void main()
 
   outerAverage /= averageDivider;
 
-
-  // vec2 minEdges = computeResolution;
-  // minEdges *= 1.0;
-  
-  // vec2 maxEdges = computeResolution;
-  // maxEdges *= 4.0;
-
-  // float outerEdges = smoothstep(minEdges.x, maxEdges.x, vUV.x);
-  // outerEdges *= smoothstep(1.0 - minEdges.x, 1.0 - maxEdges.x, vUV.x);
-
-  // outerEdges *= smoothstep(minEdges.y, maxEdges.y, vUV.y);
-  // outerEdges *= smoothstep(1.0 - minEdges.y, 1.0 - maxEdges.y, vUV.y);
-
-  // outerAverage = mix(
-  //   prevData.r,
-  //   outerAverage,
-  //   outerEdges
-  // );
-
-
-  // prevData.r += (prevVel + (attack * (outerAverage - prevData.r))) * decay;
-  prevData.r += prevVel + (attack * (outerAverage - prevHeight));
-  prevData.r *= energyReduce;
+  float height = prevHeight + prevVel + (attack * (outerAverage - prevHeight));
+  height *= energyReduce;
 
   vec2 dist;
   for (int i = 0; i < NUM_POINTS; i++) {
@@ -82,28 +56,15 @@ void main()
     dist.x *= dist.x;
     dist.y *= dist.y;
 
-    prevData.r += pointPositions[i].z * mix(
-      dotEffect,
+    height += pointPositions[i].z * mix(
+      pointEffect,
       0.0,
       clamp(dist.x + dist.y, 0.0, 1.0)
     );
   }
 
-  // vec3 norm;
-  // norm.x = l - r;
-  // norm.y = b - t;
-  // norm.z = 2.0;
-  // norm = normalize(norm);
-
-  prevData.g = (prevData.r - prevHeight); // velocity
-
-  // prevData.b = norm.x; // y normal
-  // prevData.a = norm.y; // y normal
-
-  // prevData.r = outerEdges;
-
-	// gl_FragColor = vec4(prevData.rg, norm);
+  float vel = height - prevHeight; // velocity
   
-  gl_FragColor = vec4(prevData.rg, 0.0, 0.0);
+  gl_FragColor = vec4(height, vel, 0.0, 0.0);
 }
 `;
