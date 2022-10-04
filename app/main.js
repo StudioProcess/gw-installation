@@ -113,8 +113,8 @@ const uniforms = {
   dotEffect: {type: "f", value: 3.0},
 
   attack: {type: "f", value: 2.0},
-  decay: {type: "f", value: 0.999},
-  energyReduce: {type: "f", value: 0.9999, min: 0.5, max: 1.0, step: 0.0001}, // original: value: 0.9999, min: 0.1, max: 2.0, step: 0.0001
+  // decay: {type: "f", value: 0.999},
+  energyReduce: {type: "f", value: 0.9989001, min: 0.5, max: 1.0, step: 0.0001}, // original: value: 0.9999, min: 0.1, max: 2.0, step: 0.0001
 
   displaceGain: {type: "f", value: 0.13, min: 0.0, max: 0.5, step: 0.0001}, // original: value: 0.13, min: 0.0, max: 2.0, step: 0.0001
   displaceHeight: {type: "f", value: 0.2, min: -2.0, max: 2.0, step: 0.0001},

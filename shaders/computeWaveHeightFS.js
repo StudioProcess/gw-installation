@@ -8,7 +8,7 @@ uniform float aspectRatio;
 uniform vec2 computeResolution;
 
 uniform float attack;
-uniform float decay;
+// uniform float decay;
 uniform float energyReduce;
 
 uniform float dotEffect;
@@ -66,7 +66,8 @@ void main()
   // );
 
 
-  prevData.r += (prevVel + (attack * (outerAverage - prevData.r))) * decay;
+  // prevData.r += (prevVel + (attack * (outerAverage - prevData.r))) * decay;
+  prevData.r += prevVel + (attack * (outerAverage - prevData.r));
   prevData.r *= energyReduce;
 
   vec2 dist;
