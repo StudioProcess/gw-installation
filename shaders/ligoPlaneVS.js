@@ -3,7 +3,7 @@ precision mediump float;
 
 uniform sampler2D pingPongOutMap;
 uniform vec2 computeResolution;
-uniform float time;
+// uniform float time;
 
 uniform float displaceGain;
 uniform float displaceHeight;

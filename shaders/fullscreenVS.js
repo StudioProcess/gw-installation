@@ -1,7 +1,7 @@
 export default `
 precision mediump float;
 
-uniform float time;
+// uniform float time;
 
 attribute vec3 position;
 attribute vec2 uv;

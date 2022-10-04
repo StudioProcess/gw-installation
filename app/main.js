@@ -60,7 +60,7 @@ const colors = [
 let current_colors = 0;
 
 const uniforms = {
-  time: {type: "f", value: 0.0, hideinGui: true},
+  time: {type: "f", value: 0.0, hideinGui: true}, // not used
   aspectRatio: {type: "f", value: W / H, hideinGui: true},
   computeResolution: {type: "2fv", value: [1.0 / renderResolutionX, 1.0 / renderResolutionY], hideinGui: true},
   
