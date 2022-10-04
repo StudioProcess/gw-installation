@@ -25,6 +25,8 @@ const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 let RENDERING = false;
 let TILES = 2;
 
+let SIMULATION_FPS = 24;
+
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 let gui;
@@ -33,9 +35,10 @@ const clock = new THREE.Clock();
 const heightPingPong = new PingPongRunner();
 const renderResolutionX = 1024;
 const renderResolutionY = 1024;
-const fixedFrameRate = 1.0 / 24.0;
+// const fixedFrameRate = 1.0 / 24.0;
 // const fixedFrameRate = 1.0 / 60.0;
-let deltaCounter = fixedFrameRate + 0.1;
+// let deltaCounter = fixedFrameRate + 0.1;
+let deltaCounter = 0;
 let walzeLoopValue = 0; // position inside the loop [0..1)
 let frameRequest;
 
@@ -95,7 +98,7 @@ const uniforms = {
   // 3 -> 0.6 Hz
   // 4 -> 0.45 Hz
   // 5 -> 0.36 Hz
-  pointFrequencies: {
+  pointPeriods: {
     type: "2fv",
     value: [
       1, // original: 0.3
@@ -256,30 +259,29 @@ function loop(time) { // eslint-disable-line no-unused-vars
   // console.log(loopValue, uniforms.walzeLeft.value, uniforms.walzeRight.value);
   // console.log(loopValue, uniforms.walzeRight.value);
 
-  const delta = Math.min(1.0 / 20.0, clock.getDelta());
-  deltaCounter += 1.0 / 30.0;
-
+  // const delta = Math.min(1.0 / 20.0, clock.getDelta());
+  // deltaCounter += 1.0 / 30.0;
+  const delta = clock.getDelta();
+  deltaCounter += delta; // accumulated delta
+  uniforms.time.value += delta;
+  
   if (!RENDERING) {
-    if (deltaCounter > fixedFrameRate) {
-      uniforms.time.value += fixedFrameRate;
-
-      for (let i = 0, l = uniforms.pointPositions.value.length; i < l; i++) {
-        uniforms.pointPositions.value[i].z =
-          uniforms.time.value % uniforms.pointFrequencies.value[i] < uniforms.pointOnDurations.value[i] ? 1.0 : 0.0;
+    if (deltaCounter > 1/SIMULATION_FPS) {
+      for (let i = 0; i < uniforms.pointPositions.value.length; i++) {
+        const period = uniforms.pointPeriods.value[i]; // in secs
+        const onDuration = uniforms.pointOnDurations.value[i]; // in secs
+        const cycleTime = uniforms.time.value % period; // [0.0, period]
+        uniforms.pointPositions.value[i].z = cycleTime < onDuration ? 1.0 : 0.0;
       }
+      heightPingPong.render();
+      deltaCounter %= delta;
     }
   }
-
+  
   if (!RENDERING) {
     frameRequest = requestAnimationFrame( loop );
   }
-
-
-  if (deltaCounter > fixedFrameRate) {
-    heightPingPong.render();
-
-    deltaCounter %= fixedFrameRate;
-  }
+  
   renderer.setRenderTarget( null ); // Fix for three@0.102
   renderer.render( scene, camera );
   capture.update( renderer );
