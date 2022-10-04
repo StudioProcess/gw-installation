@@ -22,9 +22,9 @@ const SW_ENABLED = false;
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
-let RENDERING = false;
-let TILES = 2;
+let EXPORT_TILES = 2;
 
+let SIMULATING = true;
 let SIMULATION_FPS = 24;
 
 let renderer, scene, camera;
@@ -141,7 +141,7 @@ function main() {
 
   loop(); // start game loop
 
-  tilesaver.init(renderer, scene, camera, TILES);
+  tilesaver.init(renderer, scene, camera, EXPORT_TILES);
   
   gui = initGui(uniforms);
   gui.hide();
@@ -265,7 +265,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
   deltaCounter += delta; // accumulated delta
   uniforms.time.value += delta;
   
-  if (!RENDERING) {
+  if (SIMULATING) {
     if (deltaCounter > 1/SIMULATION_FPS) {
       for (let i = 0; i < uniforms.pointPositions.value.length; i++) {
         const period = uniforms.pointPeriods.value[i]; // in secs
@@ -278,9 +278,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
     }
   }
   
-  if (!RENDERING) {
-    frameRequest = requestAnimationFrame( loop );
-  }
+  frameRequest = requestAnimationFrame( loop );
   
   renderer.setRenderTarget( null ); // Fix for three@0.102
   renderer.render( scene, camera );
@@ -365,28 +363,27 @@ function next_colors(offset = 1) {
 document.addEventListener('keydown', e => {
   // console.log(e.key);
   
+  // toggle HUD/GUI
   if (e.key == 'h') {
     gui?.show(gui._hidden);
   }
+  // toggle simulation on/off
   else if (e.key == ' ') {
-    console.log('space');
-    RENDERING = !RENDERING;
-
-    if (!RENDERING) {
-      cancelAnimationFrame(frameRequest);
-      loop();
-    }
-  } else if (e.key == 'e') {
+    SIMULATING = !SIMULATING;
+  }
+  // export hi-res still
+  else if (e.key == 'e') {
     tilesaver.save().then(
       (f) => {
         console.log(`Saved to: ${f}`);
         onResize();
-
-        cancelAnimationFrame(frameRequest);
-        loop();
+        // cancelAnimationFrame(frameRequest);
+        // loop();
       }
     );
-  } else if (e.key == 'f') { // f .. fullscreen
+  } 
+  // fullscreen
+  else if (e.key == 'f') { // f .. fullscreen
     toggleFullscreen();
   }
 
@@ -423,12 +420,6 @@ document.addEventListener('keydown', e => {
   else if (e.key == 'Backspace') {
     reset_simulation();
   }
-});
-
-
-document.addEventListener('dblclick', e => {
-  console.log('double click');
-  toggleFullscreen();
 });
 
 
