@@ -1,10 +1,13 @@
 export default `
+// #version 300 es
+// Note: Version specified via THREE.RawShaderMaterial
+
 precision mediump float;
 
-attribute vec3 position;
-attribute vec2 uv;
+in vec3 position;
+in vec2 uv;
 
-varying vec2 vUV;
+out vec2 vUV;
 
 void main() {
   vUV = uv;

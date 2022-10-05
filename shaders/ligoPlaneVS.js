@@ -1,4 +1,7 @@
 export default `
+// #version 300 es
+// Note: Version specified via THREE.RawShaderMaterial
+
 precision mediump float;
 
 uniform sampler2D pingPongOutMap;
@@ -25,14 +28,12 @@ uniform float walzeWidth;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
-attribute float extrude;
+in float extrude;
+in float uvX;
+in float uvY;
 
-attribute float uvX;
-attribute float uvY;
-
-varying vec2 vUV;
-
-varying float lineBase;
+out vec2 vUV;
+out float lineBase;
 
 // https://iquilezles.org/articles/functions/
 // float gain(float x, float k) {
@@ -115,17 +116,17 @@ void main()	{
   float heightMultiplier = smoothstep(walzeLeft, walzeLeft + walzeWidth, vUV.x);
   heightMultiplier *= smoothstep(walzeRight, walzeRight - walzeWidth, vUV.x);
 
-  float waveDataPrev = texture2D(pingPongOutMap, prevUV).r;
+  float waveDataPrev = texture(pingPongOutMap, prevUV).r;
   waveDataPrev *= heightMultiplier;
   vPositionPrev.z += displaceHeight * waveDataPrev * gain(abs(waveDataPrev), displaceGain);
   vPositionPrev = modelViewMatrix * vPositionPrev;
 
-  float waveData = texture2D(pingPongOutMap, vUV).r;
+  float waveData = texture(pingPongOutMap, vUV).r;
   waveData *= heightMultiplier;
   vPosition.z += displaceHeight * waveData * gain(abs(waveData), displaceGain);
   vPosition = modelViewMatrix * vPosition;
 
-  float waveDataNext = texture2D(pingPongOutMap, nextUV).r;
+  float waveDataNext = texture(pingPongOutMap, nextUV).r;
   waveDataNext *= heightMultiplier;
   vPositionNext.z += displaceHeight * waveDataNext * gain(abs(waveDataNext), displaceGain);
   vPositionNext = modelViewMatrix * vPositionNext;
@@ -139,4 +140,5 @@ void main()	{
   vPosition.xy += (extrude * lineWeight * vPosition.w) * extrudeV;
 
 	gl_Position = projectionMatrix * vPosition;
-}`;
+}
+`;

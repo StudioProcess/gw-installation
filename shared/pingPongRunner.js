@@ -37,7 +37,8 @@ const PingPongRunner = (function() {
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
       uniforms,
-      defines
+      defines,
+      glslVersion: THREE.GLSL3,
     });
     this.outputScene = new THREE.Scene();
     const mesh = new THREE.Mesh(

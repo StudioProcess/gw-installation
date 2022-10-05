@@ -15,6 +15,13 @@ import ligoPlaneFS from "../shaders/ligoPlaneFS.js";
 
 import {inverseLerpClamped} from "../shared/mathUtils.js";
 
+/* 
+  Shader passes:
+  * Simulation: fullscreenVS + computeWaveHeightFS
+  * Background: fullscreenVS + backgroundFS
+  * Waves:      ligoPlaneVS  + ligoPlaneFS
+*/
+
 const W = 1920;
 const H = 1080;
 const PX_RATIO = 1;
@@ -200,6 +207,7 @@ function setup() {
       side: THREE.DoubleSide,
       depthTest: false,
       depthWrite: false,
+      glslVersion: THREE.GLSL3,
     })
   );
   background.frustumCulled = false;
@@ -216,6 +224,7 @@ function setup() {
       // wireframe: true,
       // depthTest: false,
       // depthWrite: false,
+      glslVersion: THREE.GLSL3,
     })
   );
   waves.frustumCulled = false;
