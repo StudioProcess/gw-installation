@@ -137,6 +137,8 @@ const uniforms = {
   c: {type: "f", value: 0.6},
   damping: {type: "f", value: 1.0},
   
+  border: {type: "f", value: 0.03, min: 0.001, max: 0.5, step: 0.001 },
+  
   // // computeWaveHeightFS.old uniforms:
   // attack: {type: "f", value: 0.0, min: 0.0, max: 1.0, step: 0.0001}, // original: value: 2.0 
   // decay: {type: "f", value: 0.999},

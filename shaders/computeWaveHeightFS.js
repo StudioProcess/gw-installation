@@ -13,6 +13,7 @@ precision mediump float;
 
 uniform sampler2D pingPongInMap;
 uniform vec2      computeResolution; // typically vec2( 1.0/1024.0 )
+uniform float     border; // [0.0, 1.0]
 
 uniform float c;
 uniform float damping;
@@ -23,6 +24,23 @@ uniform float pointEffect;
 
 in  vec2 vUV;
 out vec4 fragColor;
+
+// Returns [0.0, 1.0]
+// 0.0 ... outer border, 1.0 ... inner border
+float border_dist(vec2 uv) {
+  float b = min(
+    min(uv.x, 1.0-uv.x),
+    min(uv.y, 1.0-uv.y)
+  );
+  return clamp(b, 0.0, border) / border;
+}
+
+// Christophe Schlick: Fast Alternatives to Perlin's Bias and Gain Functions; Graphics Gems 4, 1994
+// t: [0, 1], a: ]0, 1[
+// Returns: [0, 1]
+float bias(float t, float a) {
+  return t / ( (1.0/a - 2.0) * (1.0 - t) + 1.0 );
+}
 
 void main()
 {
@@ -55,6 +73,10 @@ void main()
     dist = clamp(dist, 0.0, pointSize) / pointSize; // parameter inside the point from 0 (center) .. 1 (outside)
     h = mix( pointPositions[i].z * pointEffect, h, dist ); // linear blend from point to base value from point center outwards
   }
+  
+  // damp down displacement towards the boundaries to avoid reflections
+  float border_scale = bias( border_dist(vUV), 0.95 ); // falls off from 1.0 to 0.0 on the border
+  h *= border_scale;
   
   fragColor = vec4(h, h_vel, 0.0, 0.0);
 }
