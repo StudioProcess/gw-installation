@@ -2,74 +2,60 @@ export default `
 // #version 300 es
 // Note: Version specified via THREE.RawShaderMaterial
 
+// Wave Equation
+// u_tt = ∆u
+// https://en.wikipedia.org/wiki/Wave_equation
+// 
+// Laplace-Operator
+// ∆u = u_xx + u_yy
+
 precision mediump float;
 
 uniform sampler2D pingPongInMap;
+uniform vec2      computeResolution;
 
-uniform vec2  computeResolution;
-uniform float aspectRatio;
-
-uniform float cornerEffect;
-uniform float averageDivider;
-
-uniform float attack;
-uniform float energyReduce;
+uniform float c;
+uniform float damping;
 
 uniform vec3  pointPositions[NUM_POINTS];
 uniform float pointSize;
 uniform float pointEffect;
 
-in vec2 vUV;
-
+in  vec2 vUV;
 out vec4 fragColor;
 
 void main()
 {
   vec4  prevData   = texture(pingPongInMap, vUV);
-  float prevHeight = prevData[0];
-  float prevVel    = prevData[1];
+  float prev_h     = prevData[0];
+  float prev_h_vel = prevData[1];
 
-  vec2  uvXOffset  = vec2(computeResolution.x / aspectRatio, 0.0);
-  vec2  uvYOffset  = vec2(0.0, computeResolution.y);
-
-  float l = texture(pingPongInMap, vUV - uvXOffset).r;
-  float r = texture(pingPongInMap, vUV + uvXOffset).r;
-  float t = texture(pingPongInMap, vUV + uvYOffset).r;
-  float b = texture(pingPongInMap, vUV - uvYOffset).r;
-
-  float outerAverage = l + r + t + b;
-
-  outerAverage += texture(pingPongInMap, vUV + uvYOffset - uvXOffset).r * cornerEffect; // TL
-  outerAverage += texture(pingPongInMap, vUV + uvYOffset + uvXOffset).r * cornerEffect; // TR
-  outerAverage += texture(pingPongInMap, vUV - uvYOffset - uvXOffset).r * cornerEffect; // BL
-  outerAverage += texture(pingPongInMap, vUV - uvYOffset + uvXOffset).r * cornerEffect; // BR
-
-  outerAverage /= averageDivider;
-
-  float height = prevHeight + prevVel + (attack * (outerAverage - prevHeight));
-  height *= energyReduce;
-
-  vec2 dist;
-  for (int i = 0; i < NUM_POINTS; i++) {
-    dist.x = vUV.x - pointPositions[i].x;
-    dist.y = vUV.y - pointPositions[i].y;
-
-    dist.x *= aspectRatio;
-
-    dist /= pointSize;
-
-    dist.x *= dist.x;
-    dist.y *= dist.y;
-
-    height += pointPositions[i].z * mix(
-      pointEffect,
-      0.0,
-      clamp(dist.x + dist.y, 0.0, 1.0)
-    );
-  }
-
-  float vel = height - prevHeight; // velocity
+  vec2  uv_ox  = vec2(computeResolution.x, 0.0);
+  vec2  uv_oy  = vec2(0.0, computeResolution.y);
   
-  fragColor = vec4(height, vel, 0.0, 0.0);
+  // Discrete Laplace-Operator
+  // https://stackoverflow.com/a/22442251
+  // https://en.wikipedia.org/wiki/Discrete_Laplace_operator#Image_processing
+  // ∆u = u(x+1,y) + u(x-1,y) + u(x,y+1) + u(x,y-1) - 4*u(x,y)
+  float h_acc = 0.0
+    + texture(pingPongInMap, vUV - uv_ox)[0]  // L
+    + texture(pingPongInMap, vUV + uv_ox)[0]  // R
+    + texture(pingPongInMap, vUV + uv_oy)[0]  // T
+    + texture(pingPongInMap, vUV - uv_oy)[0]  // B
+    - 4.0 * prev_h;
+
+  float h_vel = (prev_h_vel + h_acc * c*c ) * damping;
+  float h = prev_h + h_vel;
+  
+  // agitation points
+  // -> override height/vel
+  for (int i = 0; i < NUM_POINTS; i++) {
+    float dist = distance( vUV, pointPositions[i].xy );
+    float is_point = 1.0 - step( 1.0/1024.0, dist ); // 1.0 if dist < 1.0 else 0.0
+    
+    h = mix( h, pointPositions[i].z * pointEffect, is_point );
+  }
+  
+  fragColor = vec4(h, h_vel, 0.0, 0.0);
 }
 `;

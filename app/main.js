@@ -74,7 +74,7 @@ const uniforms = {
   // Common uniforms:
   //
   time: {type: "f", value: 0.0, hideinGui: true}, // not used
-  aspectRatio: {type: "f", value: W / H, hideinGui: true},
+  aspectRatio: {type: "f", value: W / H, hideinGui: true}, // not used
   computeResolution: {type: "2fv", value: [1.0 / renderResolutionX, 1.0 / renderResolutionY], hideinGui: true},
   
   //
@@ -100,7 +100,7 @@ const uniforms = {
   walzeWidth: {type: "f", value: 0.0, min: 0.0, max: 0.5, step: 0.0001, hideinGui: true}, // original" value: 0.8, hideinGui: false
   
   displaceGain: {type: "f", value: 0.13, min: 0.0, max: 0.5, step: 0.0001}, // original: value: 0.13, min: 0.0, max: 2.0, step: 0.0001
-  displaceHeight: {type: "f", value: 0.2, min: -2.0, max: 2.0, step: 0.0001},
+  displaceHeight: {type: "f", value: 1.0, min: 0.0, max: 3.0, step: 0.0001}, // original: value: 1.0, min: -2.0, max: 2.0, step: 0.0001
   
   //
   // computeWaveHeightFS uniforms:
@@ -112,7 +112,7 @@ const uniforms = {
     type: "v3v",
     value: [
       new THREE.Vector3( 0.5, 0.50, 0.0 ), // original:  0.5, 0.65, 0.0 
-      new THREE.Vector3( 0.5, 0.35, 0.0 )
+      // new THREE.Vector3( 0.5, 0.35, 0.0 )
     ]
   },
   // period in seconds
@@ -134,12 +134,15 @@ const uniforms = {
   pointSize: {type: "f", value: 0.01}, // original: value: 0.01
   pointEffect: {type: "f", value: 3.0},
   
-  attack: {type: "f", value: 2.0},
-  // decay: {type: "f", value: 0.999},
-  energyReduce: {type: "f", value: 0.9989001, min: 0.5, max: 1.0, step: 0.0001}, // original: value: 0.9999, min: 0.1, max: 2.0, step: 0.0001
+  c: {type: "f", value: 0.6},
+  damping: {type: "f", value: 1.0},
   
-  cornerEffect: {type: "f", value: 0.75},
-  averageDivider: {type: "f", value: 7},
+  // // computeWaveHeightFS.old uniforms:
+  // attack: {type: "f", value: 0.0, min: 0.0, max: 1.0, step: 0.0001}, // original: value: 2.0 
+  // decay: {type: "f", value: 0.999},
+  // energyReduce: {type: "f", value: 0.9989001, min: 0.5, max: 1.0, step: 0.0001}, // original: value: 0.9999, min: 0.1, max: 2.0, step: 0.0001
+  // cornerEffect: {type: "f", value: 0.75},
+  // averageDivider: {type: "f", value: 7},
 };
 
 main();
@@ -283,7 +286,10 @@ function loop(time) { // eslint-disable-line no-unused-vars
         const period = uniforms.pointPeriods.value[i]; // in secs
         const onDuration = uniforms.pointOnDurations.value[i]; // in secs
         const cycleTime = uniforms.time.value % period; // [0.0, period]
-        uniforms.pointPositions.value[i].z = cycleTime < onDuration ? 1.0 : 0.0;
+        // uniforms.pointPositions.value[i].z = cycleTime < onDuration ? 1.0 : 0.0;
+        
+        const cycle = cycleTime / period; // [0.0, 1.0]
+        uniforms.pointPositions.value[i].z = Math.sin(cycle * Math.PI * 2);
       }
       heightPingPong.render();
       deltaCounter %= delta;
