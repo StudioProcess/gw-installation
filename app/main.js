@@ -131,7 +131,7 @@ const uniforms = {
       0.05
     ]
   },
-  pointSize: {type: "f", value: 0.01}, // original: value: 0.01
+  pointSize: {type: "f", value: 4.0 },
   pointEffect: {type: "f", value: 3.0},
   
   c: {type: "f", value: 0.6},

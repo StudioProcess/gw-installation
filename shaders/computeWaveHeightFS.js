@@ -12,7 +12,7 @@ export default `
 precision mediump float;
 
 uniform sampler2D pingPongInMap;
-uniform vec2      computeResolution;
+uniform vec2      computeResolution; // typically vec2( 1.0/1024.0 )
 
 uniform float c;
 uniform float damping;
@@ -50,10 +50,10 @@ void main()
   // agitation points
   // -> override height/vel
   for (int i = 0; i < NUM_POINTS; i++) {
-    float dist = distance( vUV, pointPositions[i].xy );
-    float is_point = 1.0 - step( 1.0/1024.0, dist ); // 1.0 if dist < 1.0 else 0.0
-    
-    h = mix( h, pointPositions[i].z * pointEffect, is_point );
+    float dist = distance( vUV, pointPositions[i].xy ); // distance from current pos to point (in uv space)
+    dist /= computeResolution.x; // distance in "px"
+    dist = clamp(dist, 0.0, pointSize) / pointSize; // parameter inside the point from 0 (center) .. 1 (outside)
+    h = mix( pointPositions[i].z * pointEffect, h, dist ); // linear blend from point to base value from point center outwards
   }
   
   fragColor = vec4(h, h_vel, 0.0, 0.0);
