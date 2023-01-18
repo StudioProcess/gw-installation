@@ -25,6 +25,9 @@ canvas {
     width: 100% !important;
     height: auto !important;
   }
+  #overlay {
+      font-size: 4vw;
+  }
 }
 
 /* portrait viewport -> fit height */
@@ -33,4 +36,38 @@ canvas {
     height: 100% !important;
     width: auto !important;
   }
+  #overlay {
+    font-size: 7vw;
+  }
+}
+
+@font-face {
+  font-family: "Oswald";
+  src: url("../fonts/Oswald-VariableFont_wght.ttf") format("truetype");
+}
+
+#overlay {
+  position: absolute;
+  opacity: 100%;
+  transition: opacity 0.33s;
+  font-family: "Oswald";
+  line-height: 1.2;
+}
+
+#overlay .url {
+  font-weight: 550;
+}
+
+#overlay .claim {
+  font-weight: 100;
+}
+
+#overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#overlay a, #overlay a:active, #overlay a:visited {
+  color: inherit;
+  text-decoration: none;
 }

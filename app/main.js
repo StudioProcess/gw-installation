@@ -334,6 +334,11 @@ function toggleFullscreen() {
     }
 }
 
+function toggle_overlay(force) {
+  const overlay = document.querySelector('#overlay');
+  overlay.classList.toggle('hidden', force !== undefined ? !force : undefined);
+}
+
 function get_cam_pos() {
   return {
     position: camera.position.toArray(),
@@ -439,6 +444,10 @@ document.addEventListener('keydown', e => {
   // reset simulation
   else if (e.key == 'Backspace') {
     reset_simulation();
+  }
+  // toggle overlay
+  else if (e.key == 'o') {
+    toggle_overlay();
   }
 });
 
