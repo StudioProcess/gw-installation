@@ -34,8 +34,12 @@ let EXPORT_TILES = 2;
 let SIMULATING = true;
 let SIMULATION_FPS = 24;
 
+const START_WITH_OVERLAY = false;
+const START_WITH_OVERLAY_TIMER = false;
 const OVERLAY_TIMER_PERIOD = 60;
 const OVERLAY_TIMER_ON = 20;
+let overlay_pos_h = 'center'; // left|center|right
+let overlay_pos_v = 'center'; // top|center|bottom
 
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
@@ -150,8 +154,6 @@ const uniforms = {
   // averageDivider: {type: "f", value: 7},
 };
 
-main();
-
 
 function main() {
 
@@ -257,6 +259,11 @@ function setup() {
   div.addEventListener('click', toggleFullscreen );
   document.body.appendChild( div );
   
+  // overlay
+  set_overlay_pos(overlay_pos_h, overlay_pos_v);
+  if (START_WITH_OVERLAY) { toggle_overlay(true); }
+  if (START_WITH_OVERLAY_TIMER) { toggle_overlay_timer(true); }
+  
   clock.start();
 }
 
@@ -343,7 +350,7 @@ function toggle_overlay(force) {
 }
 
 let overlay_timeout = null;
-function toggle_overlay_timer() {
+function toggle_overlay_timer(force) {
     function show() {
         toggle_overlay(true); // show overlay
         overlay_timeout = setTimeout(hide, OVERLAY_TIMER_ON * 1000); 
@@ -354,7 +361,7 @@ function toggle_overlay_timer() {
         overlay_timeout = setTimeout(show, (OVERLAY_TIMER_PERIOD - OVERLAY_TIMER_ON) * 1000);
     }
     
-    if (!overlay_timeout) { // timer is not active
+    if (!overlay_timeout || force === true) { // timer is not active
         show();
     } else { // timer is active
         cancel_overlay_timer(); // stop timer
@@ -373,6 +380,57 @@ function get_cam_pos() {
     rotation: camera.rotation.toArray(),
     target: controls.target.toArray(),
   };
+}
+
+function set_overlay_pos(pos_h = 'center', pos_v = 'center') {
+    if (!pos_v) { pos_v = overlay_pos_v; }
+    if (!pos_h) { pos_h = overlay_pos_h; }
+    const overlay = document.querySelector('#overlay');
+    const body = document.querySelector('body');
+    
+    overlay_pos_v = pos_v;
+    if (pos_v === 'top') {
+        overlay.style.top = 0;
+        overlay.style.bottom = '';
+    } else if (pos_v === 'bottom') {
+        overlay.style.top = '';
+        overlay.style.bottom = 0;
+    } else {
+        overlay.style.top = '';
+        overlay.style.bottom = '';
+        overlay_pos_v = 'center';
+    }
+    
+    overlay_pos_h = pos_h;
+    if (pos_h === 'left') {
+        overlay.style.left = 0;
+        overlay.style.right = '';
+    } else if (pos_h === 'right') {
+        overlay.style.left = '';
+        overlay.style.right = 0;
+    } else {
+       overlay.style.left = '';
+       overlay.style.right = '';
+       overlay_pos_h = 'center';
+    }
+}
+
+function cycle_overlay_pos() {
+    const sequence = [
+        ['center','center'],
+        ['center','top'],
+        ['right','top'],
+        ['right','center'],
+        ['right','bottom'],
+        ['center','bottom'],
+        ['left','bottom'],
+        ['left','center'],
+        ['left','top'],
+    ];
+    let idx = sequence.findIndex(el => el[0] === overlay_pos_h && el[1] === overlay_pos_v);
+    idx += 1;
+    if (idx >= sequence.length) { idx = 0; }
+    set_overlay_pos(...sequence[idx]);
 }
 
 function set_cam_pos(obj) {
@@ -457,7 +515,7 @@ document.addEventListener('keydown', e => {
 //   }
   
   // log camera position
-  else if (e.key == 'p') {
+  else if (e.key == 'c') {
     console.log( JSON.stringify(get_cam_pos()) );
     console.log( JSON.stringify(get_colors()) );
   }
@@ -479,6 +537,10 @@ document.addEventListener('keydown', e => {
     toggle_overlay();
   }
   // toggle overlay timer
+  else if (e.key == 'p') {
+    cycle_overlay_pos();
+  }
+  // toggle overlay timer
   else if (e.key == 't') {
     toggle_overlay_timer();
   }
@@ -492,3 +554,5 @@ if (SW_ENABLED && 'serviceWorker' in navigator) {
     console.log('Service Worker registered');
   });
 }
+
+main();

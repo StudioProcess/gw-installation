@@ -52,6 +52,7 @@ canvas {
   transition: opacity 0.33s;
   font-family: "Oswald";
   line-height: 1.2;
+  padding: 0.5em;
 }
 
 #overlay .url {
