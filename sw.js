@@ -20,6 +20,8 @@ const resources = [
   './vendor/recorder.js',
   './vendor/tar.js',
   './vendor/tilesaver.js',
+  './icons/192.png',
+  './fonts/Oswald-VariableFont_wght.ttf',
 ];
 
 self.addEventListener('install', (e) => {
