@@ -34,6 +34,9 @@ let EXPORT_TILES = 2;
 let SIMULATING = true;
 let SIMULATION_FPS = 24;
 
+const OVERLAY_TIMER_PERIOD = 60;
+const OVERLAY_TIMER_ON = 20;
+
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 let gui;
@@ -339,6 +342,31 @@ function toggle_overlay(force) {
   overlay.classList.toggle('hidden', force !== undefined ? !force : undefined);
 }
 
+let overlay_timeout = null;
+function toggle_overlay_timer() {
+    function show() {
+        toggle_overlay(true); // show overlay
+        overlay_timeout = setTimeout(hide, OVERLAY_TIMER_ON * 1000); 
+    }
+    
+    function hide() {
+        toggle_overlay(false); // hide overlay
+        overlay_timeout = setTimeout(show, (OVERLAY_TIMER_PERIOD - OVERLAY_TIMER_ON) * 1000);
+    }
+    
+    if (!overlay_timeout) { // timer is not active
+        show();
+    } else { // timer is active
+        cancel_overlay_timer(); // stop timer
+        toggle_overlay(false); // hide overlay
+    }
+}
+
+function cancel_overlay_timer() {
+    clearTimeout(overlay_timeout);
+    overlay_timeout = null;
+}
+
 function get_cam_pos() {
   return {
     position: camera.position.toArray(),
@@ -447,7 +475,12 @@ document.addEventListener('keydown', e => {
   }
   // toggle overlay
   else if (e.key == 'o') {
+    cancel_overlay_timer(); // cancel timer (if any)
     toggle_overlay();
+  }
+  // toggle overlay timer
+  else if (e.key == 't') {
+    toggle_overlay_timer();
   }
 });
 
