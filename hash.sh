@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# The hash is produced by hashing each file, and then hashing the list of file hashes.
+#
+# Usage:
+#   ./hash.sh [hash to compare against]
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
@@ -11,11 +16,11 @@ HASH=$( find . -type f -not -path '*/.git/*' -not -path '*/.DS_Store' -not -path
 | cut -d " " -f 1 )
 
 if [ $# -gt 0 ]; then
-    if [[ $HASH == $1* ]]; then
-        echo "${YELLOW}INCOMPLETE${NC}"
-    else
-        if [ $HASH = $1 ]; then
-            echo "${GREEN}VERIFIED${NC}"
+    if [ $HASH = $1 ]; then
+        echo "${GREEN}VERIFIED${NC}"
+    else 
+        if [[ $HASH == $1* ]]; then
+            echo "${YELLOW}INCOMPLETE${NC}"
         else
             echo "${RED}NOT VERIFIED${NC}"
         fi
