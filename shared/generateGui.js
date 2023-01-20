@@ -1,4 +1,4 @@
-import GUI from '../node_modules/lil-gui/dist/lil-gui.esm.js';
+import GUI from 'lil-gui';
 
 export function initGui(uniforms) {
   const keys = Object.keys(uniforms);
