@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="./app/main.css">
 </head>
 <body>
-  <script async src="./node_modules/es-module-shims/dist/es-module-shims.js"></script>
+  <script async src="./node_modules/es-module-shims/dist/es-module-shims.js"></script> <!-- Needed for Safari 16.2 (macOS + iOS) -->
   <script type="importmap">
     {
       "imports": {
@@ -17,12 +17,14 @@
       }
     }
   </script>
-  
-  <!-- <script src="./node_modules/three/build/three.js"></script> -->
-  <!-- <script src="./node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
-  <!-- <script src="./node_modules/ccapture.js/build/CCapture.all.min.js"></script> -->
-
   <script type="module" src="./app/main.js"></script>
-  <div id="overlay" class="hidden"><a href="https://bernhardhoetzl.com" target="_blank"><span class='url'>bernhardhoetzl.com</span><br><span class="claim">Think ahead</span></a></div>
+  
+  <div id="overlay" class="hidden">
+    <a href="https://bernhardhoetzl.com" target="_blank">
+      <span class='url'>bernhardhoetzl.com</span><br>
+      <span class="claim">Think ahead</span>
+    </a>
+  </div>
 </body>
 </html>
+  
