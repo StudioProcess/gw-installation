@@ -7,8 +7,19 @@
   <link rel="stylesheet" href="./app/main.css">
 </head>
 <body>
-  <script src="./node_modules/three/build/three.js"></script>
-  <script src="./node_modules/three/examples/js/controls/OrbitControls.js"></script>
+  <script async src="./node_modules/es-module-shims/dist/es-module-shims.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./node_modules/three/build/three.module.js",
+        "three/addons/": "./node_modules/three/examples/jsm/",
+        "lil-gui": "./node_modules/lil-gui/dist/lil-gui.esm.js"
+      }
+    }
+  </script>
+  
+  <!-- <script src="./node_modules/three/build/three.js"></script> -->
+  <!-- <script src="./node_modules/three/examples/js/controls/OrbitControls.js"></script> -->
   <!-- <script src="./node_modules/ccapture.js/build/CCapture.all.min.js"></script> -->
 
   <script type="module" src="./app/main.js"></script>

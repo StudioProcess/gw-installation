@@ -1,3 +1,6 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  
 import * as capture from '../vendor/recorder.js';
 
 import * as tilesaver from '../vendor/tilesaver.js';
@@ -188,7 +191,7 @@ function setup() {
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
-  controls = new THREE.OrbitControls( camera, renderer.domElement );
+  controls = new OrbitControls( camera, renderer.domElement );
   next_cam(0);
   next_colors(0);
 

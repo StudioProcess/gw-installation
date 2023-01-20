@@ -17,6 +17,7 @@
   "author": "Martin Grödl <martin@process.studio> (https://process.studio)",
   "license": "AGPL-3.0",
   "dependencies": {
+    "es-module-shims": "^1.6.3",
     "lil-gui": "^0.17.0",
     "three": "^0.147.0"
   },
