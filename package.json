@@ -19,7 +19,7 @@
   "dependencies": {
     "es-module-shims": "^1.6.3",
     "lil-gui": "^0.17.0",
-    "three": "^0.147.0"
+    "three": "^0.148.0"
   },
   "devDependencies": {
     "browser-sync": "^2.27.11"
