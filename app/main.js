@@ -37,6 +37,8 @@ let EXPORT_TILES = 2;
 let SIMULATING = true;
 let SIMULATION_FPS = 24;
 
+const LOCK_CAM_TARGET_TO_PLANE = false;
+
 const START_WITH_OVERLAY = false;
 const START_WITH_OVERLAY_TIMER = false;
 const OVERLAY_TIMER_PERIOD = 60;
@@ -121,8 +123,8 @@ const uniforms = {
   pointPositions: {
     type: "v3v",
     value: [
-      new THREE.Vector3( 0.5, 0.50, 0.0 ), // original:  0.5, 0.65, 0.0 
-      // new THREE.Vector3( 0.5, 0.35, 0.0 )
+      new THREE.Vector3( 0.35, 0.5, 0.0 ), // original:  0.5, 0.65, 0.0 
+      new THREE.Vector3( 0.65, 0.5, 0.0 )
     ]
   },
   // period in seconds
@@ -130,7 +132,7 @@ const uniforms = {
     type: "2fv",
     value: [
       1, // original: 0.3
-      0.0 // original: 0.4
+      1 // original: 0.4
     ]
   },
   // on duration in seconds
@@ -317,7 +319,9 @@ function loop(time) { // eslint-disable-line no-unused-vars
   renderer.render( scene, camera );
   capture.update( renderer );
   
-  controls.target.z = 0; // lock orbit target to plane
+  if (LOCK_CAM_TARGET_TO_PLANE) {
+    controls.target.z = 0; // lock orbit target to plane
+  }
 }
 
 function reset_simulation() {
@@ -451,6 +455,50 @@ function next_cam(offset = 1) {
   console.log('cam %i', current_cam);
   set_cam_pos( cams[current_cam] );
 }
+
+// Set camera by position on plane, height above plane + target offset (from projected point on plane)
+function set_cam_target(plane_x, plane_y, height, target_offset_y, limit_target_to_plane = true) {
+    camera.position.set( plane_x, plane_y, height );
+    
+    let target_y = plane_y + target_offset_y;
+    if (limit_target_to_plane) {
+        target_y = Math.max(-20, target_y);
+        target_y = Math.min(20, target_y);
+    }
+    controls.target.set( plane_x, target_y, 0 );
+    controls.update();
+}
+window.set_cam_target = set_cam_target;
+
+// Set camera by position above plane, height above plane + tilt angle
+// Ranges:
+//   plane_x: [-20, 20] ... left to right
+//   plane_y: [-20, 20] ... bottom to top
+//   height:  [0.2, 10] ... close to far
+//   tilt:    [-90, 90] ... 0 is straight down, 45 is tilted upwards, 90 is horizontally forward
+function set_cam_tilt(plane_x, plane_y, height, tilt_up) {
+    // clamp tilt_up to [-90, 90]
+    tilt_up = Math.max(-90, tilt_up);
+    tilt_up = Math.min( 90, tilt_up);
+    
+    camera.position.set( plane_x, plane_y, height );
+    
+    // tilt angle that will hit the edge of the plane
+    const tilt_limit = Math.atan(20/height) / Math.PI * 180;
+    
+    // if tilt limit is exceeded, move target upward (instead of further away)
+    if (tilt_up > tilt_limit || tilt_up < -tilt_limit) {
+        // console.log(90-tilt_limit, Math.tan( (90-tilt_up)/180*Math.PI ));
+        const target_height = height - Math.tan( (90-Math.abs(tilt_up))/180*Math.PI ) * 20;
+        controls.target.set( plane_x, tilt_up >= 0 ? 20 : -20, target_height );
+    } else {
+        const target_offset_y = height * Math.tan(tilt_up / 180 * Math.PI);
+        controls.target.set( plane_x, plane_y + target_offset_y, 0 );
+    }
+    
+    controls.update();
+}
+window.set_cam_tilt = set_cam_tilt;
 
 function get_colors() {
   return {
