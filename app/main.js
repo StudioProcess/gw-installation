@@ -61,6 +61,7 @@ let EXPORT_TILES = 2;
 
 let SIMULATING = true;
 let SIMULATION_FPS = 24;
+let SCENE_ROTATION_PERIOD = 900;
 
 const ADD_FULLSCREEN_BUTTON = false;
 const LOCK_CAM_TARGET_TO_PLANE = false;
@@ -86,6 +87,7 @@ const renderResolutionY = 1024;
 let deltaCounter = 0;
 let walzeLoopValue = 0; // position inside the loop [0..1)
 let frameRequest;
+let sceneRotationPeriod = 0;
 
 const cams = [
   {"position":[0.0,-10.743654156564656,13.938095455943627],"rotation":[0.6566884115103175,0.0,0.0,"XYZ"],"target":[0,0,0]},
@@ -351,6 +353,10 @@ function loop(time) { // eslint-disable-line no-unused-vars
   if (LOCK_CAM_TARGET_TO_PLANE) {
     controls.target.z = 0; // lock orbit target to plane
   }
+  
+  if (sceneRotationPeriod) {
+    scene.rotation.z += 2 * Math.PI * delta / sceneRotationPeriod;
+  }
 }
 
 function reset_simulation() {
@@ -527,11 +533,28 @@ function set_cam_by_tilt(plane_x, plane_y, height, tilt_up) {
 }
 
 function rnd(min, max) {
+  if (Array.isArray(min)) {
+    const rndIdx = Math.floor(rnd(min.length));
+    return min[rndIdx];
+  }
+  if (min === undefined && max === undefined) {
+    max = 1;
+    min = 0;
+  } else if (max === undefined) {
+    max = min;
+    min = 0;
+  }
   return min + Math.random() * (max-min);
 }
 
 function randomize_cam() {
-  set_cam_by_tilt( rnd(-10,10), rnd(-10,10), rnd(0.2, 3), rnd(0, 30) ); 
+  set_cam_by_tilt( rnd(-10,10), rnd(-10,10), rnd(0.2, 3), rnd(0, 30) );
+  reset_rotation();
+  if ( rnd() < 0.25 ) {
+    toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
+  } else {
+    toggle_rotation(false);
+  }
 }
 
 function randomize_emitters() {
@@ -553,6 +576,28 @@ function randomize_emitters() {
   uniforms.pointPeriods.value[1] = period;
   gui.children[10].controllers[0].updateDisplay();
   gui.children[10].controllers[1].updateDisplay();
+}
+
+function toggle_rotation(force, period = SCENE_ROTATION_PERIOD, reverse_direction = false) {
+  if (reverse_direction) { period = -period; }
+  if (force !== undefined) {
+    if (force) {
+      sceneRotationPeriod = period;
+    } else {
+      sceneRotationPeriod = 0;
+    }
+  } else {
+    // toggle
+    if (sceneRotationPeriod === 0) {
+      sceneRotationPeriod = period;
+    } else {
+      sceneRotationPeriod = 0;
+    }
+  }
+}
+
+function reset_rotation(rotation = 0) {
+  scene.rotation.z = rotation / 180 * Math.PI;
 }
 
 function get_colors() {
@@ -662,6 +707,9 @@ document.addEventListener('keydown', e => {
   }
   else if (e.key == 'e') {
     randomize_emitters();
+  }
+  else if (e.key == 'w') {
+    toggle_rotation();
   }
 });
 
