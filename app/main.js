@@ -483,6 +483,8 @@ function set_cam_pos(obj) {
   if (obj?.target) {controls.target.fromArray(obj.target); };
   // camera.updateProjectionMatrix();
   // controls.update();
+  reset_rotation();
+  toggle_rotation(false);
 }
 
 function next_cam(offset = 1) {
