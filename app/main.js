@@ -335,21 +335,21 @@ function reset_simulation() {
 // Toggles the browser's fullscreen mode on the body element
 // Note: Doesn't work on iPhone
 function toggleFullscreen() {
-    // TODO: check latest fullscreen spec: https://caniuse.com/fullscreen
-    console.log('toggle fullscreen');
-    if (document.webkitFullscreenEnabled) { // Chrome, Opera, Safari
-        if (!document.webkitFullscreenElement) {
-            document.querySelector('body').webkitRequestFullscreen();
-        } else { document.webkitExitFullscreen(); }
-    } else if (document.mozFullScreenEnabled) { // Firefox
-        if (!document.mozFullScreenElement) {
-            document.querySelector('body').mozRequestFullScreen();
-        } else { document.mozCancelFullScreen(); }
-    } else if (document.fullscreenEnabled) { // Standard, Edge
-        if (!document.fullscreenElement) {
-            document.querySelector('body').requestFullscreen();
-        } else { document.exitFullscreen(); }
-    }
+  // TODO: check latest fullscreen spec: https://caniuse.com/fullscreen
+  console.log('toggle fullscreen');
+  if (document.webkitFullscreenEnabled) { // Chrome, Opera, Safari
+    if (!document.webkitFullscreenElement) {
+      document.querySelector('body').webkitRequestFullscreen();
+    } else { document.webkitExitFullscreen(); }
+  } else if (document.mozFullScreenEnabled) { // Firefox
+    if (!document.mozFullScreenElement) {
+      document.querySelector('body').mozRequestFullScreen();
+    } else { document.mozCancelFullScreen(); }
+  } else if (document.fullscreenEnabled) { // Standard, Edge
+    if (!document.fullscreenElement) {
+      document.querySelector('body').requestFullscreen();
+    } else { document.exitFullscreen(); }
+  }
 }
 
 function toggle_overlay(force) {
@@ -359,27 +359,27 @@ function toggle_overlay(force) {
 
 let overlay_timeout = null;
 function toggle_overlay_timer(force) {
-    function show() {
-        toggle_overlay(true); // show overlay
-        overlay_timeout = setTimeout(hide, OVERLAY_TIMER_ON * 1000); 
-    }
-    
-    function hide() {
-        toggle_overlay(false); // hide overlay
-        overlay_timeout = setTimeout(show, (OVERLAY_TIMER_PERIOD - OVERLAY_TIMER_ON) * 1000);
-    }
-    
-    if (!overlay_timeout || force === true) { // timer is not active
-        show();
-    } else { // timer is active
-        cancel_overlay_timer(); // stop timer
-        toggle_overlay(false); // hide overlay
-    }
+  function show() {
+    toggle_overlay(true); // show overlay
+    overlay_timeout = setTimeout(hide, OVERLAY_TIMER_ON * 1000); 
+  }
+  
+  function hide() {
+    toggle_overlay(false); // hide overlay
+    overlay_timeout = setTimeout(show, (OVERLAY_TIMER_PERIOD - OVERLAY_TIMER_ON) * 1000);
+  }
+  
+  if (!overlay_timeout || force === true) { // timer is not active
+    show();
+  } else { // timer is active
+    cancel_overlay_timer(); // stop timer
+    toggle_overlay(false); // hide overlay
+  }
 }
 
 function cancel_overlay_timer() {
-    clearTimeout(overlay_timeout);
-    overlay_timeout = null;
+  clearTimeout(overlay_timeout);
+  overlay_timeout = null;
 }
 
 function get_cam_pos() {
@@ -391,54 +391,54 @@ function get_cam_pos() {
 }
 
 function set_overlay_pos(pos_h = 'center', pos_v = 'center') {
-    if (!pos_v) { pos_v = overlay_pos_v; }
-    if (!pos_h) { pos_h = overlay_pos_h; }
-    const overlay = document.querySelector('#overlay');
-    const body = document.querySelector('body');
-    
-    overlay_pos_v = pos_v;
-    if (pos_v === 'top') {
-        overlay.style.top = 0;
-        overlay.style.bottom = '';
-    } else if (pos_v === 'bottom') {
-        overlay.style.top = '';
-        overlay.style.bottom = 0;
-    } else {
-        overlay.style.top = '';
-        overlay.style.bottom = '';
-        overlay_pos_v = 'center';
-    }
-    
-    overlay_pos_h = pos_h;
-    if (pos_h === 'left') {
-        overlay.style.left = 0;
-        overlay.style.right = '';
-    } else if (pos_h === 'right') {
-        overlay.style.left = '';
-        overlay.style.right = 0;
-    } else {
-       overlay.style.left = '';
-       overlay.style.right = '';
-       overlay_pos_h = 'center';
-    }
+  if (!pos_v) { pos_v = overlay_pos_v; }
+  if (!pos_h) { pos_h = overlay_pos_h; }
+  const overlay = document.querySelector('#overlay');
+  const body = document.querySelector('body');
+  
+  overlay_pos_v = pos_v;
+  if (pos_v === 'top') {
+    overlay.style.top = 0;
+    overlay.style.bottom = '';
+  } else if (pos_v === 'bottom') {
+    overlay.style.top = '';
+    overlay.style.bottom = 0;
+  } else {
+    overlay.style.top = '';
+    overlay.style.bottom = '';
+    overlay_pos_v = 'center';
+  }
+  
+  overlay_pos_h = pos_h;
+  if (pos_h === 'left') {
+    overlay.style.left = 0;
+    overlay.style.right = '';
+  } else if (pos_h === 'right') {
+    overlay.style.left = '';
+    overlay.style.right = 0;
+  } else {
+    overlay.style.left = '';
+    overlay.style.right = '';
+    overlay_pos_h = 'center';
+  }
 }
 
 function cycle_overlay_pos() {
-    const sequence = [
-        ['center','center'],
-        ['center','top'],
-        ['right','top'],
-        ['right','center'],
-        ['right','bottom'],
-        ['center','bottom'],
-        ['left','bottom'],
-        ['left','center'],
-        ['left','top'],
-    ];
-    let idx = sequence.findIndex(el => el[0] === overlay_pos_h && el[1] === overlay_pos_v);
-    idx += 1;
-    if (idx >= sequence.length) { idx = 0; }
-    set_overlay_pos(...sequence[idx]);
+  const sequence = [
+    ['center','center'],
+    ['center','top'],
+    ['right','top'],
+    ['right','center'],
+    ['right','bottom'],
+    ['center','bottom'],
+    ['left','bottom'],
+    ['left','center'],
+    ['left','top'],
+  ];
+  let idx = sequence.findIndex(el => el[0] === overlay_pos_h && el[1] === overlay_pos_v);
+  idx += 1;
+  if (idx >= sequence.length) { idx = 0; }
+  set_overlay_pos(...sequence[idx]);
 }
 
 function set_cam_pos(obj) {
@@ -459,15 +459,15 @@ function next_cam(offset = 1) {
 
 // Set camera by position on plane, height above plane + target offset (from projected point on plane)
 function set_cam_by_offset(plane_x, plane_y, height, target_offset_y, limit_target_to_plane = true) {
-    camera.position.set( plane_x, plane_y, height );
-    
-    let target_y = plane_y + target_offset_y;
-    if (limit_target_to_plane) {
-        target_y = Math.max(-20, target_y);
-        target_y = Math.min(20, target_y);
-    }
-    controls.target.set( plane_x, target_y, 0 );
-    controls.update();
+  camera.position.set( plane_x, plane_y, height );
+  
+  let target_y = plane_y + target_offset_y;
+  if (limit_target_to_plane) {
+    target_y = Math.max(-20, target_y);
+    target_y = Math.min(20, target_y);
+  }
+  controls.target.set( plane_x, target_y, 0 );
+  controls.update();
 }
 
 // Set camera by position above plane, height above plane + tilt angle
@@ -477,33 +477,33 @@ function set_cam_by_offset(plane_x, plane_y, height, target_offset_y, limit_targ
 //   height:  [0.2, 10] ... close to far
 //   tilt:    [-90, 90] ... 0 is straight down, 45 is tilted upwards, 90 is horizontally forward
 function set_cam_by_tilt(plane_x, plane_y, height, tilt_up) {
-    // clamp tilt_up to [-90, 90]
-    tilt_up = Math.max(-90, tilt_up);
-    tilt_up = Math.min( 90, tilt_up);
-    
-    camera.position.set( plane_x, plane_y, height );
-    
-    // tilt angle that will hit the edge of the plane
-    const tilt_limit = Math.atan(20/height) / Math.PI * 180;
-    
-    // if tilt limit is exceeded, move target upward (instead of further away)
-    if (tilt_up > tilt_limit || tilt_up < -tilt_limit) {
-        // console.log(90-tilt_limit, Math.tan( (90-tilt_up)/180*Math.PI ));
-        const target_height = height - Math.tan( (90-Math.abs(tilt_up))/180*Math.PI ) * 20;
-        controls.target.set( plane_x, tilt_up >= 0 ? 20 : -20, target_height );
-    } else {
-        const target_offset_y = height * Math.tan(tilt_up / 180 * Math.PI);
-        controls.target.set( plane_x, plane_y + target_offset_y, 0 );
-    }
-    controls.update();
+  // clamp tilt_up to [-90, 90]
+  tilt_up = Math.max(-90, tilt_up);
+  tilt_up = Math.min( 90, tilt_up);
+  
+  camera.position.set( plane_x, plane_y, height );
+  
+  // tilt angle that will hit the edge of the plane
+  const tilt_limit = Math.atan(20/height) / Math.PI * 180;
+  
+  // if tilt limit is exceeded, move target upward (instead of further away)
+  if (tilt_up > tilt_limit || tilt_up < -tilt_limit) {
+    // console.log(90-tilt_limit, Math.tan( (90-tilt_up)/180*Math.PI ));
+    const target_height = height - Math.tan( (90-Math.abs(tilt_up))/180*Math.PI ) * 20;
+    controls.target.set( plane_x, tilt_up >= 0 ? 20 : -20, target_height );
+  } else {
+    const target_offset_y = height * Math.tan(tilt_up / 180 * Math.PI);
+    controls.target.set( plane_x, plane_y + target_offset_y, 0 );
+  }
+  controls.update();
 }
 
 function rnd(min, max) {
-    return min + Math.random() * (max-min);
+  return min + Math.random() * (max-min);
 }
 
 function randomize_cam() {
-    set_cam_by_tilt( rnd(-10,10), rnd(-10,10), rnd(0.2, 3), rnd(0, 30) ); 
+  set_cam_by_tilt( rnd(-10,10), rnd(-10,10), rnd(0.2, 3), rnd(0, 30) ); 
 }
 
 function get_colors() {
@@ -609,7 +609,7 @@ document.addEventListener('keydown', e => {
   }
   
   else if (e.key == 'r') {
-      randomize_cam();
+    randomize_cam();
   }
 });
 
