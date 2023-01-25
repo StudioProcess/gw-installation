@@ -24,7 +24,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   ------------------------------------
   H ........... Toggle HUD/GUI
   F ........... Toggle fullscreen
-  E ........... Export hi-res still
+  X ........... Export hi-res still
   
   Space ....... Toggle simulation
   Backspace ... Reset simulation
@@ -38,6 +38,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   T ........... Toggle overlay timer
   
   R ........... Randomize camera
+  E ........... Randomize emitters
   ------------------------------------
 */
 
@@ -533,6 +534,27 @@ function randomize_cam() {
   set_cam_by_tilt( rnd(-10,10), rnd(-10,10), rnd(0.2, 3), rnd(0, 30) ); 
 }
 
+function randomize_emitters() {
+  // position left emitter
+  uniforms.pointPositions.value[0].x = rnd(0.25, 0.5);
+  uniforms.pointPositions.value[0].y = rnd(0.25, 0.75);
+  gui.children[9].children[0].controllers[0].updateDisplay();
+  gui.children[9].children[0].controllers[1].updateDisplay();
+
+  // position right emitter
+  uniforms.pointPositions.value[1].x = rnd(0.5, 0.75);
+  uniforms.pointPositions.value[1].y = rnd(0.25, 0.75);
+  gui.children[9].children[1].controllers[0].updateDisplay();
+  gui.children[9].children[1].controllers[1].updateDisplay();
+  
+  // randomize period
+  const period = rnd(1.0, 5.0);
+  uniforms.pointPeriods.value[0] = period;
+  uniforms.pointPeriods.value[1] = period;
+  gui.children[10].controllers[0].updateDisplay();
+  gui.children[10].controllers[1].updateDisplay();
+}
+
 function get_colors() {
   return {
     background: uniforms.backgroundColor.value,
@@ -573,7 +595,7 @@ document.addEventListener('keydown', e => {
     SIMULATING = !SIMULATING;
   }
   // export hi-res still
-  else if (e.key == 'e') {
+  else if (e.key == 'x') {
     tilesaver.save().then(
       (f) => {
         console.log(`Saved to: ${f}`);
@@ -637,6 +659,9 @@ document.addEventListener('keydown', e => {
   
   else if (e.key == 'r') {
     randomize_cam();
+  }
+  else if (e.key == 'e') {
+    randomize_emitters();
   }
 });
 
