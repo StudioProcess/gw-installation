@@ -457,7 +457,7 @@ function next_cam(offset = 1) {
 }
 
 // Set camera by position on plane, height above plane + target offset (from projected point on plane)
-function set_cam_target(plane_x, plane_y, height, target_offset_y, limit_target_to_plane = true) {
+function set_cam_by_offset(plane_x, plane_y, height, target_offset_y, limit_target_to_plane = true) {
     camera.position.set( plane_x, plane_y, height );
     
     let target_y = plane_y + target_offset_y;
@@ -468,7 +468,6 @@ function set_cam_target(plane_x, plane_y, height, target_offset_y, limit_target_
     controls.target.set( plane_x, target_y, 0 );
     controls.update();
 }
-window.set_cam_target = set_cam_target;
 
 // Set camera by position above plane, height above plane + tilt angle
 // Ranges:
@@ -476,7 +475,7 @@ window.set_cam_target = set_cam_target;
 //   plane_y: [-20, 20] ... bottom to top
 //   height:  [0.2, 10] ... close to far
 //   tilt:    [-90, 90] ... 0 is straight down, 45 is tilted upwards, 90 is horizontally forward
-function set_cam_tilt(plane_x, plane_y, height, tilt_up) {
+function set_cam_by_tilt(plane_x, plane_y, height, tilt_up) {
     // clamp tilt_up to [-90, 90]
     tilt_up = Math.max(-90, tilt_up);
     tilt_up = Math.min( 90, tilt_up);
@@ -495,10 +494,16 @@ function set_cam_tilt(plane_x, plane_y, height, tilt_up) {
         const target_offset_y = height * Math.tan(tilt_up / 180 * Math.PI);
         controls.target.set( plane_x, plane_y + target_offset_y, 0 );
     }
-    
     controls.update();
 }
-window.set_cam_tilt = set_cam_tilt;
+
+function rnd(min, max) {
+    return min + Math.random() * (max-min);
+}
+
+function randomize_cam() {
+    set_cam_by_tilt( rnd(-10,10), rnd(-10,10), rnd(0.2, 3), rnd(0, 30) ); 
+}
 
 function get_colors() {
   return {
@@ -594,6 +599,10 @@ document.addEventListener('keydown', e => {
   // toggle overlay timer
   else if (e.key == 't') {
     toggle_overlay_timer();
+  }
+  
+  else if (e.key == 'r') {
+      randomize_cam();
   }
 });
 
