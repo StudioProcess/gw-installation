@@ -18,12 +18,36 @@ import ligoPlaneFS from "../shaders/ligoPlaneFS.js";
 
 import {inverseLerpClamped} from "../shared/mathUtils.js";
 
+
+/* 
+  HOTKEYS
+  ------------------------------------
+  H ........... Toggle HUD/GUI
+  F ........... Toggle fullscreen
+  E ........... Export hi-res still
+  
+  Space ....... Toggle simulation
+  Backspace ... Reset simulation
+
+  C ........... Log camera and colors
+  N ........... Next camera
+  M ........... Next colors
+  
+  O ........... Toggle overlay
+  P ........... Cycle overlay position
+  T ........... Toggle overlay timer
+  
+  R ........... Randomize camera
+  ------------------------------------
+*/
+
 /* 
   Shader passes:
   * Simulation: fullscreenVS + computeWaveHeightFS
   * Background: fullscreenVS + backgroundFS
   * Waves:      ligoPlaneVS  + ligoPlaneFS
 */
+
 
 const W = 1920;
 const H = 1080;
@@ -602,7 +626,7 @@ document.addEventListener('keydown', e => {
     cancel_overlay_timer(); // cancel timer (if any)
     toggle_overlay();
   }
-  // toggle overlay timer
+  // cycle overlay position
   else if (e.key == 'p') {
     cycle_overlay_pos();
   }
