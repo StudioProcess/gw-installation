@@ -37,6 +37,7 @@ let EXPORT_TILES = 2;
 let SIMULATING = true;
 let SIMULATION_FPS = 24;
 
+const ADD_FULLSCREEN_BUTTON = false;
 const LOCK_CAM_TARGET_TO_PLANE = false;
 
 const START_WITH_OVERLAY = false;
@@ -250,20 +251,22 @@ function setup() {
   // window.addEventListener("resize", onResize);
   
   // fullscreen button
-  const div = document.createElement('div');
-  div.innerText = '←→';
-  div.style.fontSize = '20px';
-  div.style.width = '40px';
-  div.style.height = '40px';
-  div.style.position = 'fixed';
-  div.style.top = '10px';
-  div.style.left = '10px';
-  div.style.cursor = 'pointer';
-  div.style.rotate = '-45deg';
-  div.style.userSelect = 'none';
-  div.style.webkitUserSelect = 'none';
-  div.addEventListener('click', toggleFullscreen );
-  document.body.appendChild( div );
+  if (ADD_FULLSCREEN_BUTTON) {
+    const div = document.createElement('div');
+    div.innerText = '←→';
+    div.style.fontSize = '20px';
+    div.style.width = '40px';
+    div.style.height = '40px';
+    div.style.position = 'fixed';
+    div.style.top = '10px';
+    div.style.left = '10px';
+    div.style.cursor = 'pointer';
+    div.style.rotate = '-45deg';
+    div.style.userSelect = 'none';
+    div.style.webkitUserSelect = 'none';
+    div.addEventListener('click', toggleFullscreen );
+    document.body.appendChild( div );
+  }
   
   // overlay
   set_overlay_pos(overlay_pos_h, overlay_pos_v);
