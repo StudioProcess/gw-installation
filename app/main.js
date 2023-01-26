@@ -21,7 +21,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
 
 /* 
   HOTKEYS
-  ------------------------------------
+  ---------------------------------------
   H ........... Toggle HUD/GUI
   F ........... Toggle fullscreen
   X ........... Export hi-res still
@@ -39,7 +39,8 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   
   R ........... Randomize camera
   E ........... Randomize emitters
-  ------------------------------------
+  Enter ....... Start generative sequence
+  ---------------------------------------
 */
 
 /* 
@@ -632,6 +633,68 @@ function next_colors(offset = 1) {
   set_colors( colors[current_colors] );
 }
 
+function make_timer(period_s, cb) {
+  let count = 0;
+  let timer = null;
+  
+  function callback() {
+    // console.log('callback:', count);
+    if (typeof cb === 'function') { cb(count); }
+    count += 1;
+  }
+  
+  function start(immediate = true) {
+    stop(); // clear previous timer
+    if (immediate) { callback(); }
+    const time = Array.isArray(period_s) ? rnd(...period_s) : period_s;
+    // console.log('timer:', time);
+    timer = setTimeout(start, time * 1000);
+  }
+  
+  function stop() {
+    clearTimeout(timer);
+    timer = null;
+  }
+  
+  function reset() {
+    start(false);
+  }
+  
+  return {
+    start, stop, reset
+  };
+}
+
+let sequence_running = false;
+let t_view;
+let t_emitters;
+function toggle_sequence(force) {
+  
+  function stop() {
+    if (sequence_running) {
+      t_view.stop();
+      t_emitters.stop();
+    }
+    sequence_running = false;
+  }
+  
+  function start() {
+    stop();
+    t_view = make_timer( [15,30], randomize_cam );
+    t_view.start();
+    t_emitters = make_timer( 150, randomize_emitters );
+    t_emitters.reset();
+    sequence_running = true;
+  }
+  
+  if (force !== undefined) {
+    if (force) { start(); }
+    else { stop(); }
+  } else {
+    toggle_sequence(!sequence_running);
+  }
+}
+
 document.addEventListener('keydown', e => {
   // console.log(e.key);
   
@@ -683,6 +746,7 @@ document.addEventListener('keydown', e => {
   // switch camera position
   else if (e.key == 'n') {
     next_cam();
+    toggle_sequence(false); // stop running sequence
   }
   // switch colors
   else if (e.key == 'm') {
@@ -708,12 +772,16 @@ document.addEventListener('keydown', e => {
   
   else if (e.key == 'r') {
     randomize_cam();
+    toggle_sequence(false); // stop running sequence
   }
   else if (e.key == 'e') {
     randomize_emitters();
   }
   else if (e.key == 'w') {
     toggle_rotation();
+  }
+  else if (e.key == 'Enter') {
+    toggle_sequence();
   }
 });
 
