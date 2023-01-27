@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import Stats from 'stats.js';
   
 import * as capture from '../vendor/recorder.js';
 
@@ -25,6 +26,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   H ........... Toggle HUD/GUI
   F ........... Toggle fullscreen
   X ........... Export hi-res still
+  S ........... Toggle FPS/Stats
   
   Space ....... Toggle simulation
   Backspace ... Reset simulation
@@ -89,6 +91,7 @@ let deltaCounter = 0;
 let walzeLoopValue = 0; // position inside the loop [0..1)
 let frameRequest;
 let sceneRotationPeriod = 0;
+let stats;
 
 const cams = [
   {"position":[0.0,-10.743654156564656,13.938095455943627],"rotation":[0.6566884115103175,0.0,0.0,"XYZ"],"target":[0,0,0]},
@@ -303,6 +306,11 @@ function setup() {
   if (START_WITH_OVERLAY) { toggle_overlay(true); }
   if (START_WITH_OVERLAY_TIMER) { toggle_overlay_timer(true); }
   
+  // stats
+  stats = new Stats();
+  document.body.appendChild( stats.dom );
+  toggle_stats(false);
+  
   clock.start();
 }
 
@@ -316,6 +324,8 @@ function onResize() {
 
 
 function loop(time) { // eslint-disable-line no-unused-vars
+  stats.begin();
+  
   if (WALZE) {
     walzeLoopValue = (time/1000 % WALZE_PERIOD) / WALZE_PERIOD;
     uniforms.walzeRight.value = inverseLerpClamped(0.0, uniforms.walzeRelDuration.value, walzeLoopValue);
@@ -347,12 +357,6 @@ function loop(time) { // eslint-disable-line no-unused-vars
     }
   }
   
-  frameRequest = requestAnimationFrame( loop );
-  
-  renderer.setRenderTarget( null ); // Fix for three@0.102
-  renderer.render( scene, camera );
-  capture.update( renderer );
-  
   if (LOCK_CAM_TARGET_TO_PLANE) {
     controls.target.z = 0; // lock orbit target to plane
   }
@@ -360,6 +364,14 @@ function loop(time) { // eslint-disable-line no-unused-vars
   if (sceneRotationPeriod) {
     scene.rotation.z += 2 * Math.PI * delta / sceneRotationPeriod;
   }
+  
+  renderer.setRenderTarget( null ); // Fix for three@0.102
+  renderer.render( scene, camera );
+  
+  stats.end();
+  
+  capture.update( renderer );
+  frameRequest = requestAnimationFrame( loop );
 }
 
 function reset_simulation() {
@@ -417,6 +429,19 @@ function toggle_overlay_timer(force) {
 function cancel_overlay_timer() {
   clearTimeout(overlay_timeout);
   overlay_timeout = null;
+}
+
+function toggle_stats(force) {
+  if (force !== undefined) {
+    if (force) {
+      stats.dom.style.display = '';
+    } else {
+      stats.dom.style.display = 'none';
+    }
+  } else {
+    if (stats.dom.style.display === '') { toggle_stats(false); }
+    else { toggle_stats(true); }
+  }
 }
 
 function get_cam_pos() {
@@ -782,6 +807,9 @@ document.addEventListener('keydown', e => {
   }
   else if (e.key == 'Enter') {
     toggle_sequence();
+  }
+  else if (e.key == 's') {
+    toggle_stats();
   }
 });
 
