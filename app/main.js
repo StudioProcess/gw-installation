@@ -726,15 +726,23 @@ function toggle_sequence(force) {
 
 function setup_menu() {
   const menu = document.querySelector('#menu');
+  menu.onclick = (e) => {
+    e.stopPropagation();
+  };
+  document.body.ondblclick = () => {
+    toggle_menu(true);
+  };
+  
+  document.body.onclick = () => {
+    toggle_menu(false);
+  };
+  
   menu.querySelector('.fullscreen').onclick = () => {
     toggleFullscreen();
   };
   menu.querySelector('.color').onclick = () => {
     next_colors();
   };
-  
-
-  
 }
 
 function toggle_menu(force) {
