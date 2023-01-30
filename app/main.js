@@ -729,12 +729,17 @@ function setup_menu() {
   menu.onclick = (e) => {
     e.stopPropagation();
   };
-  document.body.ondblclick = () => {
-    toggle_menu(true);
-  };
   
+  let last_hidden = 0;
   document.body.onclick = () => {
+    if (!menu.classList.contains('hidden')) {
+      last_hidden = Date.now();
+    }
     toggle_menu(false);
+  };
+  document.body.ondblclick = () => {
+    if (Date.now() - last_hidden < 400) { return; }
+    toggle_menu(true);
   };
   
   menu.querySelector('.fullscreen').onclick = () => {
