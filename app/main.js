@@ -27,6 +27,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   F ........... Toggle fullscreen
   X ........... Export hi-res still
   S ........... Toggle FPS/Stats
+  Tab ......... Toggle Menu
   
   Space ....... Toggle simulation
   Backspace ... Reset simulation
@@ -63,7 +64,7 @@ const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 let EXPORT_TILES = 2;
 
 let SIMULATING = true;
-let SIMULATION_FPS = 24;
+let SIMULATION_FPS = 60;
 let SCENE_ROTATION_PERIOD = 900;
 
 const ADD_FULLSCREEN_BUTTON = false;
@@ -300,6 +301,9 @@ function setup() {
     div.addEventListener('click', toggleFullscreen );
     document.body.appendChild( div );
   }
+  
+  // menu
+  setup_menu(); 
   
   // overlay
   set_overlay_pos(overlay_pos_h, overlay_pos_v);
@@ -720,6 +724,32 @@ function toggle_sequence(force) {
   }
 }
 
+function setup_menu() {
+  const menu = document.querySelector('#menu');
+  menu.querySelector('.fullscreen').onclick = () => {
+    toggleFullscreen();
+  };
+  menu.querySelector('.color').onclick = () => {
+    next_colors();
+  };
+  
+
+  
+}
+
+function toggle_menu(force) {
+  const menu = document.querySelector('#menu');
+  if (force !== undefined) {
+    if (force) {
+      menu.classList.remove('hidden');
+    } else {
+      menu.classList.add('hidden');
+    }
+  } else {
+    toggle_menu(menu.classList.contains('hidden'));
+  }
+}
+
 document.addEventListener('keydown', e => {
   // console.log(e.key);
   
@@ -811,6 +841,11 @@ document.addEventListener('keydown', e => {
   else if (e.key == 's') {
     toggle_stats();
   }
+  else if (e.key == 'Tab') {
+    toggle_menu();
+    e.preventDefault();
+  }
+  
 });
 
 
