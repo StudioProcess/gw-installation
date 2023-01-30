@@ -81,7 +81,7 @@ canvas#three.js {
   padding: 0.5em;
   text-transform: uppercase;
   /* text-decoration: underline; */
-  background-color: rgba(0,0,0,0.5)
+  background-color: rgba(0,0,0,0.75)
 }
 
 menu.hidden {

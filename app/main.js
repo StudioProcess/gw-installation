@@ -313,6 +313,7 @@ function setup() {
   
   // stats
   stats = new Stats();
+  stats.dom.id = 'stats.js';
   document.body.appendChild( stats.dom );
   toggle_stats(false);
   
@@ -454,6 +455,7 @@ function toggle_stats(force) {
     if (stats.dom.style.display === '') { toggle_stats(false); }
     else { toggle_stats(true); }
   }
+  update_menu_indicators();
 }
 
 function get_cam_pos() {
@@ -777,6 +779,10 @@ function setup_menu() {
     toggle_sequence(true);
   };
   
+  menu.querySelector('.fps').onclick = () => {
+    toggle_stats();
+  };
+  
   function update_fs_indicator() {
     menu.querySelector('.fullscreen').classList.toggle('dot-on', is_fullscreen());
   }
@@ -803,6 +809,7 @@ function update_menu_indicators() {
   const menu = document.querySelector('#menu');
   menu.querySelector('.text').classList.toggle('dot-on', !document.querySelector('#overlay').classList.contains('hidden'));
   menu.querySelector('.text').classList.toggle('dot-pulse', overlay_timeout !== null);
+  menu.querySelector('.fps').classList.toggle('dot-on', stats.dom.style.display === '');
 }
 
 document.addEventListener('keydown', e => {
