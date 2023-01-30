@@ -76,7 +76,7 @@ canvas {
 #menu {
   position: absolute;
   font-family: "Oswald";
-  line-height: 1.2;
+  line-height: 2.0;
   left: 0;
   padding: 0.5em;
   text-transform: uppercase;
