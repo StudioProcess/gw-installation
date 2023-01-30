@@ -14,14 +14,14 @@ body {
   overflow: hidden; /* hide scrollbars */
 }
 
-canvas {
+canvas#three.js {
   width: 100% !important;
   height: auto !important;
 }
 
 /* landscape viewport -> fit width */
 @media (min-aspect-ratio: 1/1) {
-  canvas {
+  canvas#three.js {
     width: 100% !important;
     height: auto !important;
   }
@@ -32,7 +32,7 @@ canvas {
 
 /* portrait viewport -> fit height */
 @media (max-aspect-ratio: 1/1) {
-  canvas {
+  canvas#three.js {
     height: 100% !important;
     width: auto !important;
   }

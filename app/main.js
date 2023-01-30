@@ -225,6 +225,7 @@ function setup() {
   });
   renderer.setSize( W, H );
   renderer.setPixelRatio( PX_RATIO );
+  renderer.domElement.id = "three.js";
   document.body.appendChild( renderer.domElement );
 
   scene = new THREE.Scene();
