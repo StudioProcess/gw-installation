@@ -385,6 +385,12 @@ function reset_simulation() {
 }
 
 
+function is_fullscreen() {
+  return Boolean(document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement);
+}
+
+window.is_fs = is_fullscreen;
+
 // Toggles the browser's fullscreen mode on the body element
 // Note: Doesn't work on iPhone
 function toggleFullscreen() {
@@ -748,6 +754,13 @@ function setup_menu() {
   menu.querySelector('.color').onclick = () => {
     next_colors();
   };
+  
+  function update_fs_indicator() {
+    menu.querySelector('.fullscreen').classList.toggle('dot-on', is_fullscreen());
+  }
+  window.addEventListener('webkitfullscreenchange', update_fs_indicator);
+  window.addEventListener('mozfullscreenchange', update_fs_indicator);
+  window.addEventListener('fullscreenchange', update_fs_indicator);
 }
 
 function toggle_menu(force) {
@@ -761,6 +774,11 @@ function toggle_menu(force) {
   } else {
     toggle_menu(menu.classList.contains('hidden'));
   }
+}
+
+function update_menu_indicators() {
+  //console.log('update');
+  //const menu = document.querySelector('#menu');
 }
 
 document.addEventListener('keydown', e => {
