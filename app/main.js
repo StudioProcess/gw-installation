@@ -389,8 +389,6 @@ function is_fullscreen() {
   return Boolean(document.webkitFullscreenElement || document.mozFullScreenElement || document.fullscreenElement);
 }
 
-window.is_fs = is_fullscreen;
-
 // Toggles the browser's fullscreen mode on the body element
 // Note: Doesn't work on iPhone
 function toggleFullscreen() {
@@ -414,6 +412,7 @@ function toggleFullscreen() {
 function toggle_overlay(force) {
   const overlay = document.querySelector('#overlay');
   overlay.classList.toggle('hidden', force !== undefined ? !force : undefined);
+  update_menu_indicators();
 }
 
 let overlay_timeout = null;
@@ -434,6 +433,8 @@ function toggle_overlay_timer(force) {
     cancel_overlay_timer(); // stop timer
     toggle_overlay(false); // hide overlay
   }
+  
+  update_menu_indicators();
 }
 
 function cancel_overlay_timer() {
@@ -755,6 +756,26 @@ function setup_menu() {
     next_colors();
   };
   
+  menu.querySelector('.text').onclick = () => {
+    if (overlay_timeout === null) { // no timer running
+      if (document.querySelector('#overlay').classList.contains('hidden')) { // no overlay shown
+        toggle_overlay(true);
+      } else {
+        toggle_overlay_timer();
+      }
+    } else { // timer is running
+      toggle_overlay_timer(false);
+    }
+  };
+  
+  menu.querySelector('.text-position').onclick = () => {
+    cycle_overlay_pos();
+  };
+  
+  menu.querySelector('.view').onclick = () => {
+    toggle_sequence(true);
+  };
+  
   function update_fs_indicator() {
     menu.querySelector('.fullscreen').classList.toggle('dot-on', is_fullscreen());
   }
@@ -778,7 +799,9 @@ function toggle_menu(force) {
 
 function update_menu_indicators() {
   //console.log('update');
-  //const menu = document.querySelector('#menu');
+  const menu = document.querySelector('#menu');
+  menu.querySelector('.text').classList.toggle('dot-on', !document.querySelector('#overlay').classList.contains('hidden'));
+  menu.querySelector('.text').classList.toggle('dot-pulse', overlay_timeout !== null);
 }
 
 document.addEventListener('keydown', e => {
