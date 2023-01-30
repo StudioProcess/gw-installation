@@ -919,4 +919,14 @@ if (SW_ENABLED && 'serviceWorker' in navigator) {
   });
 }
 
+// Install button (in menu) (Chrome, needs service worker)
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // Prevents the default mini-infobar or install dialog from appearing on mobile
+  const install_btn = document.querySelector('menu li.install');
+  install_btn.onclick = () => {
+    e.prompt();
+  };
+  install_btn.classList.remove('hidden');
+});
+
 main();

@@ -102,6 +102,23 @@ menu.hidden {
   user-select: none;
 }
 
+#menu li.hidden {
+  display: none;
+}
+
+#menu li.install {
+  list-style-type: none;
+}
+
+#menu li.install span {
+  color: black;
+  background-color: white ;
+  border: 1px solid black;
+  border-radius: 3px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
 .dot-off::after {
   content: "○";
   padding-left: 0.3em;

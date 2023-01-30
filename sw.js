@@ -5,9 +5,11 @@ const resources = [
   './manifest.webmanifest',
   './app/main.js',
   './app/main.css',
-  './node_modules/three/build/three.js',
-  './node_modules/three/examples/js/controls/OrbitControls.js',
-  './node_modules/dat.gui/build/dat.gui.min.js',
+  './node_modules/es-module-shims/dist/es-module-shims.js',
+  './node_modules/three/build/three.module.js',
+  './node_modules/three/examples/jsm/controls/OrbitControls.js',
+  './node_modules/lil-gui/dist/lil-gui.esm.js',
+  './node_modules/stats.js/src/Stats.js',
   './shaders/backgroundFS.js',
   './shaders/computeWaveHeightFS.js',
   './shaders/fullscreenVS.js',
@@ -21,6 +23,7 @@ const resources = [
   './vendor/tar.js',
   './vendor/tilesaver.js',
   './icons/192.png',
+  './icons/1024.png',
   './fonts/Oswald-VariableFont_wght.ttf',
 ];
 

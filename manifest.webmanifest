@@ -7,6 +7,10 @@
             "src": "icons/192.png",
             "sizes": "192x192",
             "type": "image/png"
+        },        {
+            "src": "icons/1024.png",
+            "sizes": "1024x2024",
+            "type": "image/png"
         }
     ],
     "name": "Gravitational Waves",
