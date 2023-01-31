@@ -8,14 +8,14 @@
   <link rel="apple-touch-icon" href="./icons/192.png">
 </head>
 <body>
-  <script async src="./node_modules/es-module-shims/dist/es-module-shims.js"></script> <!-- Needed for Safari 16.2 (macOS + iOS) -->
+  <script async src="./vendor/es-module-shims.js"></script> <!-- Needed for Safari 16.2 (macOS + iOS) -->
   <script type="importmap">
     {
       "imports": {
-        "three": "./node_modules/three/build/three.module.js",
-        "three/addons/": "./node_modules/three/examples/jsm/",
-        "lil-gui": "./node_modules/lil-gui/dist/lil-gui.esm.js",
-        "stats.js": "./node_modules/stats.js/src/Stats.js"
+        "three": "./vendor/three.module.js",
+        "three/addons/controls/OrbitControls.js": "./vendor/OrbitControls.js",
+        "lil-gui": "./vendor/lil-gui.esm.js",
+        "stats.js": "./vendor/Stats.js"
       }
     }
   </script>

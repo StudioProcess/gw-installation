@@ -11,7 +11,10 @@
     "start": "browser-sync start --server --port 8080 --no-notify --no-ghost-mode --files index.html app",
     "test": "echo \"Error: no test specified\" && exit 1",
     "reinstall": "rm -rf node_modules && npm install",
-    "hash": "./hash.sh"
+    "hash": "./hash.sh",
+    "copy-vendor-scripts": "mkdir -p vendor; cp ./node_modules/es-module-shims/dist/es-module-shims.js vendor; cp ./node_modules/three/build/three.module.js vendor; cp ./node_modules/three/examples/jsm/controls/OrbitControls.js vendor; cp ./node_modules/lil-gui/dist/lil-gui.esm.js vendor; cp ./node_modules/stats.js/src/Stats.js vendor",
+    "preinstall": "npm run copy-vendor-scripts",
+    "prestart": "npm run copy-vendor-scripts"
   },
   "keywords": [],
   "author": "Martin Grödl <martin@process.studio> (https://process.studio)",

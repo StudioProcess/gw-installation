@@ -1,7 +1,8 @@
 {
   "identifier" : "7736B7F2-EEA3-4AF1-B593-A2FAF93E0A1F",
   "ignoredFilePatterns" : [
-    ".git"
+    ".git",
+    "node_modules"
   ],
   "remotePath" : "\/gw-installation",
   "remoteURL" : "https:\/\/sketch.process.studio\/gw-installation",
