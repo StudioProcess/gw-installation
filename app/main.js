@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'stats.js';
   
-import * as capture from '../vendor/recorder.js';
+import * as capture from '../lib/recorder.js';
 
-import * as tilesaver from '../vendor/tilesaver.js';
+import * as tilesaver from '../lib/tilesaver.js';
 import {initGui} from "../shared/generateGui.js";
 
 import getInstancedSplineGeometry from "../shared/getInstancedSplineGeometry.js";
