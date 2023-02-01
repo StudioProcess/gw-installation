@@ -1,4 +1,4 @@
-export const ENV = 'development'; // Will be set to 'production' by npm build script
+import env from './env.js';
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -58,7 +58,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
 const W = 1920;
 const H = 1080;
 const PX_RATIO = 1;
-const SW_ENABLED = (ENV=='production');
+const SW_ENABLED = (env.ENV=='production');
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
@@ -212,7 +212,10 @@ function main() {
 
 
 function setup() {
-  console.log(`ENV: ${ENV}`);
+  console.log(`ENV: ${env.ENV}`);
+  if (env.ENV === 'production') {
+    console.log(`BUILD_DATE: ${env.BUILD_DATE}`);
+  }
   
   // check screen
   const screen_w = screen.width * devicePixelRatio;

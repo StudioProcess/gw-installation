@@ -15,7 +15,7 @@
     "copy-vendor-scripts": "mkdir -p vendor; cp ./node_modules/es-module-shims/dist/es-module-shims.js vendor; cp ./node_modules/three/build/three.module.js vendor; cp ./node_modules/three/examples/jsm/controls/OrbitControls.js vendor; cp ./node_modules/lil-gui/dist/lil-gui.esm.js vendor; cp ./node_modules/stats.js/src/Stats.js vendor",
     "preinstall": "npm run copy-vendor-scripts",
     "prestart": "npm run copy-vendor-scripts",
-    "build": "rm -rf dist; rsync -a ./ dist/ --exclude='node_modules' --exclude='.git' --exclude='.nova' --exclude='.DS_Store'; sed -i'.orig' -e 's/ENV = \\x27development\\x27/ENV = \\x27production\\x27/g' 'dist/app/main.js'; rm -f dist/app/main.js.orig",
+    "build": "rm -rf dist; rsync -a ./ dist/ --exclude='node_modules' --exclude='.git' --exclude='.nova' --exclude='.DS_Store'; sed -i'.orig' -e \"s/ENV: \\x27development\\x27/ENV: \\x27production\\x27/g;s/### BUILD_DATE ###/$(date)/g\" 'dist/app/env.js'; rm -f dist/app/env.js.orig",
     "prebuild": "npm run copy-vendor-scripts"
   },
   "keywords": [],
