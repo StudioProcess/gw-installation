@@ -1,3 +1,5 @@
+export const ENV = 'development'; // Will be set to 'production' by npm build script
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'stats.js';
@@ -53,11 +55,10 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   * Waves:      ligoPlaneVS  + ligoPlaneFS
 */
 
-
 const W = 1920;
 const H = 1080;
 const PX_RATIO = 1;
-const SW_ENABLED = false;
+const SW_ENABLED = (ENV=='production');
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
@@ -211,6 +212,7 @@ function main() {
 
 
 function setup() {
+  console.log(`ENV: ${ENV}`);
   
   // check screen
   const screen_w = screen.width * devicePixelRatio;
