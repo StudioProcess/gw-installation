@@ -26,7 +26,7 @@ canvas#three-js {
     height: auto !important;
   }
   #overlay {
-      font-size: 4vw;
+    font-size: 4vw;
   }
 }
 
@@ -38,6 +38,17 @@ canvas#three-js {
   }
   #overlay {
     font-size: 7vw;
+  }
+  #menu {
+    font-size: 36px !important;
+  }
+  #info {
+    font-size: 18px !important;
+    top: 96px !important;
+  }
+  #stats_js canvas {
+    width: 160px !important;
+    height: 96px !important;
   }
 }
 
