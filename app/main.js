@@ -230,7 +230,7 @@ function setup() {
   });
   renderer.setSize( W, H );
   renderer.setPixelRatio( PX_RATIO );
-  renderer.domElement.id = "three.js";
+  renderer.domElement.id = "three-js";
   document.body.appendChild( renderer.domElement );
 
   scene = new THREE.Scene();
@@ -318,7 +318,7 @@ function setup() {
   
   // stats
   stats = new Stats();
-  stats.dom.id = 'stats.js';
+  stats.dom.id = 'stats_js';
   document.body.appendChild( stats.dom );
   toggle_stats(false);
   
