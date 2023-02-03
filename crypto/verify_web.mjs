@@ -1,0 +1,130 @@
+import files from './files.mjs';
+
+// const config = { algorithm: 'ECDSA', named_curve: 'P-256', hash: 'SHA-256' };
+const config = { algorithm: 'ECDSA', named_curve: 'P-384', hash: 'SHA-384' };
+// const config = { algorithm: 'ECDSA', named_curve: 'P-521', hash: 'SHA-512' };
+
+
+async function fetch_text(path) {
+    const res = await fetch(path);
+    return res.text();
+}
+
+async function fetch_ab(path) {
+    const res = await fetch(path);
+    return res.arrayBuffer();
+}
+
+/*
+Convert a string into an ArrayBuffer
+from https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+*/
+function str2ab(str) {
+    const buf = new ArrayBuffer(str.length);
+    const bufView = new Uint8Array(buf);
+    for (let i = 0; i < str.length; i++) {
+        bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+}
+
+function ab2str(buf) {
+    const bufView = new Uint8Array(buf);
+    const str = String.fromCharCode(...bufView);
+    return str;
+}
+
+function ab_to_base64(buf) {
+    const binary_str = ab2str(buf);
+    return btoa(binary_str);
+}
+
+function base64_to_ab(str) {
+    const binary_str = atob(str); // base64 to (binary) string
+    return str2ab(binary_str);
+}
+
+// https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail
+// https://www.rfc-editor.org/rfc/rfc7468
+// Note: Only returns the first PEM data block
+function decode_pem(pem_str) {    
+    let matches = pem_str.matchAll(/-----BEGIN ([^-]*)-----/gd);
+    matches = [...matches];
+    if (matches.length == 0) {
+        throw "PEM header not found";
+    }
+    const first_match = matches[0];
+    const label = first_match[1];
+    const header_end = first_match.indices[0][1];
+    
+    const footer_start = pem_str.indexOf(`-----END ${label}-----`, header_end + 1)
+    if (footer_start === -1) {
+        throw `PEM footer not found for header with label ${label}`;
+    } 
+    let data = pem_str.slice(header_end + 1, footer_start - 1 );
+    data = data.replaceAll(/\s+/g, ''); // remove all whitespace
+    const decoded_buf = base64_to_ab(data);
+    return {
+        label,
+        data: decoded_buf,
+    };
+}
+
+async function load_public_key(path) {
+    const pem_text = await fetch_text(path);
+    return crypto.subtle.importKey(
+        'spki',
+        decode_pem(pem_text).data,
+        { name: config.algorithm, namedCurve: config.named_curve },
+        false,
+        ['verify']
+    );
+}
+
+async function load_private_key(path) {
+    const pem_text = await fetch_text(path);
+    return crypto.subtle.importKey(
+        'pkcs8',
+        decode_pem(pem_text).data,
+        { name: config.algorithm, namedCurve: config.named_curve },
+        false,
+        ['sign']
+    );
+}
+
+async function load_signature(path) {
+    const sig_text = await fetch_text(path);
+    return base64_to_ab(sig_text);
+}
+
+function join_buffers(buffers) {
+    const total_length = buffers.reduce((acc, buf) => acc + buf.byteLength, 0);
+    const out = new Uint8Array(total_length);
+    
+    let offset = 0;
+    for (let buf of buffers) {
+        out.set( new Uint8Array(buf), offset);
+        offset += buf.byteLength;
+    }
+    return out.buffer;
+}
+
+const public_key = await load_public_key('./public_key.pem');
+const sig = await fetch_text('./signature.base64');
+console.log('Signature:', sig);
+
+const data_buffers = await Promise.all(files.map(path => {
+    console.log('Verifying:', path);
+    return fetch_ab(path);
+}));
+const data = join_buffers(data_buffers);
+// console.log(data);
+
+const verified = await crypto.subtle.verify(
+    { name: config.algorithm, hash: config.hash },
+    public_key,
+    base64_to_ab(sig),
+    data
+);
+
+console.log(verified);
