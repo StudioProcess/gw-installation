@@ -5,20 +5,20 @@ const config = { algorithm: 'ECDSA', named_curve: 'P-384', hash: 'SHA-384' };
 // const config = { algorithm: 'ECDSA', named_curve: 'P-521', hash: 'SHA-512' };
 
 
+// Fetch String
 async function fetch_text(path) {
     const res = await fetch(path);
     return res.text();
 }
 
+// Fetch ArrayBuffer
 async function fetch_ab(path) {
     const res = await fetch(path);
     return res.arrayBuffer();
 }
 
-/*
-Convert a string into an ArrayBuffer
-from https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-*/
+// String to ArrayBuffer
+// https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 function str2ab(str) {
     const buf = new ArrayBuffer(str.length);
     const bufView = new Uint8Array(buf);
@@ -28,25 +28,30 @@ function str2ab(str) {
     return buf;
 }
 
+// ArrayBuffer to String
 function ab2str(buf) {
     const bufView = new Uint8Array(buf);
     const str = String.fromCharCode(...bufView);
     return str;
 }
 
+// ArrayBuffer to base64 String
 function ab_to_base64(buf) {
     const binary_str = ab2str(buf);
     return btoa(binary_str);
 }
 
+// Base64 String to ArrayBuffer
 function base64_to_ab(str) {
     const binary_str = atob(str); // base64 to (binary) string
     return str2ab(binary_str);
 }
 
+// Decode PEM format
+// Returns: { label: String, data: ArrayBuffer }
+// Note: Only returns the first PEM data block
 // https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail
 // https://www.rfc-editor.org/rfc/rfc7468
-// Note: Only returns the first PEM data block
 function decode_pem(pem_str) {    
     let matches = pem_str.matchAll(/-----BEGIN ([^-]*)-----/gd);
     matches = [...matches];
@@ -70,33 +75,34 @@ function decode_pem(pem_str) {
     };
 }
 
+// Load public key from PEM file
+// Returns: Promise<CryptoKey>
 async function load_public_key(path) {
     const pem_text = await fetch_text(path);
     return crypto.subtle.importKey(
         'spki',
         decode_pem(pem_text).data,
         { name: config.algorithm, namedCurve: config.named_curve },
-        false,
+        false, // not extractable
         ['verify']
     );
 }
 
+// Load private key from PEM file
+// Returns: Promise<CryptoKey>
 async function load_private_key(path) {
     const pem_text = await fetch_text(path);
     return crypto.subtle.importKey(
         'pkcs8',
         decode_pem(pem_text).data,
         { name: config.algorithm, namedCurve: config.named_curve },
-        false,
+        false, // not extractable
         ['sign']
     );
 }
 
-async function load_signature(path) {
-    const sig_text = await fetch_text(path);
-    return base64_to_ab(sig_text);
-}
-
+// Join ArrayBuffers
+// Returns: ArrayBuffer
 function join_buffers(buffers) {
     const total_length = buffers.reduce((acc, buf) => acc + buf.byteLength, 0);
     const out = new Uint8Array(total_length);
