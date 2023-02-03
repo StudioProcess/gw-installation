@@ -219,21 +219,26 @@ function update_info() {
   const aspect = screen_w >= screen_h ? screen_w / screen_h : screen_h / screen_w;
   const orientation = screen_w >= screen_h ? 'landscape' : 'portrait'
   
-  let t = '';
+  let t = '<div>';
   t += `Platform: ${PLATFORM.device} (${PLATFORM.os})\n`;
+  t += `Rendering: ${W} ✕ ${H}\n`;
+  t += `Simulation: ${SIMULATION_FPS} fps`;
+  t += `</div>`;
+  t += `<div style="margin-top: 8px;">`;
   t += `Screen: ${screen_w} ✕ ${screen_h}\n`;
   t += `Aspect: 1:${aspect.toFixed(2)}\n`;
   t += `Orientation: ${orientation}\n`;
+  t += `Current: ${renderer.domElement.offsetWidth * devicePixelRatio} ✕ ${renderer.domElement.offsetHeight * devicePixelRatio}\n`;
+  t += `</div>`;
+  t += `<div style="margin-top: 8px;">`;
   t += `Environment: ${env.ENV}\n`;
   if (env.ENV === 'production') {
     t += `Build: ${env.BUILD_DATE}\n`;
   }
-  t += `Rendering: ${W} ✕ ${H}\n`;
-  t += `Simulation: ${SIMULATION_FPS} fps\n`;
-  t += `Current: ${renderer.domElement.offsetWidth * devicePixelRatio} ✕ ${renderer.domElement.offsetHeight * devicePixelRatio}`;
+  t += `</div>`;
   
   const info = document.querySelector('#info');
-  info.innerText = t;
+  info.innerHTML = t;
 }
 
 
