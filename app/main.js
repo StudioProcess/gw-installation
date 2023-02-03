@@ -55,17 +55,19 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   * Waves:      ligoPlaneVS  + ligoPlaneFS
 */
 
-const W = 1920;
-const H = 1080;
+const RES_INSTALLATION = [3840, 2160, 60];
+const RES_DESKTOP      = [1920, 1080, 50];
+const RES_MOBILE       = [1280, 720, 30];
+
 const PX_RATIO = 1;
 const SW_ENABLED = (env.ENV=='production');
+const PLATFORM = get_platform();
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
 let EXPORT_TILES = 2;
 
 let SIMULATING = true;
-let SIMULATION_FPS = 60;
 let SCENE_ROTATION_PERIOD = 900;
 
 const ADD_FULLSCREEN_BUTTON = false;
@@ -78,6 +80,7 @@ const OVERLAY_TIMER_ON = 20;
 let overlay_pos_h = 'center'; // left|center|right
 let overlay_pos_v = 'center'; // top|center|bottom
 
+let W, H, SIMULATION_FPS;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 let gui;
@@ -217,6 +220,7 @@ function update_info() {
   const orientation = screen_w >= screen_h ? 'landscape' : 'portrait'
   
   let t = '';
+  t += `Platform: ${PLATFORM.device} (${PLATFORM.os})\n`;
   t += `Screen: ${screen_w} ✕ ${screen_h}\n`;
   t += `Aspect: 1:${aspect.toFixed(2)}\n`;
   t += `Orientation: ${orientation}\n`;
@@ -239,12 +243,13 @@ function setup() {
     console.log(`BUILD_DATE: ${env.BUILD_DATE}`);
   }
   
-  // check screen
-  const screen_w = screen.width * devicePixelRatio;
-  const screen_h = screen.height * devicePixelRatio;
-  const aspect = screen_w >= screen_h ? screen_w / screen_h : screen_h / screen_w;
-  const orientation = screen_w >= screen_h ? 'landscape' : 'portrait'
-  console.log('screen: %d x %d — 1:%.2f — %s', screen_w, screen_h, aspect, orientation);
+  if (PLATFORM.device == 'installation') {
+    [ W, H, SIMULATION_FPS ] = RES_INSTALLATION;
+  } else if (PLATFORM.device === 'desktop') {
+    [ W, H, SIMULATION_FPS] = RES_DESKTOP;
+  } else {
+    [ W, H, SIMULATION_FPS ] = RES_MOBILE;
+  }
   
   renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -844,6 +849,43 @@ function update_menu_indicators() {
   menu.querySelector('.text').classList.toggle('dot-pulse', overlay_timeout !== null);
   menu.querySelector('.fps').classList.toggle('dot-on', stats.dom.style.display === '');
 }
+
+// https://stackoverflow.com/a/38241481
+function get_platform() {
+  let userAgent = window.navigator.userAgent,
+    platform = window.navigator?.userAgentData?.platform || window.navigator.platform,
+    macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+    windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+    iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+    os = 'unknown';
+
+  if (macosPlatforms.indexOf(platform) !== -1) {
+    os = 'macos';
+  } else if (iosPlatforms.indexOf(platform) !== -1) {
+    os = 'ios';
+  } else if (windowsPlatforms.indexOf(platform) !== -1) {
+    os = 'windows';
+  } else if (/Android/.test(userAgent)) {
+    os = 'android';
+  } else if (/Linux/.test(platform)) {
+    os = 'linux';
+  }
+  
+  const hash = location.hash.toLowerCase();
+  let device;
+  if ( ['#installation', '#inst', '#hires'].includes(hash) ) {
+    device = 'installation';
+  } else if ( hash === '#desktop' ) {
+    device = 'desktop';
+  } else if ( hash === '#mobile' ) {
+    device = 'mobile';
+  } else {
+    device = ['ios', 'android'].includes(os) ? 'mobile' : 'desktop';
+  }
+  
+  return { device, os };
+}
+
 
 document.addEventListener('keydown', e => {
   // console.log(e.key);
