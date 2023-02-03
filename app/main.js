@@ -210,6 +210,28 @@ function main() {
   
 }
 
+function update_info() {
+  const screen_w = screen.width * devicePixelRatio;
+  const screen_h = screen.height * devicePixelRatio;
+  const aspect = screen_w >= screen_h ? screen_w / screen_h : screen_h / screen_w;
+  const orientation = screen_w >= screen_h ? 'landscape' : 'portrait'
+  
+  let t = '';
+  t += `Screen: ${screen_w} ✕ ${screen_h}\n`;
+  t += `Aspect: 1:${aspect.toFixed(2)}\n`;
+  t += `Orientation: ${orientation}\n`;
+  t += `Environment: ${env.ENV}\n`;
+  if (env.ENV === 'production') {
+    t += `Build: ${env.BUILD_DATE}\n`;
+  }
+  t += `Rendering: ${W} ✕ ${H}\n`;
+  t += `Simulation: ${SIMULATION_FPS} fps\n`;
+  t += `Current: ${renderer.domElement.offsetWidth * devicePixelRatio} ✕ ${renderer.domElement.offsetHeight * devicePixelRatio}`;
+  
+  const info = document.querySelector('#info');
+  info.innerText = t;
+}
+
 
 function setup() {
   console.log(`ENV: ${env.ENV}`);
@@ -321,6 +343,9 @@ function setup() {
   stats.dom.id = 'stats_js';
   document.body.appendChild( stats.dom );
   toggle_stats(false);
+  
+  update_info();
+  window.onresize = update_info;
   
   clock.start();
 }
@@ -450,11 +475,14 @@ function cancel_overlay_timer() {
 }
 
 function toggle_stats(force) {
+  const info = document.querySelector('#info');
   if (force !== undefined) {
     if (force) {
       stats.dom.style.display = '';
+      info.classList.remove('hidden');
     } else {
       stats.dom.style.display = 'none';
+      info.classList.add('hidden');
     }
   } else {
     if (stats.dom.style.display === '') { toggle_stats(false); }

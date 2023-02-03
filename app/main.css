@@ -81,7 +81,7 @@ canvas#three-js {
   padding: 0.5em;
   text-transform: uppercase;
   /* text-decoration: underline; */
-  background-color: rgba(0,0,0,0.75)
+  background-color: rgba(0,0,0,0.75);
 }
 
 menu.hidden {
@@ -154,4 +154,19 @@ menu.hidden {
 @keyframes pulse {
   0% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+
+#info {
+  position: fixed;
+  left: 0;
+  top: 48px;
+  font: 13px white Helvetica,Arial,sans-serif;
+  padding: 3px;
+  white-space: pre;
+  background-color: rgba(0, 0, 34, 0.9);
+}
+
+#info.hidden {
+  display: none;
 }
