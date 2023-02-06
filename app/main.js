@@ -859,11 +859,11 @@ function update_menu_indicators() {
 function get_platform() {
   let userAgent = window.navigator.userAgent,
     platform = window.navigator?.userAgentData?.platform || window.navigator.platform,
-    macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+    macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K', 'macOS'],
     windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
     iosPlatforms = ['iPhone', 'iPad', 'iPod'],
     os = 'unknown';
-
+    
   if (macosPlatforms.indexOf(platform) !== -1) {
     os = 'macos';
   } else if (iosPlatforms.indexOf(platform) !== -1) {
@@ -997,6 +997,9 @@ if (SW_ENABLED && 'serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').then(() => { 
     console.log('Service Worker registered');
   });
+} else {
+  const registrations = await navigator.serviceWorker.getRegistrations();
+  for (let r of registrations) { r.unregister(); }
 }
 
 // Install button (in menu) (Chrome, needs service worker)
