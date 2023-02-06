@@ -635,7 +635,23 @@ function rnd(min, max) {
 }
 
 function randomize_cam() {
-  set_cam_by_tilt( rnd(-10,10), rnd(-10,10), rnd(0.2, 3), rnd(0, 30) );
+  let new_x, new_y, new_h;
+  let d = 0, dh = 0;
+  
+  while (d < 4) {
+    new_x = rnd(-10, 10);
+    new_y = rnd(-10, 10);
+    d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 );
+    // console.log('d', d);
+  }
+  
+  while (dh < 0.4) {
+    new_h = rnd(0.2, 3);
+    dh = Math.abs(camera.position.z - new_h);
+    // console.log('dh', dh);
+  }
+  
+  set_cam_by_tilt( new_x, new_y, new_h, rnd(0, 30) );
   reset_rotation();
   if ( rnd() < 0.25 ) {
     toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
