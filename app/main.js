@@ -65,6 +65,12 @@ const PLATFORM = get_platform();
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
+const CHANGE_VIEW = [15, 30]; // seconds
+const CHANGE_EMITTERS = 150; // seconds
+const ROTATION_EVERY = 90; // once every x seconds 
+const SPECIAL_VIEW_EVERY = 600; // once every x seconds
+const SPECIAL_VIEWS = [1, 2];
+
 let EXPORT_TILES = 2;
 
 let SIMULATING = true;
@@ -100,8 +106,9 @@ let stats;
 
 const cams = [
   {"position":[0.0,-10.743654156564656,13.938095455943627],"rotation":[0.6566884115103175,0.0,0.0,"XYZ"],"target":[0,0,0]},
-  {position: [0, 0, 14.6], rotation: [0, 0, 0], target: [0,0,0]},
+  {"position":[0,-11.9263622096271,5.709490516499767],"rotation":[0.696514541873541,0,0,"XYZ"],"target":[0,-3.9949149773471113,-3.7739436503427433]},
   {position: [0,-28,0], rotation: [Math.PI/2, 0,0],target:[0,0,0]},
+  
   {position: [0, 0, 1.75], rotation: [0, 0, 0], target: [0,0,0]},
   {position: [0, 0, 4], rotation: [0, 0, 0], target: [0,0,0]},
   {"position":[0,1.7609600643905499,3.343492523192335],"rotation":[0.3202709674243868,0,0,"XYZ"],"target":[0.2574544348659495,2.86981734899508,0]},
@@ -578,6 +585,11 @@ function next_cam(offset = 1) {
   set_cam_pos( cams[current_cam] );
 }
 
+function set_cam(idx) {
+  current_cam = idx;
+  set_cam_pos( cams[current_cam] );
+}
+
 // Set camera by position on plane, height above plane + target offset (from projected point on plane)
 function set_cam_by_offset(plane_x, plane_y, height, target_offset_y, limit_target_to_plane = true) {
   camera.position.set( plane_x, plane_y, height );
@@ -634,7 +646,21 @@ function rnd(min, max) {
   return min + Math.random() * (max-min);
 }
 
+function rnd_every( every, call_period = (CHANGE_VIEW[0] + CHANGE_VIEW[1])/2 ) {
+  return rnd() < 1/(every/call_period);
+}
+
+let special_views_idx = -1;
 function randomize_cam() {
+  if (rnd_every(SPECIAL_VIEW_EVERY)) {
+    special_views_idx += 1;
+    if (special_views_idx >= SPECIAL_VIEWS.length) { special_views_idx = 0 };
+    set_cam(SPECIAL_VIEWS[special_views_idx]);
+    reset_rotation();
+    toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
+    return;
+  }
+  
   let new_x, new_y, new_h;
   let d = 0, dh = 0;
   
@@ -653,7 +679,7 @@ function randomize_cam() {
   
   set_cam_by_tilt( new_x, new_y, new_h, rnd(0, 30) );
   reset_rotation();
-  if ( rnd() < 0.25 ) {
+  if ( rnd_every(ROTATION_EVERY) ) {
     toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
   } else {
     toggle_rotation(false);
@@ -778,9 +804,9 @@ function toggle_sequence(force) {
   
   function start() {
     stop();
-    t_view = make_timer( [15,30], randomize_cam );
+    t_view = make_timer( CHANGE_VIEW, randomize_cam );
     t_view.start();
-    t_emitters = make_timer( 150, randomize_emitters );
+    t_emitters = make_timer( CHANGE_EMITTERS, randomize_emitters );
     t_emitters.reset();
     sequence_running = true;
   }
