@@ -792,8 +792,7 @@ function make_timer(period_s, cb) {
 let sequence_running = false;
 let t_view;
 let t_emitters;
-function toggle_sequence(force) {
-  
+function toggle_sequence(force, emitters_immediate = false) {
   function stop() {
     if (sequence_running) {
       t_view.stop();
@@ -807,7 +806,8 @@ function toggle_sequence(force) {
     t_view = make_timer( CHANGE_VIEW, randomize_cam );
     t_view.start();
     t_emitters = make_timer( CHANGE_EMITTERS, randomize_emitters );
-    t_emitters.reset();
+    if (emitters_immediate) { t_emitters.start(); }
+    else { t_emitters.reset(); }
     sequence_running = true;
   }
   
@@ -816,6 +816,15 @@ function toggle_sequence(force) {
     else { stop(); }
   } else {
     toggle_sequence(!sequence_running);
+  }
+}
+
+function next_sequence() {
+  if (!sequence_running) {
+    toggle_sequence(true);
+  } else {
+    t_view.start(); // change view, with new timer
+    // Don't reset emitter change
   }
 }
 
@@ -861,7 +870,7 @@ function setup_menu() {
   };
   
   menu.querySelector('.view').onclick = () => {
-    toggle_sequence(true);
+    next_sequence();
   };
   
   menu.querySelector('.fps').onclick = () => {
