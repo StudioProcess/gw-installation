@@ -160,6 +160,7 @@ const uniforms = {
   
   displaceGain: {type: "f", value: 0.13, min: 0.0, max: 0.5, step: 0.0001}, // original: value: 0.13, min: 0.0, max: 2.0, step: 0.0001
   displaceHeight: {type: "f", value: 1.0, min: 0.0, max: 3.0, step: 0.0001}, // original: value: 1.0, min: -2.0, max: 2.0, step: 0.0001
+  displaceLimit: {type: "f", value: 1.5, min: 0.0, max: 3.0, step: 0.0001},
   
   //
   // computeWaveHeightFS uniforms:
@@ -693,21 +694,21 @@ function randomize_emitters() {
   // position left emitter
   uniforms.pointPositions.value[0].x = rnd(0.25, 0.5);
   uniforms.pointPositions.value[0].y = rnd(0.25, 0.75);
-  gui.children[9].children[0].controllers[0].updateDisplay();
-  gui.children[9].children[0].controllers[1].updateDisplay();
+  gui.children[10].children[0].controllers[0].updateDisplay();
+  gui.children[10].children[0].controllers[1].updateDisplay();
 
   // position right emitter
   uniforms.pointPositions.value[1].x = rnd(0.5, 0.75);
   uniforms.pointPositions.value[1].y = rnd(0.25, 0.75);
-  gui.children[9].children[1].controllers[0].updateDisplay();
-  gui.children[9].children[1].controllers[1].updateDisplay();
+  gui.children[10].children[1].controllers[0].updateDisplay();
+  gui.children[10].children[1].controllers[1].updateDisplay();
   
   // randomize period
   const period = rnd(2, 8);
   uniforms.pointPeriods.value[0] = period;
   uniforms.pointPeriods.value[1] = period;
-  gui.children[10].controllers[0].updateDisplay();
-  gui.children[10].controllers[1].updateDisplay();
+  gui.children[11].controllers[0].updateDisplay();
+  gui.children[11].controllers[1].updateDisplay();
 }
 
 function toggle_rotation(force, period = SCENE_ROTATION_PERIOD, reverse_direction = false) {

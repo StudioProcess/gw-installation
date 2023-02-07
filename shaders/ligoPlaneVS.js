@@ -10,6 +10,7 @@ uniform vec2 computeResolution;
 
 uniform float displaceGain;
 uniform float displaceHeight;
+uniform float displaceLimit;
 
 uniform float numLines;
 
@@ -57,6 +58,10 @@ float gain(float t, float a) {
     return t < 0.5 ?
         t / ( (1.0/a - 2.0) * (1.0 - 2.0*t) + 1.0 ) :
         ((1.0/a - 2.0)*(1.0 - 2.0*t) - t) / ((1.0/a - 2.0)*(1.0 - 2.0*t) - 1.0);	
+}
+
+float limit(float t, float l) {
+  return max( min(t, l), -l);
 }
 
 vec2 rotate(vec2 v, float a) {
@@ -119,16 +124,19 @@ void main()	{
   float waveDataPrev = texture(pingPongOutMap, prevUV).r;
   waveDataPrev *= heightMultiplier;
   vPositionPrev.z += displaceHeight * waveDataPrev * gain(abs(waveDataPrev), displaceGain);
+  vPositionPrev.z = limit(vPositionPrev.z, displaceLimit);
   vPositionPrev = modelViewMatrix * vPositionPrev;
 
   float waveData = texture(pingPongOutMap, vUV).r;
   waveData *= heightMultiplier;
   vPosition.z += displaceHeight * waveData * gain(abs(waveData), displaceGain);
+  vPosition.z = limit(vPosition.z, displaceLimit);
   vPosition = modelViewMatrix * vPosition;
 
   float waveDataNext = texture(pingPongOutMap, nextUV).r;
   waveDataNext *= heightMultiplier;
   vPositionNext.z += displaceHeight * waveDataNext * gain(abs(waveDataNext), displaceGain);
+  vPositionNext.z = limit(vPositionNext.z, displaceLimit);
   vPositionNext = modelViewMatrix * vPositionNext;
 
   vec2 extrudeV = getNormal(
