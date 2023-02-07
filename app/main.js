@@ -79,12 +79,8 @@ let SCENE_ROTATION_PERIOD = 900;
 const ADD_FULLSCREEN_BUTTON = false;
 const LOCK_CAM_TARGET_TO_PLANE = false;
 
-const START_WITH_OVERLAY = false;
-const START_WITH_OVERLAY_TIMER = false;
 const OVERLAY_TIMER_PERIOD = 60;
 const OVERLAY_TIMER_ON = 20;
-let overlay_pos_h = 'center'; // left|center|right
-let overlay_pos_v = 'center'; // top|center|bottom
 
 let W, H, SIMULATION_FPS;
 let renderer, scene, camera;
@@ -282,7 +278,7 @@ function setup() {
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new OrbitControls( camera, renderer.domElement );
   set_cam_by_idx(0);
-  set_colors_by_idx( localStorage.getItem('current_colors') ?? 0 );
+  set_colors_by_idx( JSON.parse(localStorage.getItem('current_colors')) ?? 0 );
 
   heightPingPong.setup(
     camera,
@@ -356,11 +352,6 @@ function setup() {
   // menu
   setup_menu(); 
   
-  // overlay
-  set_overlay_pos(overlay_pos_h, overlay_pos_v);
-  if (START_WITH_OVERLAY) { toggle_overlay(true); }
-  if (START_WITH_OVERLAY_TIMER) { toggle_overlay_timer(true); }
-  
   // stats + info
   stats = new Stats();
   stats.dom.id = 'stats_js';
@@ -368,6 +359,14 @@ function setup() {
   toggle_stats(false);
   update_info();
   window.onresize = update_info;
+  
+  // overlay
+  set_overlay_pos( localStorage.getItem('overlay_pos_h') ?? 'center', localStorage.getItem('overlay_pos_v') ?? 'center' );
+  if (JSON.parse(localStorage.getItem('overlay_timer')) ?? false) {
+    toggle_overlay_timer(true)
+  } else if (JSON.parse(localStorage.getItem('overlay')) ?? false) {
+    toggle_overlay(true);
+  }
   
   if (env.ENV === 'production') {
     toggle_sequence(true, true); // start sequence and change emitters immediately
@@ -471,6 +470,7 @@ function toggle_overlay(force) {
   const overlay = document.querySelector('#overlay');
   overlay.classList.toggle('hidden', force !== undefined ? !force : undefined);
   update_menu_indicators();
+  localStorage.setItem('overlay', !overlay.classList.contains('hidden'));
 }
 
 let overlay_timeout = null;
@@ -487,12 +487,15 @@ function toggle_overlay_timer(force) {
   
   if (!overlay_timeout || force === true) { // timer is not active
     show();
+    localStorage.setItem('overlay_timer', true);
   } else { // timer is active
     cancel_overlay_timer(); // stop timer
     toggle_overlay(false); // hide overlay
+    localStorage.setItem('overlay_timer', false);
   }
   
   update_menu_indicators();
+
 }
 
 function cancel_overlay_timer() {
@@ -525,6 +528,8 @@ function get_cam_pos() {
   };
 }
 
+let overlay_pos_h = 'center'; // left|center|right
+let overlay_pos_v = 'center'; // top|center|bottom
 function set_overlay_pos(pos_h = 'center', pos_v = 'center') {
   if (!pos_v) { pos_v = overlay_pos_v; }
   if (!pos_h) { pos_h = overlay_pos_h; }
@@ -556,6 +561,9 @@ function set_overlay_pos(pos_h = 'center', pos_v = 'center') {
     overlay.style.right = '';
     overlay_pos_h = 'center';
   }
+  
+  localStorage.setItem('overlay_pos_v', overlay_pos_v);
+  localStorage.setItem('overlay_pos_h', overlay_pos_h);
 }
 
 function cycle_overlay_pos() {
