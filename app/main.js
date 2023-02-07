@@ -351,7 +351,7 @@ function setup() {
   }
   
   // menu
-  setup_menu(); 
+  setup_menu();
   
   // stats + info
   stats = new Stats();
@@ -368,6 +368,7 @@ function setup() {
   } else if (JSON.parse(localStorage.getItem('overlay')) ?? false) {
     toggle_overlay(true);
   }
+  toggle_overlay_bg( JSON.parse(localStorage.getItem('overlay_background')) ?? false );
   window.addEventListener('resize', adjust_overlay);
   
   if (env.ENV === 'production') {
@@ -497,12 +498,22 @@ function toggle_overlay_timer(force) {
   }
   
   update_menu_indicators();
-
 }
 
 function cancel_overlay_timer() {
   clearTimeout(overlay_timeout);
   overlay_timeout = null;
+}
+
+function toggle_overlay_bg(force) {
+  const overlay = document.querySelector('#overlay');
+  if (force === undefined) {
+    overlay.classList.toggle('hidden-bg');
+  } else {
+    overlay.classList.toggle('hidden-bg', !force);
+  }
+  localStorage.setItem('overlay_background', !overlay.classList.contains('hidden-bg'));
+  update_menu_indicators();
 }
 
 function toggle_stats(force) {
@@ -775,13 +786,16 @@ function set_colors(obj) {
   let background = obj.background;
   let line = obj.line;
   if (obj?.contrast) {
-    background = background.map(x => x * (2.0 - obj.contrast)); // make background darker
-    line = line.map(x => x * obj.contrast); // make lines brighter
+    if (background) { background = background.map(x => x * (2.0 - obj.contrast)); } // make background darker
+    if (line) { line = line.map(x => x * obj.contrast); } // make lines brighter
   }
   if (background) { uniforms.backgroundColor.value = Array.from(background); } // copy array
   if (line) { uniforms.lineColor.value = Array.from(line); } // copy array
   gui?.controllers[0].updateDisplay();
   gui?.controllers[1].updateDisplay();
+  if (background) {
+    document.querySelector('#overlay').style.backgroundColor = `rgb(${background.map(x => x*255).join(',')})`;
+  }
 }
 
 function set_colors_by_idx(idx) {
@@ -905,6 +919,10 @@ function setup_menu() {
     }
   };
   
+  menu.querySelector('.text-background').onclick = () => {
+    toggle_overlay_bg();
+  };
+  
   menu.querySelector('.text-position').onclick = () => {
     cycle_overlay_pos();
   };
@@ -941,8 +959,10 @@ function toggle_menu(force) {
 function update_menu_indicators() {
   //console.log('update');
   const menu = document.querySelector('#menu');
-  menu.querySelector('.text').classList.toggle('dot-on', !document.querySelector('#overlay').classList.contains('hidden'));
+  const overlay = document.querySelector('#overlay');
+  menu.querySelector('.text').classList.toggle('dot-on', !overlay.classList.contains('hidden'));
   menu.querySelector('.text').classList.toggle('dot-pulse', overlay_timeout !== null);
+  menu.querySelector('.text-background').classList.toggle('dot-on', !overlay.classList.contains('hidden-bg'));
   menu.querySelector('.fps').classList.toggle('dot-on', stats.dom.style.display === '');
 }
 

@@ -79,6 +79,10 @@ canvas#three-js {
   pointer-events: none;
 }
 
+#overlay.hidden-bg {
+  background: none !important;
+}
+
 #overlay a, #overlay a:active, #overlay a:visited {
   color: inherit;
   text-decoration: none;
