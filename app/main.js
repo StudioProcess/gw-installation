@@ -281,8 +281,8 @@ function setup() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new OrbitControls( camera, renderer.domElement );
-  next_cam(0);
-  next_colors(0);
+  set_cam_by_idx(0);
+  set_colors_by_idx(0);
 
   heightPingPong.setup(
     camera,
@@ -586,17 +586,15 @@ function set_cam_pos(obj) {
   toggle_rotation(false);
 }
 
-function next_cam(offset = 1) {
-  current_cam += offset;
-  current_cam %= cams.length;
+function set_cam_by_idx(idx) {
+  current_cam = idx;
   if (current_cam < 0) { current_cam += cams.length; }
   console.log('cam %i', current_cam);
   set_cam_pos( cams[current_cam] );
 }
 
-function set_cam(idx) {
-  current_cam = idx;
-  set_cam_pos( cams[current_cam] );
+function next_cam(offset = 1) {
+  set_cam_by_idx(current_cam + offset);
 }
 
 // Set camera by position on plane, height above plane + target offset (from projected point on plane)
@@ -664,7 +662,7 @@ function randomize_cam() {
   if (rnd_every(SPECIAL_VIEW_EVERY)) {
     special_views_idx += 1;
     if (special_views_idx >= SPECIAL_VIEWS.length) { special_views_idx = 0 };
-    set_cam(SPECIAL_VIEWS[special_views_idx]);
+    set_cam_by_idx(SPECIAL_VIEWS[special_views_idx]);
     reset_rotation();
     toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
     return;
@@ -758,12 +756,16 @@ function set_colors(obj) {
   gui?.controllers[1].updateDisplay();
 }
 
-function next_colors(offset = 1) {
-  current_colors += offset;
+function set_colors_by_idx(idx) {
+  current_colors = idx;
   current_colors %= colors.length;
   if (current_colors < 0) { current_colors += colors.length; }
-  console.log('colors %i', current_colors);
+  console.log('colors', current_colors);
   set_colors( colors[current_colors] );
+}
+
+function next_colors(offset = 1) {
+  set_colors_by_idx(current_colors + offset);
 }
 
 function make_timer(period_s, cb) {
