@@ -588,6 +588,7 @@ function set_cam_pos(obj) {
 
 function set_cam_by_idx(idx) {
   current_cam = idx;
+  current_cam %= cams.length;
   if (current_cam < 0) { current_cam += cams.length; }
   console.log('cam %i', current_cam);
   set_cam_pos( cams[current_cam] );
