@@ -81,6 +81,7 @@ const LOCK_CAM_TARGET_TO_PLANE = false;
 
 const OVERLAY_TIMER_PERIOD = 60;
 const OVERLAY_TIMER_ON = 20;
+const OVERLAY_RELATIVE_TO_CANVAS = true;
 
 let W, H, SIMULATION_FPS;
 let renderer, scene, camera;
@@ -358,7 +359,7 @@ function setup() {
   document.body.appendChild( stats.dom );
   toggle_stats(false);
   update_info();
-  window.onresize = update_info;
+  window.addEventListener('resize', update_info);
   
   // overlay
   set_overlay_pos( localStorage.getItem('overlay_pos_h') ?? 'center', localStorage.getItem('overlay_pos_v') ?? 'center' );
@@ -367,6 +368,7 @@ function setup() {
   } else if (JSON.parse(localStorage.getItem('overlay')) ?? false) {
     toggle_overlay(true);
   }
+  window.addEventListener('resize', adjust_overlay);
   
   if (env.ENV === 'production') {
     toggle_sequence(true, true); // start sequence and change emitters immediately
@@ -562,8 +564,25 @@ function set_overlay_pos(pos_h = 'center', pos_v = 'center') {
     overlay_pos_h = 'center';
   }
   
+  adjust_overlay();
+  
   localStorage.setItem('overlay_pos_v', overlay_pos_v);
   localStorage.setItem('overlay_pos_h', overlay_pos_h);
+}
+
+function adjust_overlay() {
+  if (!OVERLAY_RELATIVE_TO_CANVAS) { return; }
+  const overlay = document.querySelector('#overlay');
+  if (overlay_pos_v === 'top') {
+    overlay.style.marginTop = renderer.domElement.offsetTop + 'px';
+    overlay.style.marginBottom = '';
+  } else if (overlay_pos_v === 'bottom') {
+    overlay.style.marginTop = '';
+    overlay.style.marginBottom = window.innerHeight - renderer.domElement.clientHeight - renderer.domElement.offsetTop + 'px';
+  } else {
+    overlay.style.marginTop = '';
+    overlay.style.marginBottom = '';
+  }
 }
 
 function cycle_overlay_pos() {
