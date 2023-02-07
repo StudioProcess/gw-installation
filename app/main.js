@@ -178,8 +178,8 @@ const uniforms = {
   pointPeriods: {
     type: "2fv",
     value: [
-      1, // original: 0.3
-      1 // original: 0.4
+      2, // original: 0.3
+      2 // original: 0.4
     ]
   },
   // on duration in seconds
@@ -703,7 +703,7 @@ function randomize_emitters() {
   gui.children[9].children[1].controllers[1].updateDisplay();
   
   // randomize period
-  const period = rnd(1.0, 5.0);
+  const period = rnd(2, 8);
   uniforms.pointPeriods.value[0] = period;
   uniforms.pointPeriods.value[1] = period;
   gui.children[10].controllers[0].updateDisplay();
