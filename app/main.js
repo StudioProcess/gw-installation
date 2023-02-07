@@ -208,15 +208,15 @@ const uniforms = {
 
 
 function main() {
+  
+  gui = initGui(uniforms);
+  gui.hide();
 
   setup(); // set up scene
 
   loop(); // start game loop
 
   tilesaver.init(renderer, scene, camera, EXPORT_TILES);
-  
-  gui = initGui(uniforms);
-  gui.hide();
   
 }
 
@@ -355,14 +355,17 @@ function setup() {
   if (START_WITH_OVERLAY) { toggle_overlay(true); }
   if (START_WITH_OVERLAY_TIMER) { toggle_overlay_timer(true); }
   
-  // stats
+  // stats + info
   stats = new Stats();
   stats.dom.id = 'stats_js';
   document.body.appendChild( stats.dom );
   toggle_stats(false);
-  
   update_info();
   window.onresize = update_info;
+  
+  if (env.ENV === 'production') {
+    toggle_sequence(true, true); // start sequence and change emitters immediately
+  }
   
   clock.start();
 }
