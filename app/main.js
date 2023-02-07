@@ -282,7 +282,7 @@ function setup() {
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new OrbitControls( camera, renderer.domElement );
   set_cam_by_idx(0);
-  set_colors_by_idx(0);
+  set_colors_by_idx( localStorage.getItem('current_colors') ?? 0 );
 
   heightPingPong.setup(
     camera,
@@ -763,6 +763,7 @@ function set_colors_by_idx(idx) {
   if (current_colors < 0) { current_colors += colors.length; }
   console.log('colors', current_colors);
   set_colors( colors[current_colors] );
+  localStorage.setItem('current_colors', current_colors);
 }
 
 function next_colors(offset = 1) {
