@@ -706,6 +706,7 @@ function randomize_cam() {
     set_cam_by_idx(SPECIAL_VIEWS[special_views_idx]);
     reset_rotation();
     toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
+    log(`randomize cam – special ${SPECIAL_VIEWS[special_views_idx]}`);
     return;
   }
   
@@ -729,8 +730,10 @@ function randomize_cam() {
   reset_rotation();
   if ( rnd_every(ROTATION_EVERY) ) {
     toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
+    log(`randomize cam – rotation`);
   } else {
     toggle_rotation(false);
+    log(`randomize cam`);
   }
 }
 
@@ -739,6 +742,7 @@ function randomize_emitters() {
     randomize_emitters_burst();
   } else {
     randomize_emitters_once();
+    log(`randomize emitters`);
   }
 }
 
@@ -765,6 +769,7 @@ function randomize_emitters_once() {
 
 function randomize_emitters_burst() {
   const count = Math.floor(rnd(3,10));
+  log(`randomize emitters – burst ${count}x`);
   const t_burst = make_timer([0.07, 0.3], randomize_emitters_once, count);
   t_burst.start();
 }
@@ -869,11 +874,13 @@ function toggle_sequence(force, emitters_immediate = false) {
     if (sequence_running) {
       t_view.stop();
       t_emitters.stop();
+      log(`sequence stopped`);
     }
     sequence_running = false;
   }
   
   function start() {
+    log('sequence started');
     stop();
     t_view = make_timer( CHANGE_VIEW, randomize_cam );
     t_view.start();
@@ -1121,6 +1128,29 @@ document.addEventListener('keydown', e => {
   }
   
 });
+
+function pad(n, z = 2) {
+  return (n + '').padStart(z, '0');
+}
+
+function tz_offset_str(d) {
+  if (!d) { d = new Date(); }
+  const o = d.getTimezoneOffset();
+  const o_sign = Math.sign(-o);
+  const o_hours = Math.floor(Math.abs(o) / 60);
+  const o_mins = Math.abs(o) % 60;
+  return 'UTC' + (o_sign >= 0 ? '+' : '-') + (o_mins === 0 ? o_hours : pad(o_hours)+pad(o_mins));
+}
+
+function ts_local(d) {
+  if (!d) { d = new Date(); }
+
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)} ${tz_offset_str(d)}`;
+}
+
+function log(msg) {
+  console.log(`${ts_local()}: ${msg}`);
+}
 
 
 // Register service worker to control making site work offline
