@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify</title>
+</head>
+<body>
+    <textarea id="txt-url" placeholder="URL">http://localhost:8080</textarea><br>
+    <textarea id="txt-sig" placeholder="Signature">ekvK+JvaywBJv95Ueb991JMb/D3beJQ30cjIDHFR35CtgxrkOtYMp3ziINT3XlTVwR75K76XWUjlZom91e/ZFdrxiZyS7dT86gbpnQ48mKPIOow/7Gs588/CkYfyekWX</textarea><br>
+    <button id="btn-verify">Verify</button>
+    <div id="output" style="white-space:pre;"></div>
+    
+    <script type="module">
+        import * as util from './util.mjs';
+        
+        const txt_url = document.querySelector('#txt-url');
+        const txt_sig = document.querySelector('#txt-sig');
+        const btn_verify = document.querySelector('#btn-verify');
+        const div_output = document.querySelector('#output');
+        
+        function log(msg) {
+            output.innerHTML += `<div>${msg}</div>`;
+        }
+        
+        async function load_sitemap() {
+            log(`Verifying URL: ${txt_url.value}`);
+            const url = new URL('./sitemap.txt', txt_url.value).href;
+            let sitemap = await util.fetch_text(url);
+            log(`Sitemap: ${url}`);
+            // TODO: no sitemap found
+            sitemap = sitemap.trim();
+            sitemap = sitemap.split('\n');
+            sitemap = sitemap.map(x => x.trim()).filter( x => x !== '');
+            sitemap = sitemap.map(x => new URL(x, url).href);
+            return sitemap;
+        }
+        
+        async function verify() {
+            output.innerHTML = '';
+            const files = await load_sitemap();
+            
+            const sig = txt_sig.value;
+            log(`Verifying Signature: ${sig}`);
+            
+            const public_key_url = new URL('../crypto/public_key.pem', location.href).href;
+            const public_key = await util.load_public_key(public_key_url);
+            log(`Public key: ${public_key_url}`);
+            
+            const data_buffers = await Promise.all(files.map(path => {
+                log(`Verifying: ${path}`);
+                return util.fetch_ab(path);
+            }));
+            
+            const data = util.join_buffers(data_buffers);
+            log(`Total bytes to verify: ${data.byteLength}`);
+            
+            const valid = await util.verify(public_key, sig, data);
+            if (valid) {
+                log(`VALID`);
+            } else {
+                log(`NOT VALID`);
+            }
+        }
+        
+        btn_verify.onclick = verify;
+        
+        /* 
+            VALID means:
+            * The data is complete and unchanged from it's original state (Integrity)
+            * The data is verified to be from Process Studio (Authenticity)
+         
+            INVALID means:
+            * The data was changed or tammpered with
+            * The signature was changed or tampered with
+        */
+        
+        verify();
+        
+    </script>
+    
+</body>
+</html>
