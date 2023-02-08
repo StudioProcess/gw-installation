@@ -44,6 +44,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   
   R ........... Randomize camera
   E ........... Randomize emitters
+  B ........... Force emitter burst
   Enter ....... Start generative sequence
   ---------------------------------------
 */
@@ -70,6 +71,7 @@ const CHANGE_EMITTERS = 150; // seconds
 const ROTATION_EVERY = 90; // once every x seconds 
 const SPECIAL_VIEW_EVERY = 600; // once every x seconds
 const SPECIAL_VIEWS = [1, 2];
+const EMITTER_BURST_EVERY = 450; // seconds
 
 let EXPORT_TILES = 2;
 
@@ -733,6 +735,14 @@ function randomize_cam() {
 }
 
 function randomize_emitters() {
+  if (rnd_every(EMITTER_BURST_EVERY)) {
+    randomize_emitters_burst();
+  } else {
+    randomize_emitters_once();
+  }
+}
+
+function randomize_emitters_once() {
   // position left emitter
   uniforms.pointPositions.value[0].x = rnd(0.25, 0.5);
   uniforms.pointPositions.value[0].y = rnd(0.25, 0.75);
@@ -751,6 +761,12 @@ function randomize_emitters() {
   uniforms.pointPeriods.value[1] = period;
   gui.children[11].controllers[0].updateDisplay();
   gui.children[11].controllers[1].updateDisplay();
+}
+
+function randomize_emitters_burst() {
+  const count = Math.floor(rnd(3,10));
+  const t_burst = make_timer([0.07, 0.3], randomize_emitters_once, count);
+  t_burst.start();
 }
 
 function toggle_rotation(force, period = SCENE_ROTATION_PERIOD, reverse_direction = false) {
@@ -811,7 +827,7 @@ function next_colors(offset = 1) {
   set_colors_by_idx(current_colors + offset);
 }
 
-function make_timer(period_s, cb) {
+function make_timer(period_s, cb, max_count = 0) {
   let count = 0;
   let timer = null;
   
@@ -826,7 +842,9 @@ function make_timer(period_s, cb) {
     if (immediate) { callback(); }
     const time = Array.isArray(period_s) ? rnd(...period_s) : period_s;
     // console.log('timer:', time);
-    timer = setTimeout(start, time * 1000);
+    if (count < max_count || max_count <= 0) {
+      timer = setTimeout(start, time * 1000);
+    }
   }
   
   function stop() {
@@ -1084,6 +1102,9 @@ document.addEventListener('keydown', e => {
   }
   else if (e.key == 'e') {
     randomize_emitters();
+  }
+  else if (e.key == 'b') {
+    randomize_emitters_burst();
   }
   else if (e.key == 'w') {
     toggle_rotation();
