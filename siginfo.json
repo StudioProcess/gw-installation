@@ -1,4 +1,6 @@
 {
+    "version": 1,
+    "base_url": "",
     "sitemap": [
         "./app/main.js",
         "./app/main.css",

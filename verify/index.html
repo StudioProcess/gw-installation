@@ -6,8 +6,8 @@
     <title>Verify</title>
 </head>
 <body>
-    <textarea id="txt-url" placeholder="URL">http://localhost:8080</textarea><br>
-    <!-- <textarea id="txt-sig" placeholder="Signature">ekvK+JvaywBJv95Ueb991JMb/D3beJQ30cjIDHFR35CtgxrkOtYMp3ziINT3XlTVwR75K76XWUjlZom91e/ZFdrxiZyS7dT86gbpnQ48mKPIOow/7Gs588/CkYfyekWX</textarea><br> -->
+    <textarea id="txt-url" placeholder="URL"></textarea><br>
+    <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
     <button id="btn-verify">Verify</button>
     <div id="output" style="white-space:pre;"></div>
     
@@ -15,19 +15,33 @@
         import * as util from './util.mjs';
         
         const txt_url = document.querySelector('#txt-url');
-        // const txt_sig = document.querySelector('#txt-sig');
+        const txt_sig = document.querySelector('#txt-sig');
         const btn_verify = document.querySelector('#btn-verify');
         const div_output = document.querySelector('#output');
         
-        function log(msg) {
-            output.innerHTML += `<div>${msg}</div>`;
+        function linkify(str) {
+            console.log(typeof str);
+            if (typeof str !== 'string' || (!str.startsWith('http://') && !str.startsWith('https://'))) {
+                return str;
+            }
+            try {
+                const url = new URL(str);
+                return `<a href="${url.href}">${str}</a>`;
+            } catch {
+                return str;
+            }
+        }
+        
+        function log(...msgs) {
+            msgs = msgs.map(linkify);
+            output.innerHTML += `<div>${msgs.join(' ')}</div>`;
         }
         
         async function load_siginfo() {
-            log(`Verifying URL: ${txt_url.value}`);
+            log('Verifying URL:', txt_url.value);
             const url = new URL('./siginfo.json', txt_url.value).href;
             const siginfo = await util.fetch_json(url);
-            log(`Siginfo: ${url}`);
+            log('Siginfo:', url);
             // TODO: no siginfo found
             return siginfo;
         }
@@ -44,23 +58,25 @@
             // TODO: check that siginfo is signed
             // TODO: check that timestamp is signed
             // TODO: check that signed files are on the checked domain
-            
-            const sig = await util.fetch_text(util.make_url(siginfo.signature_url , txt_url.value));
-            log(`Signature: ${sig}`);
+            let sig = txt_sig.value;
+            if (!sig) {
+                sig = await util.fetch_text(util.make_url(siginfo.signature_url , txt_url.value));
+            }
+            log('Signature:', sig);
             
             const public_key_url = new URL('../crypto/public_key.pem', location.href).href;
             const public_key = await util.load_public_key(public_key_url);
-            log(`Public key: ${public_key_url}`);
+            log('Public key:', public_key_url);
             
             const files = process_sitemap(siginfo.sitemap);
-            log(`Files to verify: ${files.length}`)
+            log('Files to verify:', files.length);
             const data_buffers = await Promise.all(files.map(path => {
-                log(`Verifying: ${path}`);
+                log('Verifying:', path);
                 return util.fetch_ab(path);
             }));
             
             const data = util.join_buffers(data_buffers);
-            log(`Total bytes to verify: ${data.byteLength}`);
+            log('Total bytes to verify:', data.byteLength);
             
             const valid = await util.verify(public_key, sig, data);
             if (valid) {
@@ -90,6 +106,9 @@
         const query = new URLSearchParams(window.location.search);
         const url = query.get('url');
         if (url) { txt_url.value = url; }
+        if (txt_url.value === '') { txt_url.value = location.origin; }
+        const sig = query.get('sig');
+        if (sig) { txt_sig.value = sig; }
         
         verify();
         
