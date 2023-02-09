@@ -179,6 +179,7 @@
                     log('Signature:', sig_url);
                 } catch {
                     warn('Cannot load signature:', siginfo.signature_url);
+                    return;
                 }
             } else {
                 log('Signature:', sig);
