@@ -33,6 +33,25 @@ export async function fetch_ab(path) {
     return res.arrayBuffer();
 }
 
+function pad(n, z = 2) {
+  return (n + '').padStart(z, '0');
+}
+
+function tz_offset_str(d) {
+  if (!d) { d = new Date(); }
+  const o = d.getTimezoneOffset();
+  const o_sign = Math.sign(-o);
+  const o_hours = Math.floor(Math.abs(o) / 60);
+  const o_mins = Math.abs(o) % 60;
+  return 'UTC' + (o_sign >= 0 ? '+' : '-') + (o_mins === 0 ? o_hours : pad(o_hours)+pad(o_mins));
+}
+export function ts_local(d) {
+  if (!d) { d = new Date(); }
+  console.log(d);
+
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)} ${tz_offset_str(d)}`;
+}
+
 // String to ArrayBuffer
 // https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 function str2ab(str) {

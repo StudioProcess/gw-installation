@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify</title>
+    <script src="https://unpkg.com/qrcode@1.5.1/build/qrcode.js"></script>
 </head>
 <body>
     <style>
@@ -24,7 +25,7 @@
         .warn { color: darkorange; }
         .alert { color: red; }
         .ok { color: green; }
-        
+        .qrcode { max-width: 150px; }
     </style>
     <textarea id="txt-url" placeholder="URL"></textarea><br>
     <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
@@ -99,14 +100,14 @@
                     return false;
                 }
             }
-            log('Siginfo: All files within checked domain');
+            // log('Siginfo: All files within checked domain');
             
             // Check that siginfo is signed
             if (!siginfo.sitemap.includes(siginfo_url)) {
                 warn(`Siginfo: ${url} not included in signature`);
                 return false;
             }
-            log(`Siginfo: ${url} included in signature`);
+            // log(`Siginfo: ${url} included in signature`);
             
             // Check that timestamp is signed (if present)
             if (siginfo.timestamp_url) {
@@ -120,7 +121,7 @@
                     return false;
                 }
             }
-            log(`Siginfo: Timestamp included in signature`);
+            // log(`Siginfo: Timestamp included in signature`);
             
             // Check that image_url is signed (if present)
             if (siginfo?.metadata.image_url) {
@@ -134,7 +135,7 @@
                     return false;
                 }
             }
-            log(`Siginfo: Image included in signature`);
+            // log(`Siginfo: Image included in signature`);
             return siginfo;
         }
         
@@ -218,28 +219,52 @@
                 console.warn(e);
             }
             if (valid) {
-                ok(`VALID\n\n`);
-                log(`<img src="${util.make_url(siginfo.metadata.image_url, txt_url.value)}" style="max-width:200px;"/>`)
-                log(JSON.stringify(siginfo.metadata));
-                const timestamp = await util.fetch_text(util.make_url(siginfo.timestamp_url , txt_url.value));
-                log(`Signature Timestamp: ${timestamp}`)
+                ok(`✅ SIGNATURE VALID`);
+                append_log([
+                    '<ul>',
+                    '<li>The data is complete and unchanged from its original state (Integrity), and</li>',
+                    '<li>The data originates from <a href="https://process.studio">Process Studio</a> (Authenticity)</li>',
+                    '</ul>'
+                ]);
+                
+                append_log(`<a href="${origin}">${origin}</a>`, 'link');
+                
+                if (siginfo?.metadata.image_url) {
+                    append_log(`<a href="${origin}"><img src="${siginfo.metadata.image_url}" style="max-width:200px;"/></a>`, 'image');
+                }
+                if (siginfo?.metadata.title) {
+                    append_log(siginfo.metadata.title, 'title');
+                }
+                if (siginfo?.metadata.author) {
+                    append_log(siginfo.metadata.author, 'author');
+                }
+                
+                if (siginfo.timestamp_url) {
+                    try {
+                        let timestamp = await util.fetch_text(siginfo.timestamp_url);
+                        timestamp = new Date(timestamp);
+                        append_log(util.ts_local(timestamp), 'timestamp');
+                    } catch { /* nop */ }
+                }
+                if (window.QRCode) {
+                    const url = `${location.origin}${location.pathname}?url=${encodeURIComponent(origin)}&sig=${encodeURIComponent(sig)}`;
+                    const svg = await window.QRCode.toString(url, {type: 'svg'});
+                    const svg_uri = `data:image/svg+xml;base64,${btoa(svg)}`;
+                    append_log(`<a href="${url}"><img src="${svg_uri}"></a>`, 'qrcode');
+                }
                 
             } else {
-                alert(`NOT VALID`);
+                alert(`❌ SIGNATURE NOT VALID`);
+                append_log([
+                    '<ul>',
+                    '<li>The data is incomplete, was changed or tampered with, and/or</li>',
+                    '<li>The signature was changed or tampered with</li>',
+                    '</ul>'
+                ]);
             }
         }
         
         btn_verify.onclick = verify;
-        
-        /* 
-            VALID means:
-            * The data is complete and unchanged from it's original state (Integrity)
-            * The data is verified to be from Process Studio (Authenticity)
-         
-            INVALID means:
-            * The data was changed or tammpered with
-            * The signature was changed or tampered with
-        */
         
         const query = new URLSearchParams(window.location.search);
         const url = query.get('url');
