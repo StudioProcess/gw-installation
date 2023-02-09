@@ -3,3 +3,4 @@ node_modules
 dist
 crypto/*.pem
 crypto/*.base64
+crypto/*.timestamp

@@ -3,4 +3,5 @@ export default [
     '../app/main.css',
     '../app/env.js',
     './files.mjs',
+    './signature.timestamp',
 ];

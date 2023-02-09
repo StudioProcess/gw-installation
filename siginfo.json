@@ -1,0 +1,16 @@
+{
+    "sitemap": [
+        "./app/main.js",
+        "./app/main.css",
+        "./app/env.js",
+        "./crypto/files.mjs",
+        "./crypto/signature.timestamp"
+    ],
+    "metadata": {
+        "title": "Gravitational Waves",
+        "author": "Process Studio",
+        "image_url": "./icons/1024.png"
+    },
+    "timestamp_url": "./crypto/signature.timestamp",
+    "signature_url": "./crypto/signature.base64"
+}

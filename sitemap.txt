@@ -1,4 +1,0 @@
-./app/main.js
-./app/main.css
-./app/env.js
-./crypto/files.mjs

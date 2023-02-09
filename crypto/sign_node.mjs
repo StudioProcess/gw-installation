@@ -30,13 +30,20 @@ try {
     console.log("Key pair generated:", pair);
 }
 
+const timestamp = new Date().toISOString();
+writeFileSync('signature.timestamp', timestamp);
+console.log('Timestamp:', timestamp);
+
 const sign = createSign(config.hash);
 
+let length = 0;
 for (let file of files) {
     console.log('Signing:', file);
     const buffer = readFileSync(file);
+    length += buffer.length;
     sign.update(buffer);
 }
+console.log('Signed bytes:', length);
 
 const key_object = createPrivateKey(private_key);
 key_object.dsaEncoding = 'ieee-p1363'; // This signature format is required for Web Cryptography API

@@ -2,10 +2,20 @@
 const config = { algorithm: 'ECDSA', named_curve: 'P-384', hash: 'SHA-384' };
 // const config = { algorithm: 'ECDSA', named_curve: 'P-521', hash: 'SHA-512' };
 
+export function make_url(url, base) {
+    return (new URL(url, base)).href;
+}
+
 // Fetch String
 export async function fetch_text(path) {
     const res = await fetch(path);
     return res.text();
+}
+
+// Fetch JSON
+export async function fetch_json(path) {
+    const res = await fetch(path);
+    return res.json();
 }
 
 // Fetch ArrayBuffer
