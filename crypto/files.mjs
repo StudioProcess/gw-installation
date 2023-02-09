@@ -4,4 +4,6 @@ export default [
     '../app/env.js',
     './files.mjs',
     './signature.timestamp',
+    '../siginfo.json',
+    '../icons/1024.png'
 ];

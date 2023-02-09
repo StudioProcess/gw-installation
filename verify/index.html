@@ -21,7 +21,7 @@
             word-break: break-all;
         }
         .log { color: black; }
-        .warn { color: orange; }
+        .warn { color: darkorange; }
         .alert { color: red; }
         .ok { color: green; }
         
@@ -34,13 +34,16 @@
     <script type="module">
         import * as util from './util.mjs';
         
+        const SIGINFO_URL = './siginfo.json';
+        const PUBLIC_KEY_URL = '../crypto/public_key.pem';
+        
         const txt_url = document.querySelector('#txt-url');
         const txt_sig = document.querySelector('#txt-sig');
         const btn_verify = document.querySelector('#btn-verify');
         const div_output = document.querySelector('#output');
+        let origin = '';
         
         function linkify(str) {
-            console.log(typeof str);
             if (typeof str !== 'string' || (!str.startsWith('http://') && !str.startsWith('https://'))) {
                 return str;
             }
@@ -63,48 +66,157 @@
         function alert(...msgs) { append_log(msgs, 'alert'); }
         function ok(...msgs) { append_log(msgs, 'ok'); }
         
-        async function load_siginfo() {
-            log('Verifying URL:', txt_url.value);
-            const url = new URL('./siginfo.json', txt_url.value).href;
-            const siginfo = await util.fetch_json(url);
-            log('Siginfo:', url);
-            // TODO: no siginfo found
-            return siginfo;
+        function check_origin(url) {
+            return url.toLowerCase().startsWith(origin.toLowerCase());
         }
         
-        function process_sitemap(files) {
-            return files.map(f => util.make_url(f, txt_url.value));
+        async function load_siginfo(url) {
+            const siginfo_url = util.make_url(url, origin);
+            let siginfo;
+            try {
+                siginfo = await util.fetch_json(siginfo_url);
+                log('Signature info:', siginfo_url);
+            } catch {
+                warn('Signature info not found');
+                return false;
+            }
+            
+            if (!siginfo.version) {
+                warn('Siginfo: version missing');
+                return false;
+            }
+            
+            if (!Array.isArray(siginfo?.sitemap)) {
+                warn('Siginfo: sitemap missing');
+                return false;
+            }
+            siginfo.sitemap = siginfo.sitemap.map(f => util.make_url(f, origin));
+            
+            // Check that signed files are within the checked domain
+            for (let file of siginfo.sitemap) {
+                if (!check_origin(file)) {
+                    warn('Siginfo: File outside of checked domain:', file);
+                    return false;
+                }
+            }
+            log('Siginfo: All files within checked domain');
+            
+            // Check that siginfo is signed
+            if (!siginfo.sitemap.includes(siginfo_url)) {
+                warn(`Siginfo: ${url} not included in signature`);
+                return false;
+            }
+            log(`Siginfo: ${url} included in signature`);
+            
+            // Check that timestamp is signed (if present)
+            if (siginfo.timestamp_url) {
+                siginfo.timestamp_url = util.make_url(siginfo.timestamp_url, origin);
+                if (!check_origin(siginfo.timestamp_url)) {
+                    warn(`Siginfo: Timestamp outside of checked domain: ${siginfo.timestamp_url}`);
+                    return false;
+                }
+                if (!siginfo.sitemap.includes(siginfo.timestamp_url)) {
+                    warn(`Siginfo: Timestamp not included in signature: ${siginfo.timestamp_url}`);
+                    return false;
+                }
+            }
+            log(`Siginfo: Timestamp included in signature`);
+            
+            // Check that image_url is signed (if present)
+            if (siginfo?.metadata.image_url) {
+                siginfo.metadata.image_url = util.make_url(siginfo.metadata.image_url, origin);
+                if (!check_origin(siginfo.metadata.image_url)) {
+                    warn(`Siginfo: Image outside of checked domain: ${siginfo.metadata.image_url}`);
+                    return false;
+                }
+                if (!siginfo.sitemap.includes(siginfo.metadata.image_url)) {
+                    warn(`Siginfo: Image not included in signature: ${siginfo.metadata.image_url}`);
+                    return false;
+                }
+            }
+            log(`Siginfo: Image included in signature`);
+            return siginfo;
         }
         
         async function verify() {
             output.innerHTML = '';
-            const siginfo = await load_siginfo();
-            console.log(siginfo);
             
-            // TODO: check that siginfo is signed
-            // TODO: check that timestamp is signed
-            // TODO: check that signed files are on the checked domain
+            origin = txt_url.value;
+            log('Verifying site:', origin);
+            
+            // Check crypto.subtle
+            if (!util.check_crypto()) {
+                warn("This browser does not support the crypto module");
+                return;
+            }
+            
+            // Check HTTPS
+            if (!origin.toLowerCase().startsWith('https://') 
+                && !origin.toLowerCase().startsWith('http://localhost:')) {
+                warn('Cannot verify. HTTPS is required');
+                return;
+            }
+            
+            // Load siginfo
+            const siginfo = await load_siginfo(SIGINFO_URL);
+            if (!siginfo) {
+                return;
+            }
+            
+            // Get signature (from input/querystring or siginfo)
             let sig = txt_sig.value;
             if (!sig) {
-                sig = await util.fetch_text(util.make_url(siginfo.signature_url , txt_url.value));
+                if (!siginfo.signature_url) {
+                    warn('No signature provided');
+                    return;
+                }
+                try {
+                    const sig_url = util.make_url(siginfo.signature_url, location.origin);
+                    sig = await util.fetch_text(sig_url);
+                    log('Signature:', sig_url);
+                } catch {
+                    warn('Cannot load signature:', siginfo.signature_url);
+                }
+            } else {
+                log('Signature:', sig);
             }
-            log('Signature:', sig);
             
-            const public_key_url = new URL('../crypto/public_key.pem', location.href).href;
-            const public_key = await util.load_public_key(public_key_url);
-            log('Public key:', public_key_url);
-            
-            const files = process_sitemap(siginfo.sitemap);
-            log('Files to verify:', files.length);
-            const data_buffers = await Promise.all(files.map(path => {
-                log('Verifying:', path);
-                return util.fetch_ab(path);
-            }));
+            log('Files to verify:', siginfo.sitemap.length);
+            let data_buffers;
+            let failed;
+            try {
+                data_buffers = await Promise.all(siginfo.sitemap.map(path => {
+                    return util.fetch_ab(path).then(buf => {
+                        if (!failed) log('Verifying:', path); // log only when successfully loaded
+                        return buf;
+                    }) 
+                }));
+            } catch (e) {
+                failed = true;
+                warn('Cannot load file:', e.url);
+                return;
+            }
             
             const data = util.join_buffers(data_buffers);
-            log('Total bytes to verify:', data.byteLength);
+            log('Total bytes to verify:', new Intl.NumberFormat('en').format(data.byteLength));
             
-            const valid = await util.verify(public_key, sig, data);
+            
+            const public_key_url = util.make_url(PUBLIC_KEY_URL, location.origin);
+            let public_key;
+            try {
+                public_key = await util.load_public_key(public_key_url);
+            } catch {
+                warn('Cannot load public key:', public_key_url);
+                return;
+            }
+            log('Public key:', public_key_url);
+            
+            let valid;
+            try {
+                valid = await util.verify(public_key, sig, data);
+            } catch (e) {
+                console.warn(e);
+            }
             if (valid) {
                 ok(`VALID\n\n`);
                 log(`<img src="${util.make_url(siginfo.metadata.image_url, txt_url.value)}" style="max-width:200px;"/>`)

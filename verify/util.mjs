@@ -2,6 +2,12 @@
 const config = { algorithm: 'ECDSA', named_curve: 'P-384', hash: 'SHA-384' };
 // const config = { algorithm: 'ECDSA', named_curve: 'P-521', hash: 'SHA-512' };
 
+export function check_crypto() {
+    return crypto && crypto.subtle 
+        && crypto.subtle.importKey
+        && crypto.subtle.verify;   
+}
+
 export function make_url(url, base) {
     return (new URL(url, base)).href;
 }
@@ -9,18 +15,21 @@ export function make_url(url, base) {
 // Fetch String
 export async function fetch_text(path) {
     const res = await fetch(path);
+    if (!res.ok) { throw res; }
     return res.text();
 }
 
 // Fetch JSON
 export async function fetch_json(path) {
     const res = await fetch(path);
+    if (!res.ok) { throw res; }
     return res.json();
 }
 
 // Fetch ArrayBuffer
 export async function fetch_ab(path) {
     const res = await fetch(path);
+    if (!res.ok) { throw res; }
     return res.arrayBuffer();
 }
 
@@ -63,7 +72,7 @@ function decode_pem(pem_str) {
     let matches = pem_str.matchAll(/-----BEGIN ([^-]*)-----/gd);
     matches = [...matches];
     if (matches.length == 0) {
-        throw "PEM header not found";
+        throw { type: 'pem_error', msg: 'PEM header not found' };
     }
     const first_match = matches[0];
     const label = first_match[1];
@@ -71,7 +80,7 @@ function decode_pem(pem_str) {
     
     const footer_start = pem_str.indexOf(`-----END ${label}-----`, header_end + 1)
     if (footer_start === -1) {
-        throw `PEM footer not found for header with label ${label}`;
+        throw { type: 'pem_error', msg: `PEM footer not found for header with label ${label}` };
     } 
     let data = pem_str.slice(header_end + 1, footer_start - 1 );
     data = data.replaceAll(/\s+/g, ''); // remove all whitespace

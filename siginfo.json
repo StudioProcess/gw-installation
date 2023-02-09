@@ -6,7 +6,9 @@
         "./app/main.css",
         "./app/env.js",
         "./crypto/files.mjs",
-        "./crypto/signature.timestamp"
+        "./crypto/signature.timestamp",
+        "./siginfo.json",
+        "./icons/1024.png"
     ],
     "metadata": {
         "title": "Gravitational Waves",
