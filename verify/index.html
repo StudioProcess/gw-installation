@@ -50,7 +50,7 @@
             }
             try {
                 const url = new URL(str);
-                return `<a href="${url.href}">${str}</a>`;
+                return `<a href="${url.href}" target="_blank">${str}</a>`;
             } catch {
                 return str;
             }
@@ -142,6 +142,8 @@
         async function verify() {
             output.innerHTML = '';
             
+            log('Verification started:', util.ts_local());
+            
             origin = txt_url.value;
             log('Verifying site:', origin);
             
@@ -183,17 +185,14 @@
             }
             
             log('Files to verify:', siginfo.sitemap.length);
-            let data_buffers;
-            let failed;
+            const data_buffers = [];
             try {
-                data_buffers = await Promise.all(siginfo.sitemap.map(path => {
-                    return util.fetch_ab(path).then(buf => {
-                        if (!failed) log('Verifying:', path); // log only when successfully loaded
-                        return buf;
-                    }) 
-                }));
+                for (let [idx, file] of siginfo.sitemap.entries()) {
+                    let buf = await util.fetch_ab(file);
+                    log(`(${idx+1})`, file);
+                    data_buffers.push(buf);
+                }
             } catch (e) {
-                failed = true;
                 warn('Cannot load file:', e.url);
                 return;
             }
@@ -227,11 +226,10 @@
                     '</ul>'
                 ]);
                 
-                append_log(`<a href="${origin}">${origin}</a>`, 'link');
-                
                 if (siginfo?.metadata.image_url) {
                     append_log(`<a href="${origin}"><img src="${siginfo.metadata.image_url}" style="max-width:200px;"/></a>`, 'image');
                 }
+                append_log(`<a href="${origin}">${origin}</a>`, 'link');
                 if (siginfo?.metadata.title) {
                     append_log(siginfo.metadata.title, 'title');
                 }

@@ -47,8 +47,6 @@ function tz_offset_str(d) {
 }
 export function ts_local(d) {
   if (!d) { d = new Date(); }
-  console.log(d);
-
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)} ${tz_offset_str(d)}`;
 }
 
