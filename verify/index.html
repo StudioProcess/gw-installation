@@ -6,10 +6,30 @@
     <title>Verify</title>
 </head>
 <body>
+    <style>
+        body {
+            font-family: system-ui;
+        }
+        a, a:active, a:visited {
+            color: inherit;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #output {
+            word-break: break-all;
+        }
+        .log { color: black; }
+        .warn { color: orange; }
+        .alert { color: red; }
+        .ok { color: green; }
+        
+    </style>
     <textarea id="txt-url" placeholder="URL"></textarea><br>
     <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
     <button id="btn-verify">Verify</button>
-    <div id="output" style="white-space:pre;"></div>
+    <div id="output"></div>
     
     <script type="module">
         import * as util from './util.mjs';
@@ -32,10 +52,16 @@
             }
         }
         
-        function log(...msgs) {
-            msgs = msgs.map(linkify);
-            output.innerHTML += `<div>${msgs.join(' ')}</div>`;
+        function append_log(strings, cls = '') {
+            if (!Array.isArray(strings)) { strings = [strings]; }
+            strings = strings.map(linkify);
+            output.innerHTML += `<div class="${cls}">${strings.join(' ')}</div>`;
         }
+        
+        function log(...msgs) { append_log(msgs, 'log'); }
+        function warn(...msgs) { append_log(msgs, 'warn'); }
+        function alert(...msgs) { append_log(msgs, 'alert'); }
+        function ok(...msgs) { append_log(msgs, 'ok'); }
         
         async function load_siginfo() {
             log('Verifying URL:', txt_url.value);
@@ -80,14 +106,14 @@
             
             const valid = await util.verify(public_key, sig, data);
             if (valid) {
-                log(`VALID\n\n`);
+                ok(`VALID\n\n`);
                 log(`<img src="${util.make_url(siginfo.metadata.image_url, txt_url.value)}" style="max-width:200px;"/>`)
                 log(JSON.stringify(siginfo.metadata));
                 const timestamp = await util.fetch_text(util.make_url(siginfo.timestamp_url , txt_url.value));
                 log(`Signature Timestamp: ${timestamp}`)
                 
             } else {
-                log(`NOT VALID`);
+                alert(`NOT VALID`);
             }
         }
         
