@@ -1,3 +1,7 @@
+// Test to verify files signed by ./sign_node.mjs
+// Uses Web Crypto API
+// Use ./index.html to load this file in a browser
+
 // const config = { algorithm: 'ECDSA', named_curve: 'P-256', hash: 'SHA-256' };
 const config = { algorithm: 'ECDSA', named_curve: 'P-384', hash: 'SHA-384' };
 // const config = { algorithm: 'ECDSA', named_curve: 'P-521', hash: 'SHA-512' };

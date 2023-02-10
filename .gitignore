@@ -1,9 +1,9 @@
 node_modules
 .DS_Store
 dist
-crypto/*.pem
-crypto/*.base64
-crypto/*.timestamp
+sign/*.pem
+sign/*.base64
+sign/*.timestamp
 *.base64
 *.timestamp
 verify/*.base64

@@ -1,3 +1,11 @@
+#!/usr/bin/env node
+
+// Test to verfiy files signed by ./sign_node.mjs 
+// Uses Node's crypto API
+// 
+// Usage:
+// ./verify_node.mjs [<folder to verify>]
+
 import { createVerify, getCurves, getHashes, createPublicKey } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';

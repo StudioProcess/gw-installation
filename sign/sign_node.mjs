@@ -1,3 +1,11 @@
+#!/usr/bin/env node
+
+// Sign files using ECDSA
+// Can be verified using the verification tool ./verify/index.html
+// 
+// Usage:
+// ./sign_node.js [<folder to sign>]
+
 import { generateKeyPairSync, createSign, getCurves, getHashes, createPrivateKey } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
