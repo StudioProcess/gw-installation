@@ -35,8 +35,8 @@
     <script type="module">
         import * as util from './util.mjs';
         
-        const SIGINFO_URL = './siginfo.json';
-        const PUBLIC_KEY_URL = '../crypto/public_key.pem';
+        const SIGINFO_URL = './siginfo.json'; // Relative to the checked site
+        const PUBLIC_KEY_URL = './public_key.pem'; // Relative to this file
         
         const txt_url = document.querySelector('#txt-url');
         const txt_sig = document.querySelector('#txt-sig');

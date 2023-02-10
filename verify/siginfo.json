@@ -3,6 +3,7 @@
     "sitemap": [
         "./index.html",
         "./util.mjs",
+        "./public_key.pem",
         "./siginfo.json",
         "./signature.timestamp"
     ],

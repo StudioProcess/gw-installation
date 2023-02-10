@@ -4,7 +4,9 @@ dist
 sign/*.pem
 sign/*.base64
 sign/*.timestamp
+*.pem
 *.base64
 *.timestamp
 verify/*.base64
 verify/*.timestamp
+verify/*.pem

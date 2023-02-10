@@ -57,6 +57,7 @@ try {
         },
     });
     writeFileSync(`public_key.pem`, pair.publicKey);
+    writeFileSync(`../verify/public_key.pem`, pair.publicKey); // also copy pyblic key to verify folder
     writeFileSync(`private_key.pem`, pair.privateKey);
     private_key = pair.privateKey;
     console.log("Key pair generated:", pair);
