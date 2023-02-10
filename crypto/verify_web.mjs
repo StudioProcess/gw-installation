@@ -1,14 +1,19 @@
-import files from './files.mjs';
-
 // const config = { algorithm: 'ECDSA', named_curve: 'P-256', hash: 'SHA-256' };
 const config = { algorithm: 'ECDSA', named_curve: 'P-384', hash: 'SHA-384' };
 // const config = { algorithm: 'ECDSA', named_curve: 'P-521', hash: 'SHA-512' };
 
+const FOLDER = '../'; // folder to verify
 
 // Fetch String
 async function fetch_text(path) {
     const res = await fetch(path);
     return res.text();
+}
+
+// Fetch String
+async function fetch_json(path) {
+    const res = await fetch(path);
+    return res.json();
 }
 
 // Fetch ArrayBuffer
@@ -115,8 +120,12 @@ function join_buffers(buffers) {
     return out.buffer;
 }
 
+// Get files to verify (from siginfo.json)
+const siginfo = await fetch_json(FOLDER + 'siginfo.json');
+const files = siginfo.sitemap.map(f => FOLDER + f);
+
 const public_key = await load_public_key('./public_key.pem');
-const sig = await fetch_text('./signature.base64');
+const sig = await fetch_text(FOLDER + './signature.base64');
 console.log('Signature:', sig);
 
 const data_buffers = await Promise.all(files.map(path => {
