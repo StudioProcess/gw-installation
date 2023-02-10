@@ -16,11 +16,16 @@ const config = { named_curve: 'secp384r1', hash: 'sha384' };
 
 
 // Get list of files to sign (from siginfo.json)
-let folder = '../';
-if (process.argv[2]) {
-    folder = process.argv[2];
+let folder = process.argv[2];
+if (folder) {
+    if (!path.isAbsolute(folder)) {
+        folder = path.join(process.cwd(), process.argv[2]); // relative to working dir
+    }
+} else {
+    folder = path.join(path.dirname(process.argv[1]), '../'); // default to ../ relative to this script
 }
-folder = path.join(path.dirname(process.argv[1]), folder);
+process.chdir(path.dirname(process.argv[1])); // set working dir to script dir
+
 console.log('Signing folder:', folder);
 
 const siginfo_path = path.join(folder, './siginfo.json');
