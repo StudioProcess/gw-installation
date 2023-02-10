@@ -1,7 +1,6 @@
 import { createVerify, getCurves, getHashes, createPublicKey } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-
-import files from './files.mjs';
+import path from 'node:path';
 
 // console.log(getCurves());
 // console.log(getHashes());
@@ -11,8 +10,27 @@ import files from './files.mjs';
 const config = { hash: 'sha384' };
 // const config = { hash: 'sha512' };
 
+
+// Get list of files to verify (from siginfo.json)
+let folder = '../';
+if (process.argv[2]) {
+    folder = process.argv[2];
+}
+folder = path.join(path.dirname(process.argv[1]), folder);
+console.log('Verifying folder:', folder);
+const siginfo_path = path.join(folder, './siginfo.json');
+let siginfo;
+try {
+    siginfo = readFileSync(siginfo_path);
+    siginfo = JSON.parse(siginfo);
+} catch {
+    console.log('Cannot load siginfo:', siginfo_path);
+}
+const files = siginfo.sitemap.map(f => path.join(folder, f));
+
+
 const public_key = readFileSync('./public_key.pem', 'utf8');
-const sig = readFileSync('./signature.base64', 'utf8');
+const sig = readFileSync(path.join(folder, './signature.base64'), 'utf8');
 console.log('Signature:', sig);
 
 const verify = createVerify(config.hash);
