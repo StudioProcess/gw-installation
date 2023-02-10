@@ -73,7 +73,6 @@
         
         async function load_siginfo(url) {
             const siginfo_url = util.make_url(url, origin);
-            console.log(siginfo_url);
             let siginfo;
             try {
                 siginfo = await util.fetch_json(siginfo_url);
@@ -137,6 +136,12 @@
                 }
             }
             // log(`Siginfo: Image included in signature`);
+            
+            // Process signature URL (if present)
+            if (siginfo.signature_url) {
+                siginfo.signature_url = util.make_url(siginfo.signature_url, origin);
+            }
+            
             return siginfo;
         }
         
