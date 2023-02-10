@@ -73,6 +73,7 @@
         
         async function load_siginfo(url) {
             const siginfo_url = util.make_url(url, origin);
+            console.log(siginfo_url);
             let siginfo;
             try {
                 siginfo = await util.fetch_json(siginfo_url);
@@ -144,7 +145,8 @@
             
             log('Verification started:', util.ts_local());
             
-            origin = txt_url.value;
+            origin = txt_url.value.trim();
+            if (!origin.endsWith('/')) { origin += '/'; } // make sure the URL ends with a slash, so make_url doesn't remove the last path part
             log('Verifying site:', origin);
             
             // Check crypto.subtle
