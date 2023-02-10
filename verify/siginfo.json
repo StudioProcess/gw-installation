@@ -1,0 +1,15 @@
+{
+    "version": 1,
+    "sitemap": [
+        "./index.html",
+        "./util.mjs",
+        "./siginfo.json",
+        "./signature.timestamp"
+    ],
+    "metadata": {
+        "title": "Verify",
+        "author": "Process Studio"
+    },
+    "timestamp_url": "./signature.timestamp",
+    "signature_url": "./signature.base64"
+}

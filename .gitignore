@@ -4,3 +4,7 @@ dist
 crypto/*.pem
 crypto/*.base64
 crypto/*.timestamp
+*.base64
+*.timestamp
+verify/*.base64
+verify/*.timestamp

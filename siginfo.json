@@ -1,12 +1,10 @@
 {
     "version": 1,
-    "base_url": "",
     "sitemap": [
         "./app/main.js",
         "./app/main.css",
         "./app/env.js",
-        "./crypto/files.mjs",
-        "./crypto/signature.timestamp",
+        "./signature.timestamp",
         "./siginfo.json",
         "./icons/1024.png"
     ],
@@ -15,6 +13,6 @@
         "author": "Process Studio",
         "image_url": "./icons/1024.png"
     },
-    "timestamp_url": "./crypto/signature.timestamp",
-    "signature_url": "./crypto/signature.base64"
+    "timestamp_url": "./signature.timestamp",
+    "signature_url": "./signature.base64"
 }

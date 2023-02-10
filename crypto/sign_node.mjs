@@ -1,11 +1,30 @@
 import { generateKeyPairSync, createSign, getCurves, getHashes, createPrivateKey } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
-
-import files from './files.mjs';
+import path from 'node:path';
 
 // const config = { named_curve: 'prime256v1', hash: 'sha256' };
 const config = { named_curve: 'secp384r1', hash: 'sha384' };
 // const config = { named_curve: 'secp521r1', hash: 'sha512' };
+
+
+// Get list of files to verify (from siginfo.json)
+let folder = '../';
+if (process.argv[2]) {
+    folder = process.argv[2];
+}
+folder = path.join(path.dirname(process.argv[1]), folder);
+console.log('Signing folder:', folder);
+
+const siginfo_path = path.join(folder, './siginfo.json');
+let siginfo;
+try {
+    siginfo = readFileSync(siginfo_path);
+    siginfo = JSON.parse(siginfo);
+} catch {
+    console.log('Cannot load siginfo:', siginfo_path);
+}
+const files = siginfo.sitemap.map(f => path.join(folder, f));
+
 
 // load private key
 // if file not found, generated new key pair
@@ -31,7 +50,7 @@ try {
 }
 
 const timestamp = new Date().toISOString();
-writeFileSync('signature.timestamp', timestamp);
+writeFileSync(path.join(folder, 'signature.timestamp'), timestamp);
 console.log('Timestamp:', timestamp);
 
 const sign = createSign(config.hash);
@@ -51,4 +70,4 @@ const sig = sign.sign(key_object, 'base64');
 console.log('Signature:');
 console.log(sig);
 
-writeFileSync(`signature.base64`, sig);
+writeFileSync(path.join(folder, 'signature.base64'), sig);
