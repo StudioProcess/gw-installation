@@ -7,7 +7,7 @@ const config = { named_curve: 'secp384r1', hash: 'sha384' };
 // const config = { named_curve: 'secp521r1', hash: 'sha512' };
 
 
-// Get list of files to verify (from siginfo.json)
+// Get list of files to sign (from siginfo.json)
 let folder = '../';
 if (process.argv[2]) {
     folder = process.argv[2];
