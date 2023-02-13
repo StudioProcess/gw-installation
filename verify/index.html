@@ -18,7 +18,10 @@
         a:hover {
             text-decoration: underline;
         }
-        textarea { width: 99%; }
+        textarea { 
+            width: 99%;
+            resize: vertical;
+        }
         #output {
             width: 99%;
             max-height: 100px;
@@ -49,6 +52,7 @@
         
         const SIGINFO_URL = './siginfo.json'; // Relative to the checked site
         const PUBLIC_KEY_URL = './public_key.pem'; // Relative to this file
+        const INITIALLY_SHOW_LOG = true;
         
         const txt_url = document.querySelector('#txt-url');
         const txt_sig = document.querySelector('#txt-sig');
@@ -314,8 +318,8 @@
                 alert(`❌ SIGNATURE NOT VALID`);
                 append_log([
                     '<ul>',
-                    '<li>The data is incomplete, was changed or tampered with, and/or</li>',
-                    '<li>The signature was changed or tampered with</li>',
+                    '<li>The data is incomplete, was modified or tampered with, and/or</li>',
+                    '<li>The signature was modified or tampered with</li>',
                     '</ul>'
                 ]);
             }
@@ -339,6 +343,7 @@
         if (txt_url.value === '') { txt_url.value = location.origin + location.pathname; }
         const sig = query.get('sig');
         if (sig) { txt_sig.value = sig; }
+        if (INITIALLY_SHOW_LOG) { toggle_log(true); }
         
         verify();
         
