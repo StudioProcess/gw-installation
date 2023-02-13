@@ -18,13 +18,14 @@
         a:hover {
             text-decoration: underline;
         }
+        textarea { width: 99%; }
         .log { color: black; }
         .warn { color: darkorange; }
         .alert { color: red; }
         .ok { color: green; }
         .qrcode { max-width: 150px; }
     </style>
-    <textarea id="txt-url" placeholder="URL"></textarea><br>
+    <textarea id="txt-url" rows="1" placeholder="URL"></textarea><br>
     <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
     <button id="btn-verify">Verify</button>
     <div id="output"></div>
