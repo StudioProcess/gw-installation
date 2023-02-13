@@ -22,6 +22,7 @@
         textarea { 
             width: 99%;
             resize: vertical;
+            font-family: inherit;
         }
         button {
             font-size: inherit;
@@ -46,16 +47,27 @@
         #toggle-log {
             cursor: pointer;
         }
+        #result ul { margin-top: 0.1em; }
+        
         .metadata td:first-child {
             text-align: right;
             vertical-align: bottom;
         }
-        .caption { font-variant: small-caps; color:rgb(47, 47, 47); font-size: 66%; }
+        .metadata table {
+            padding: 1em;
+            /* border: 5px solid gray; */
+            border-radius: 20px;
+            background-color: rgb(24, 24, 24);
+            color: white;
+            margin: 0 auto;
+        }
+        
+        .caption { font-variant: small-caps; color: rgb(192, 192, 192); font-size: 66%; }
         .log { color: black; }
         .warn { color: darkorange; }
         .alert { color: red; }
-        .ok { color: color(srgb 0 0.7 0.0084); }
-        .qrcode { max-width: 150px; margin: 0 auto; }
+        .ok { color: #00B202; }
+        .qrcode { max-width: 150px; }
     </style>
     <textarea id="txt-url" rows="1" placeholder="URL"></textarea><br>
     <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
@@ -69,7 +81,7 @@
         
         const SIGINFO_URL = './siginfo.json'; // Relative to the checked site
         const PUBLIC_KEY_URL = './public_key.pem'; // Relative to this file
-        const INITIALLY_SHOW_LOG = true;
+        const INITIALLY_SHOW_LOG = false;
         
         const txt_url = document.querySelector('#txt-url');
         const txt_sig = document.querySelector('#txt-sig');
@@ -360,17 +372,21 @@
                     `<td>${util.ts_local(end_ts)}</td>`,
                     '</tr>',
                 );
-                out.push('</table>');
-                append_log(out, 'metadata');
-
                 
                 if (window.QRCode) {
                     const url = `${location.origin}${location.pathname}?url=${encodeURIComponent(origin)}&sig=${encodeURIComponent(sig)}`;
                     const svg = await window.QRCode.toString(url, {type: 'svg'});
                     const svg_uri = `data:image/svg+xml;base64,${btoa(svg)}`;
-                    append_log(`<a href="${url}"><img src="${svg_uri}"></a>`, 'qrcode');
+                    out.push(
+                        '<tr>',
+                        `<td><span class="caption">Verification URL</span></td>`,
+                        `<td><a href="${url}"><img class="qrcode" src="${svg_uri}"></a></td>`,
+                        '</tr>',
+                    );
                 }
                 
+                out.push('</table>');
+                append_log(out, 'metadata');
             } else {
                 alert(`❌ SIGNATURE NOT VALID`);
                 append_log([
