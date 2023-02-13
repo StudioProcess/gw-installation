@@ -19,6 +19,10 @@
             text-decoration: underline;
         }
         textarea { width: 99%; }
+        #output {
+            max-height: 100px;
+            overflow-y: scroll;
+        }
         .log { color: black; }
         .warn { color: darkorange; }
         .alert { color: red; }
@@ -62,6 +66,7 @@
             if (!Array.isArray(strings)) { strings = [strings]; }
             strings = strings.map(linkify);
             log_output.innerHTML += `<div class="${cls}">${strings.join(' ')}</div>`;
+            log_output.scrollTop = log_output.scrollHeight; // scroll to bottom (in case this is scrollable)
         }
         
         function log(...msgs) { append_log(msgs, 'log'); }
@@ -150,6 +155,7 @@
         async function verify() {
             output.innerHTML = '';
             result.innerHTML = '';
+            set_log_output(div_output);
             
             log('Verification started:', util.ts_local());
             
