@@ -10,6 +10,7 @@
     <style>
         body {
             font-family: system-ui;
+            font-size: 20px;
         }
         a, a:active, a:visited {
             color: inherit;
@@ -22,23 +23,39 @@
             width: 99%;
             resize: vertical;
         }
+        button {
+            font-size: inherit;
+            display: block;
+            margin: 0 auto;
+            font-weight: bold;
+        }
         #output {
             width: 99%;
-            max-height: 100px;
+            max-height: 200px;
             overflow-y: scroll;
-            border: 1px solid black;
             padding: 2px;
             /* font-size: 11px; */
             display: none;
         }
+        textarea, #output {
+            font-size: inherit;
+            border: 1px solid darkgray;
+            padding: 0.2em;
+            border-radius: 5px;
+        }
         #toggle-log {
             cursor: pointer;
         }
+        .metadata td:first-child {
+            text-align: right;
+            vertical-align: bottom;
+        }
+        .caption { font-variant: small-caps; color:rgb(47, 47, 47); font-size: 66%; }
         .log { color: black; }
         .warn { color: darkorange; }
         .alert { color: red; }
-        .ok { color: green; }
-        .qrcode { max-width: 150px; }
+        .ok { color: color(srgb 0 0.7 0.0084); }
+        .qrcode { max-width: 150px; margin: 0 auto; }
     </style>
     <textarea id="txt-url" rows="1" placeholder="URL"></textarea><br>
     <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
@@ -76,10 +93,11 @@
         
         let log_output = div_output;
         function set_log_output(el) { log_output = el; }
-        function append_log(strings, cls = '') {
+        
+        function append_log(strings, cls = '',) {
             if (!Array.isArray(strings)) { strings = [strings]; }
             strings = strings.map(linkify);
-            log_output.innerHTML += `<div class="${cls}">${strings.join(' ')}</div>`;
+            log_output.innerHTML += `<div ${cls ? 'class="' + cls + '"': ''}>${strings.join(' ')}</div>`;
             log_output.scrollTop = log_output.scrollHeight; // scroll to bottom (in case this is scrollable)
         }
         
@@ -287,25 +305,64 @@
                     '</ul>'
                 ]);
                 
+                let out = [];
+                out.push('<table>');
                 if (siginfo?.metadata.image_url) {
-                    append_log(`<a href="${origin}"><img src="${siginfo.metadata.image_url}" style="max-width:200px;"/></a>`, 'image');
+                    out.push(
+                        '<tr>',
+                        '<td><span class="caption">Image</span></td>',
+                        `<td><a href="${origin}"><img src="${siginfo.metadata.image_url}" style="max-width:200px;" /></a></td>`,
+                        '</tr>',
+                    );
                 }
-                append_log(`<a href="${origin}">${origin}</a>`, 'link');
+                
+                out.push(
+                    '<tr>',
+                    '<td><span class="caption">Site</span></td>',
+                    `<td><a href="${origin}">${origin}</a></td>`,
+                    '</tr>',
+                );
+                
                 if (siginfo?.metadata.title) {
-                    append_log(siginfo.metadata.title, 'title');
+                    out.push(
+                        '<tr>',
+                        '<td><span class="caption">Work title</span></td>',
+                        `<td>${siginfo.metadata.title}</td>`,
+                        '</tr>',
+                    );
                 }
                 if (siginfo?.metadata.author) {
-                    append_log(siginfo.metadata.author, 'author');
+                    out.push(
+                        '<tr>',
+                        '<td><span class="caption">Author</span></td>',
+                        `<td>${siginfo.metadata.author}</td>`,
+                        '</tr>',
+                    );
                 }
                 
                 if (siginfo.timestamp_url) {
                     try {
                         let timestamp = await util.fetch_text(siginfo.timestamp_url);
                         timestamp = new Date(timestamp);
-                        append_log(['Signed:', util.ts_local(timestamp)], 'timestamp');
-                    } catch { /* nop */ }
+                        out.push(
+                            '<tr>',
+                            '<td><span class="caption">Signed</span></td>', 
+                            `<td>${util.ts_local(timestamp)}</td>`,
+                            '</tr>',
+                        );
+                    } catch {
+                        // nop
+                    }
                 }
-                append_log(['Verified:', util.ts_local(end_ts)], 'timestamp');
+                out.push(
+                    '<tr>',
+                    '<td><span class="caption">Verified</span></td>',
+                    `<td>${util.ts_local(end_ts)}</td>`,
+                    '</tr>',
+                );
+                out.push('</table>');
+                append_log(out, 'metadata');
+
                 
                 if (window.QRCode) {
                     const url = `${location.origin}${location.pathname}?url=${encodeURIComponent(origin)}&sig=${encodeURIComponent(sig)}`;
