@@ -18,9 +18,6 @@
         a:hover {
             text-decoration: underline;
         }
-        #output {
-            word-break: break-all;
-        }
         .log { color: black; }
         .warn { color: darkorange; }
         .alert { color: red; }
@@ -188,7 +185,7 @@
                     return;
                 }
             } else {
-                log('Signature:', sig);
+                log('Signature:', `<span style="word-break: break-all;">${sig}</span>`);
             }
             
             log('Files to verify:', siginfo.sitemap.length);
