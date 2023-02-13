@@ -20,8 +20,16 @@
         }
         textarea { width: 99%; }
         #output {
+            width: 99%;
             max-height: 100px;
             overflow-y: scroll;
+            border: 1px solid black;
+            padding: 2px;
+            /* font-size: 11px; */
+            display: none;
+        }
+        #toggle-log {
+            cursor: pointer;
         }
         .log { color: black; }
         .warn { color: darkorange; }
@@ -31,9 +39,10 @@
     </style>
     <textarea id="txt-url" rows="1" placeholder="URL"></textarea><br>
     <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
-    <button id="btn-verify">Verify</button>
-    <div id="output"></div>
-    <div id="result"></div>
+    <button id="btn-verify">Verify</button><br>
+    <span id="toggle-log">Show log ▶︎</span><br>
+    <div id="output"></div><br>
+    <div id="result"></div><br>
     
     <script type="module">
         import * as util from './util.mjs';
@@ -44,6 +53,7 @@
         const txt_url = document.querySelector('#txt-url');
         const txt_sig = document.querySelector('#txt-sig');
         const btn_verify = document.querySelector('#btn-verify');
+        const span_toggle_log = document.querySelector('#toggle-log');
         const div_output = document.querySelector('#output');
         const div_result = document.querySelector('#result');
         let origin = '';
@@ -73,6 +83,26 @@
         function warn(...msgs) { append_log(msgs, 'warn'); }
         function alert(...msgs) { append_log(msgs, 'alert'); }
         function ok(...msgs) { append_log(msgs, 'ok'); }
+        
+        let first_show_of_log = false;
+        function toggle_log(force) {
+            if (force !== undefined) {
+                if (force) {
+                    div_output.style.display = 'block';
+                    span_toggle_log.textContent = 'Hide log ▼';
+                    if (!first_show_of_log) {
+                        first_show_of_log = true;
+                        div_output.scrollTop = log_output.scrollHeight; 
+                    }
+                } else {
+                    div_output.style.display = 'none';
+                    span_toggle_log.textContent = 'Show log ▶︎';
+                }
+            } else {
+                toggle_log(div_output.style.display !== 'block');
+            }
+        }
+        span_toggle_log.onclick = e => { toggle_log(); };
         
         function check_origin(url) {
             return url.toLowerCase().startsWith(origin.toLowerCase());
@@ -152,6 +182,11 @@
             return siginfo;
         }
         
+        function bail() {
+            toggle_log(true);
+            return false;
+        }
+        
         async function verify() {
             output.innerHTML = '';
             result.innerHTML = '';
@@ -167,20 +202,20 @@
             // Check crypto.subtle
             if (!util.check_crypto()) {
                 warn("This browser does not support the crypto module");
-                return;
+                return bail();
             }
             
             // Check HTTPS
             if (!origin.toLowerCase().startsWith('https://') 
                 && !origin.toLowerCase().startsWith('http://localhost:')) {
                 warn('Cannot verify. HTTPS is required');
-                return;
+                return bail();
             }
             
             // Load siginfo
             const siginfo = await load_siginfo(SIGINFO_URL);
             if (!siginfo) {
-                return;
+                return bail();
             }
             
             // Get signature (from input/querystring or siginfo)
@@ -188,14 +223,14 @@
             if (!sig) {
                 if (!siginfo.signature_url) {
                     warn('No signature provided');
-                    return;
+                    return bail();
                 }
                 try {
                     sig = await util.fetch_text(siginfo.signature_url);
                     log('Signature:', siginfo.signature_url);
                 } catch {
                     warn('Cannot load signature:', siginfo.signature_url);
-                    return;
+                    return bail();
                 }
             } else {
                 log('Signature:', `<span style="word-break: break-all;">${sig}</span>`);
@@ -211,12 +246,11 @@
                 }
             } catch (e) {
                 warn('Cannot load file:', e.url);
-                return;
+                return bail();
             }
             
             const data = util.join_buffers(data_buffers);
             log('Total bytes to verify:', new Intl.NumberFormat('en').format(data.byteLength));
-            
             
             const public_key_url = util.make_url(PUBLIC_KEY_URL, location.origin + location.pathname);
             let public_key;
@@ -224,7 +258,7 @@
                 public_key = await util.load_public_key(public_key_url);
             } catch {
                 warn('Cannot load public key:', public_key_url);
-                return;
+                return bail();
             }
             log('Public key:', public_key_url);
             
@@ -236,8 +270,8 @@
             }
             const end_ts = new Date();
             log('Verification finished:', util.ts_local(end_ts));
-            log('Verification took:', util.format_duration(end_ts-start_ts));
-            log('Result (Signature valid?):', valid);
+            log('Elapsed time:', util.format_duration(end_ts-start_ts));
+            log('Result:', valid ? 'valid' : 'invalid');
             
             set_log_output(div_result);
             if (valid) {
