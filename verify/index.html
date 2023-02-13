@@ -29,6 +29,7 @@
     <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
     <button id="btn-verify">Verify</button>
     <div id="output"></div>
+    <div id="result"></div>
     
     <script type="module">
         import * as util from './util.mjs';
@@ -40,6 +41,7 @@
         const txt_sig = document.querySelector('#txt-sig');
         const btn_verify = document.querySelector('#btn-verify');
         const div_output = document.querySelector('#output');
+        const div_result = document.querySelector('#result');
         let origin = '';
         
         function linkify(str) {
@@ -54,10 +56,12 @@
             }
         }
         
+        let log_output = div_output;
+        function set_log_output(el) { log_output = el; }
         function append_log(strings, cls = '') {
             if (!Array.isArray(strings)) { strings = [strings]; }
             strings = strings.map(linkify);
-            output.innerHTML += `<div class="${cls}">${strings.join(' ')}</div>`;
+            log_output.innerHTML += `<div class="${cls}">${strings.join(' ')}</div>`;
         }
         
         function log(...msgs) { append_log(msgs, 'log'); }
@@ -222,6 +226,7 @@
             } catch (e) {
                 console.warn(e);
             }
+            set_log_output(div_result);
             if (valid) {
                 ok(`✅ SIGNATURE VALID`);
                 append_log([
