@@ -149,6 +149,7 @@
         
         async function verify() {
             output.innerHTML = '';
+            result.innerHTML = '';
             
             log('Verification started:', util.ts_local());
             
@@ -273,6 +274,16 @@
         }
         
         btn_verify.onclick = verify;
+        
+        const verify_on_enter = e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.target.blur();
+                verify();
+            }
+        };
+        txt_url.onkeydown = verify_on_enter;
+        txt_sig.onkeydown = verify_on_enter;
         
         const query = new URLSearchParams(window.location.search);
         const url = query.get('url');
