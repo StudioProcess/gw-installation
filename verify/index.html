@@ -157,7 +157,8 @@
             result.innerHTML = '';
             set_log_output(div_output);
             
-            log('Verification started:', util.ts_local());
+            let start_ts = new Date();
+            log('Verification started:', util.ts_local(start_ts));
             
             origin = txt_url.value.trim();
             if (!origin.endsWith('/')) { origin += '/'; } // make sure the URL ends with a slash, so make_url doesn't remove the last path part
@@ -233,6 +234,11 @@
             } catch (e) {
                 console.warn(e);
             }
+            const end_ts = new Date();
+            log('Verification finished:', util.ts_local(end_ts));
+            log('Verification took:', util.format_duration(end_ts-start_ts));
+            log('Result (Signature valid?):', valid);
+            
             set_log_output(div_result);
             if (valid) {
                 ok(`✅ SIGNATURE VALID`);
@@ -258,9 +264,11 @@
                     try {
                         let timestamp = await util.fetch_text(siginfo.timestamp_url);
                         timestamp = new Date(timestamp);
-                        append_log(util.ts_local(timestamp), 'timestamp');
+                        append_log(['Signed:', util.ts_local(timestamp)], 'timestamp');
                     } catch { /* nop */ }
                 }
+                append_log(['Verified:', util.ts_local(end_ts)], 'timestamp');
+                
                 if (window.QRCode) {
                     const url = `${location.origin}${location.pathname}?url=${encodeURIComponent(origin)}&sig=${encodeURIComponent(sig)}`;
                     const svg = await window.QRCode.toString(url, {type: 'svg'});

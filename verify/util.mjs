@@ -50,6 +50,14 @@ export function ts_local(d) {
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)} ${tz_offset_str(d)}`;
 }
 
+export function format_duration(ms) {
+  const m = Math.floor(ms / 60000);
+  ms = ms % 60000;
+  const s = Math.floor(ms / 1000);
+  ms = ms % 1000;
+  return `${m > 0 ? m + 'm ' : ''}${s > 0 ? s + 's ' : ''}${ms}ms`;
+}
+
 // String to ArrayBuffer
 // https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 function str2ab(str) {
