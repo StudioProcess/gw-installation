@@ -20,8 +20,8 @@
             text-decoration: underline;
         }
         textarea { 
-            width: 99%;
-            resize: vertical;
+            /* width: 99%; */
+            /* resize: vertical; */
             font-family: inherit;
         }
         button {
@@ -38,11 +38,14 @@
             /* font-size: 11px; */
             display: none;
         }
-        textarea, #output {
+        input, #output {
             font-size: inherit;
             border: 1px solid darkgray;
             padding: 0.2em;
             border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 5px;
         }
         #toggle-log {
             cursor: pointer;
@@ -69,8 +72,8 @@
         .ok { color: #00B202; }
         .qrcode { max-width: 150px; }
     </style>
-    <textarea id="txt-url" rows="1" placeholder="URL"></textarea><br>
-    <textarea id="txt-sig" placeholder="(Optional) Signature"></textarea><br>
+    <input id="txt-url" type="text" placeholder="URL"></input><br>
+    <input id="txt-sig" type="text" placeholder="(Optional) Signature"></input><br>
     <button id="btn-verify">Verify</button><br>
     <span id="toggle-log">Show log ▶︎</span><br>
     <div id="output"></div><br>
@@ -91,13 +94,17 @@
         const div_result = document.querySelector('#result');
         let origin = '';
         
-        function linkify(str) {
+        function linkify(str, target = '_blank') {
             if (typeof str !== 'string' || (!str.startsWith('http://') && !str.startsWith('https://'))) {
                 return str;
             }
             try {
                 const url = new URL(str);
-                return `<a href="${url.href}" target="_blank">${str}</a>`;
+                // insert line-break opportunities
+                str = str.replaceAll('//', '//<wbr>');
+                str = str.replaceAll(/[^/]\//g, '$&<wbr>'); // slash preceded by non-slash
+                
+                return `<a href="${url}"${target ? ' target="' + target + '"' : ''}>${str}</a>`;
             } catch {
                 return str;
             }
@@ -109,7 +116,7 @@
         function append_log(strings, cls = '',) {
             if (!Array.isArray(strings)) { strings = [strings]; }
             strings = strings.map(linkify);
-            log_output.innerHTML += `<div ${cls ? 'class="' + cls + '"': ''}>${strings.join(' ')}</div>`;
+            log_output.innerHTML += `<div${cls ? ' class="' + cls + '"': ''}>${strings.join(' ')}</div>`;
             log_output.scrollTop = log_output.scrollHeight; // scroll to bottom (in case this is scrollable)
         }
         
@@ -339,7 +346,7 @@
                 out.push(
                     '<tr>',
                     '<td><span class="caption">Site</span></td>',
-                    `<td><a href="${origin}">${origin}</a></td>`,
+                    `<td>${linkify(origin, null)}</td>`,
                     '</tr>',
                 );
                 
