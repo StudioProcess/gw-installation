@@ -167,7 +167,7 @@
             const siginfo_url = util.make_url(url, origin);
             let siginfo;
             try {
-                siginfo = await util.fetch_json(siginfo_url);
+                siginfo = await util.fetch_json(siginfo_url, true);
                 log('Signature info:', siginfo_url);
             } catch {
                 warn('Signature info not found');
@@ -291,7 +291,7 @@
                     return bail();
                 }
                 try {
-                    sig = await util.fetch_text(siginfo.signature_url);
+                    sig = await util.fetch_text(siginfo.signature_url, true);
                     log('Signature:', siginfo.signature_url);
                 } catch {
                     warn('Cannot load signature:', siginfo.signature_url);
@@ -305,7 +305,7 @@
             const data_buffers = [];
             try {
                 for (let [idx, file] of siginfo.sitemap.entries()) {
-                    let buf = await util.fetch_ab(file);
+                    let buf = await util.fetch_ab(file, true);
                     log(`(${idx+1})`, file);
                     data_buffers.push(buf);
                 }
@@ -320,7 +320,7 @@
             const public_key_url = util.make_url(PUBLIC_KEY_URL, location.origin + location.pathname);
             let public_key;
             try {
-                public_key = await util.load_public_key(public_key_url);
+                public_key = await util.load_public_key(public_key_url, true);
             } catch {
                 warn('Cannot load public key:', public_key_url);
                 return bail();
@@ -386,7 +386,7 @@
                 
                 if (siginfo.timestamp_url) {
                     try {
-                        let timestamp = await util.fetch_text(siginfo.timestamp_url);
+                        let timestamp = await util.fetch_text(siginfo.timestamp_url, true);
                         timestamp = new Date(timestamp);
                         out.push(
                             '<tr>',

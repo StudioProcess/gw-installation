@@ -12,23 +12,31 @@ export function make_url(url, base) {
     return (new URL(url, base)).href;
 }
 
+// Cache-busting version of fetch
+// Appends Unix timestamp as query parameter _ts
+function fetch_nocache(url) {
+  url = new URL(url);
+  url.searchParams.append('_ts', Date.now());
+  return fetch(url);
+}
+
 // Fetch String
-export async function fetch_text(path) {
-    const res = await fetch(path);
+export async function fetch_text(path, nocache=false) {
+    const res = nocache ? await fetch_nocache(path) : await fetch(path);
     if (!res.ok) { throw res; }
     return res.text();
 }
 
 // Fetch JSON
-export async function fetch_json(path) {
-    const res = await fetch(path);
+export async function fetch_json(path, nocache=false) {
+    const res = nocache ? await fetch_nocache(path) : await fetch(path);
     if (!res.ok) { throw res; }
     return res.json();
 }
 
 // Fetch ArrayBuffer
-export async function fetch_ab(path) {
-    const res = await fetch(path);
+export async function fetch_ab(path, nocache=false) {
+    const res = nocache ? await fetch_nocache(path) : await fetch(path);
     if (!res.ok) { throw res; }
     return res.arrayBuffer();
 }
@@ -118,8 +126,8 @@ function decode_pem(pem_str) {
 
 // Load public key from PEM file
 // Returns: Promise<CryptoKey>
-export async function load_public_key(path) {
-    const pem_text = await fetch_text(path);
+export async function load_public_key(path, nocache=false) {
+    const pem_text = await fetch_text(path, nocache);
     return crypto.subtle.importKey(
         'spki',
         decode_pem(pem_text).data,
@@ -131,8 +139,8 @@ export async function load_public_key(path) {
 
 // Load private key from PEM file
 // Returns: Promise<CryptoKey>
-async function load_private_key(path) {
-    const pem_text = await fetch_text(path);
+async function load_private_key(path, nocache=false) {
+    const pem_text = await fetch_text(path, nocache);
     return crypto.subtle.importKey(
         'pkcs8',
         decode_pem(pem_text).data,
