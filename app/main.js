@@ -1174,4 +1174,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   install_btn.classList.remove('hidden');
 });
 
+// Reload on hash change
+window.addEventListener('hashchange', location.reload);
+
 main();
