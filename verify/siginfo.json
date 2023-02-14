@@ -5,7 +5,8 @@
         "./util.mjs",
         "./public_key.pem",
         "./siginfo.json",
-        "./signature.timestamp"
+        "./signature.timestamp",
+        "./vendor/qrcode.js"
     ],
     "metadata": {
         "title": "Verify",
