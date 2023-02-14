@@ -20,11 +20,6 @@
         a:hover {
             text-decoration: underline;
         }
-        textarea { 
-            /* width: 99%; */
-            /* resize: vertical; */
-            font-family: inherit;
-        }
         button {
             font-size: inherit;
             display: block;
@@ -36,10 +31,9 @@
             max-height: 200px;
             overflow-y: scroll;
             padding: 2px;
-            /* font-size: 11px; */
-            display: none;
         }
         input, #output {
+            font-family: inherit;
             font-size: inherit;
             border: 1px solid darkgray;
             padding: 0.2em;
@@ -59,7 +53,6 @@
         }
         .metadata table {
             padding: 1em;
-            /* border: 5px solid gray; */
             border-radius: 20px;
             background-color: rgb(24, 24, 24);
             color: white;
@@ -88,7 +81,7 @@
     <input id="txt-sig" type="text" placeholder="(Optional) Signature"></input><br>
     <button id="btn-verify">Verify</button><br>
     <span id="toggle-log">Show log ▶︎</span><br>
-    <div id="output"></div><br>
+    <div id="output" class="hidden"> </div><br>
     <div id="spinner">⏱️ WORKING</div>
     <div id="result"></div>
     
@@ -139,22 +132,22 @@
         function alert(...msgs) { append_log(msgs, 'alert'); }
         function ok(...msgs) { append_log(msgs, 'ok'); }
         
-        let first_show_of_log = false;
+        let first_show_of_log = true;
         function toggle_log(force) {
             if (force !== undefined) {
                 if (force) {
-                    div_output.style.display = 'block';
+                    div_output.classList.remove('hidden');
                     span_toggle_log.textContent = 'Hide log ▼';
-                    if (!first_show_of_log) {
-                        first_show_of_log = true;
-                        div_output.scrollTop = log_output.scrollHeight; 
+                    if (first_show_of_log) {
+                        first_show_of_log = false;
+                        div_output.scrollTop = div_output.scrollHeight; 
                     }
                 } else {
-                    div_output.style.display = 'none';
+                    div_output.classList.add('hidden');
                     span_toggle_log.textContent = 'Show log ▶︎';
                 }
             } else {
-                toggle_log(div_output.style.display !== 'block');
+                toggle_log(div_output.classList.contains('hidden'));
             }
         }
         span_toggle_log.onclick = e => { toggle_log(); };
@@ -256,6 +249,7 @@
             result.innerHTML = '';
             set_log_output(div_output);
             spinner.classList.remove('hidden');
+            if (div_output.classList.contains('hidden')) { first_show_of_log = true; } // reset flag when log closed
             
             let start_ts = new Date();
             log('Verification started:', util.ts_local(start_ts));
