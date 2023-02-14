@@ -16,10 +16,13 @@
     "preinstall": "npm run copy-vendor-scripts",
     "prestart": "npm run copy-vendor-scripts",
     "build": "rm -rf dist; rsync -a ./ dist/ --exclude='node_modules' --exclude='sign' --exclude='verify' --exclude='.git' --exclude='.nova' --exclude='.DS_Store'; sed -i'.orig' -e \"s/ENV: \\x27development\\x27/ENV: \\x27production\\x27/g;s/### BUILD_DATE ###/$(date)/g\" 'dist/app/env.js'; rm -f dist/app/env.js.orig",
-    "prebuild": "npm run copy-vendor-scripts",
+    "prebuild": "npm run copy-vendor-scripts; npm run update-sitemap",
     "postbuild": "npm run sign-build",
-    "sign": "./sign/sign_node.mjs; ./sign/sign_node.mjs ./verify",
-    "sign-build": "./sign/sign_node.mjs ./dist"
+    "update-sitemap": "./update_sitemap.mjs",
+    "sign": "npm run update-sitemap; ./sign/sign_node.mjs; ./sign/sign_node.mjs ./verify",
+    "sign-build": "./sign/sign_node.mjs ./dist",
+    "verify": "./sign/verify_node.mjs",
+    "verify-build": "./sign/verify_node.mjs ./dist"
   },
   "keywords": [],
   "author": "Martin Grödl <martin@process.studio> (https://process.studio)",
