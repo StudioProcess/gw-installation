@@ -217,7 +217,15 @@
         }
         
         function bail() {
-            toggle_log(true);
+            set_log_output(div_result);
+            warn(`⚠️ DATA INCOMPLETE`);
+            append_log([
+                '<ul>',
+                '<li>Signature information is missing or incomplete, and/or</li>',
+                '<li>The data to be verified is missing, incomplete or can\'t be accessed.</li>',
+                '<li>(See log for details)</li>',
+                '</ul>'
+            ]);
             return false;
         }
         
