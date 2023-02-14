@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Sign files using ECDSA
+// Update sitemap in ./siginfo.json
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
