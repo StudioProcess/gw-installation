@@ -41,7 +41,7 @@
     "metadata": {
         "title": "Gravitational Waves",
         "author": "Process Studio",
-        "image_url": "./icons/1024.png"
+        "image_url": "./img/1024.png"
     },
     "timestamp_url": "./signature.timestamp",
     "signature_url": "./signature.base64"

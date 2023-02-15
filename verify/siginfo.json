@@ -12,7 +12,7 @@
     "metadata": {
         "title": "Verify",
         "author": "Process Studio",
-        "image_url": "./icons/192.png"
+        "image_url": "./img/192.png"
     },
     "timestamp_url": "./signature.timestamp",
     "signature_url": "./signature.base64"
