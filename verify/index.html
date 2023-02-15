@@ -246,7 +246,8 @@
         
         function update_query_param(key, value) {
             const params = new URLSearchParams(window.location.search);
-            params.set(key, value);
+            if (value) { params.set(key, value); } 
+            else { params.delete(key); }
             history.pushState(null, null, '?' + params.toString()); // update without reload
         }
         
@@ -288,6 +289,7 @@
             // Get signature (from input/querystring or siginfo)
             let sig = txt_sig.value;
             if (!sig) {
+                update_query_param('sig', null);
                 if (!siginfo.signature_url) {
                     warn('No signature provided');
                     return bail();
