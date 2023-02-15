@@ -5,7 +5,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-const EXCLUDE_START = [ '.git/', '.nova/', 'dist/', 'node_modules/', 'sign/', 'verify/', 'signature.base64', '.eslintrc.json', '.gitignore' ];
+const EXCLUDE_START = [ '.git/', '.nova/', 'dist/', 'node_modules/', 'sign/', 'verify/', 'signature.base64', '.eslintrc.json', '.gitignore', '.htaccess' ];
 const EXCLUDE_END = [ '.DS_Store' ];
 
 function is_excluded(path) {
