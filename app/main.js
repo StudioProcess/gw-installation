@@ -966,6 +966,10 @@ function setup_menu() {
   window.addEventListener('webkitfullscreenchange', update_fs_indicator);
   window.addEventListener('mozfullscreenchange', update_fs_indicator);
   window.addEventListener('fullscreenchange', update_fs_indicator);
+  
+  // Add verify link
+  const verify_site = env.ENV === 'production' ? 'https://verify.process.studio' : window.location.origin + '/verify';
+  menu.querySelector('.verify a').href = verify_site + '/?url=' + encodeURIComponent(window.location.href);
 }
 
 function toggle_menu(force) {
