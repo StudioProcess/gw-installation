@@ -244,12 +244,19 @@
             return false;
         }
         
+        function update_query_param(key, value) {
+            const params = new URLSearchParams(window.location.search);
+            params.set(key, value);
+            history.pushState(null, null, '?' + params.toString()); // update without reload
+        }
+        
         async function verify() {
             output.innerHTML = '';
             result.innerHTML = '';
             set_log_output(div_output);
             spinner.classList.remove('hidden');
             if (div_output.classList.contains('hidden')) { first_show_of_log = true; } // reset flag when log closed
+
             
             let start_ts = new Date();
             log('Verification started:', util.ts_local(start_ts));
@@ -257,6 +264,7 @@
             origin = txt_url.value.trim();
             if (!origin.endsWith('/')) { origin += '/'; } // make sure the URL ends with a slash, so make_url doesn't remove the last path part
             log('Verifying site:', origin);
+            update_query_param('url', origin);
             
             // Check crypto.subtle
             if (!util.check_crypto()) {
@@ -292,6 +300,7 @@
                     return bail();
                 }
             } else {
+                update_query_param('sig', sig);
                 log('Signature:', `<span style="word-break: break-all;">${sig}</span>`);
             }
             
