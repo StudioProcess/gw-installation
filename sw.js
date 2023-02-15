@@ -30,8 +30,8 @@ const resources = [
   './lib/recorder.js',
   './lib/tar.js',
   './lib/tilesaver.js',
-  './icons/192.png',
-  './icons/1024.png',
+  './img/192.png',
+  './img/1024.png',
   './fonts/Oswald-VariableFont_wght.ttf',
 ];
 

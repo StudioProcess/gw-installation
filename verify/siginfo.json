@@ -6,7 +6,7 @@
         "./public_key.pem",
         "./siginfo.json",
         "./signature.timestamp",
-        "./icons/192.png",
+        "./img/192.png",
         "./vendor/qrcode.js"
     ],
     "metadata": {
