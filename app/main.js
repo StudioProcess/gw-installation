@@ -977,7 +977,7 @@ function setup_menu() {
   window.addEventListener('fullscreenchange', update_fs_indicator);
   
   // Add verify link
-  const verify_site = env.ENV === 'production' ? 'https://verify.process.studio' : window.location.origin + '/verify';
+  const verify_site = env.ENV === 'production' ? 'https://verify.process.studio' : new URL('/verify', window.location).href;
   menu.querySelector('.verify a').href = verify_site + '/?url=' + encodeURIComponent(window.location.href);
 }
 
