@@ -1195,7 +1195,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 // Reload on hash change
-window.addEventListener('hashchange', location.reload);
+window.addEventListener('hashchange', () => {
+  window.location.reload();
+});
 
 // Hide mouse on inactivity
 let cursor_timer;
