@@ -819,8 +819,12 @@ function set_colors(obj) {
   if (line) { uniforms.lineColor.value = Array.from(line); } // copy array
   gui?.controllers[0].updateDisplay();
   gui?.controllers[1].updateDisplay();
+  // set overlay colors
   if (background) {
-    document.querySelector('#overlay').style.backgroundColor = `rgb(${background.map(x => x*255).join(',')})`;
+    document.querySelector('#overlay').style.backgroundColor = `rgb(${background.map(x => x*255).join(',')},0.9)`;
+  }
+  if (line) {
+    document.querySelector('#overlay').style.color = `rgb(${line.map(x => x*1.66*255).join(',')})`;
   }
 }
 
