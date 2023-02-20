@@ -162,8 +162,12 @@
             try {
                 siginfo = await util.fetch_json(siginfo_url, true);
                 log('Signature info:', siginfo_url);
-            } catch {
-                warn('Signature info not found');
+            } catch (e) {
+                if (e.status) {
+                    warn(`Cannot load signature info (${e.status}${e.statusText ? " " + e.statusText : ""}):`, siginfo_url);
+                } else {
+                    warn(`Error loading signature info (see console for error info):`, siginfo_url);
+                }
                 return false;
             }
             
@@ -276,7 +280,7 @@
             // Check HTTPS
             if (!origin.toLowerCase().startsWith('https://') 
                 && !origin.toLowerCase().startsWith('http://localhost:')) {
-                warn('Cannot verify. HTTPS is required');
+                warn('Cannot verify site. HTTPS is required:', origin);
                 return bail();
             }
             
@@ -315,7 +319,11 @@
                     data_buffers.push(buf);
                 }
             } catch (e) {
-                warn('Cannot load file:', e.url);
+                if (e.status) {
+                    warn(`Cannot load file (${e.status}${e.statusText ? " " + e.statusText : ""}):`, e.url);
+                } else {
+                    warn('Cannot load file:', e.url);
+                }
                 return bail();
             }
             
@@ -327,7 +335,11 @@
             try {
                 public_key = await util.load_public_key(public_key_url, true);
             } catch {
-                warn('Cannot load public key:', public_key_url);
+                if (e.status) {
+                    warn(`Cannot load public key (${e.status}${e.statusText ? " " + e.statusText : ""}):`, public_key_url);
+                } else {
+                    warn('Cannot load public key:', public_key_url);
+                }
                 return bail();
             }
             log('Public key:', public_key_url);
