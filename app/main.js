@@ -125,7 +125,8 @@ let current_cam = 0;
 
 const colors = [
   // {background: [0.06, 0.11, 0.25], line: [0.24, 0.29, 0.46]},                 // original
-  {background: [0.06, 0.11, 0.25], line: [0.24, 0.29, 0.46], contrast: 1.1}, // high contrast
+  // {background: [0.06, 0.11, 0.25], line: [0.24, 0.29, 0.46], contrast: 1.5}, // high contrast
+  {background: [0.06, 0.11, 0.25], line: [0.396, 0.482, 0.784]}, // high contrast (manual)
   // {background: [0,0,0], line: [1,1,1]},                                       // b/w
   {background: [0.1,0.1,0.1], line: [0.9,0.9,0.9]},                           // off-b/w 
   // {background: [0.1, 0.08, 0.16], line: [0.31, 0.28, 0.45]},                  // violet variation 1
