@@ -68,6 +68,8 @@ canvas#three-js {
   font-family: "Oswald";
   line-height: 1.2;
   padding: 0.5em;
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
 }
 
 #overlay .url {
