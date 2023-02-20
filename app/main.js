@@ -46,6 +46,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   E ........... Randomize emitters
   B ........... Force emitter burst
   Enter ....... Start generative sequence
+  L ........... Lock/unlock controls
   ---------------------------------------
 */
 
@@ -283,6 +284,7 @@ function setup() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new OrbitControls( camera, renderer.domElement );
+  if (env.ENV === 'production') { toggle_controls_enabled(false); } // lock controls in production mode
   set_cam_by_idx(0);
   set_colors_by_idx( JSON.parse(localStorage.getItem('current_colors')) ?? 0 );
 
@@ -1034,6 +1036,14 @@ function get_platform() {
   return { device, os };
 }
 
+function toggle_controls_enabled(force) {
+  if (force !== undefined) {
+    controls.enabled = force;
+  } else {
+    controls.enabled = !controls.enabled;
+  }
+}
+
 
 document.addEventListener('keydown', e => {
   // console.log(e.key);
@@ -1132,6 +1142,9 @@ document.addEventListener('keydown', e => {
   else if (e.key == 'Tab') {
     toggle_menu();
     e.preventDefault();
+  }
+  else if (e.key == 'l') {
+    toggle_controls_enabled();
   }
   
 });
