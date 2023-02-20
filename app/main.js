@@ -85,6 +85,8 @@ const OVERLAY_TIMER_PERIOD = 60;
 const OVERLAY_TIMER_ON = 20;
 const OVERLAY_RELATIVE_TO_CANVAS = true;
 
+const HIDE_CURSOR_AFTER = 3; // seconds
+
 let W, H, SIMULATION_FPS;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
@@ -1180,5 +1182,19 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 // Reload on hash change
 window.addEventListener('hashchange', location.reload);
+
+// Hide mouse on inactivity
+let cursor_timer;
+function hide_cursor_after_delay(delay = HIDE_CURSOR_AFTER * 1000) {
+  cursor_timer = setTimeout(() => {
+    document.body.classList.add('nocursor');
+  }, delay);
+}
+window.addEventListener('mousemove', () => {
+  clearTimeout(cursor_timer);
+  document.body.classList.remove('nocursor');
+  hide_cursor_after_delay();
+});
+hide_cursor_after_delay();
 
 main();
