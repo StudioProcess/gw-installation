@@ -70,7 +70,7 @@ const CHANGE_VIEW = [15, 30]; // seconds
 const CHANGE_EMITTERS = 150; // seconds
 const ROTATION_EVERY = 90; // once every x seconds 
 const SPECIAL_VIEW_EVERY = 600; // once every x seconds
-const SPECIAL_VIEWS = [1, 2];
+const SPECIAL_VIEWS = [2]; // indices into cams array
 const EMITTER_BURST_EVERY = 450; // seconds
 
 let EXPORT_TILES = 2;
