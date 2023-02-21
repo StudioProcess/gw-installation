@@ -197,3 +197,20 @@ menu.hidden {
 #info.hidden {
   display: none;
 }
+
+#notify {
+  position: absolute;
+  background-color: black;
+  font-family: "Inter";
+  font-size: 2em;
+  line-height: 1.2;
+  padding: 0.5em;
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+  text-transform: uppercase;
+  white-space: pre;
+}
+
+#notify.hidden {
+  display: none;
+}

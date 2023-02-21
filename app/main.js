@@ -1185,11 +1185,19 @@ function log(msg) {
   console.log(`${ts_local()}: ${msg}`);
 }
 
+function notify(msg) {
+  const div = document.querySelector('#notify');
+  div.textContent = msg;
+  div.classList.remove('hidden');
+}
+
 function on_sw_update(e) {
   console.log('Updating service worker...');
+  notify('Update found\nInstalling...');
   e.target.installing.onstatechange = (e) => { // fired when the state changes
     if (e.target.state === 'activated') {
       console.log('Service worker installed and activated. Reloading in 3s ...');
+      notify('Update found\nReloading...');
       setTimeout(() => { location.reload(); }, 3000);
     }
   };
@@ -1213,10 +1221,12 @@ async function uninstall() {
   if (registrations.length === 0) {
     console.log(`No service workers registered.`);
   } else {
+    notify('Uninstalling...\n');
     console.log(`Unregistering ${registrations.length} service workers...`);
     const results = await Promise.all(registrations.map(r => r.unregister())); // Result is true if the registration was found, regardless of the actual unregister status. Service workers finish all ongoing operations before unregisteing.
     const count = results.filter(r => r).length;
     console.log(`${count} service worker(s) set to be unregistered. Reloading in 3s ...`); 
+    notify('Uninstalled\nReloading...');
     setTimeout(() => { location.reload(); }, 3000);
   }
 }
