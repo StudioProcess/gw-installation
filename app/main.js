@@ -47,6 +47,9 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   B ........... Force emitter burst
   Enter ....... Start generative sequence
   L ........... Lock/unlock controls
+  
+  I ........... Install/Register Service worker
+  Ctrl-I ...... Uninstall/Unregister Service worker
   ---------------------------------------
 */
 
@@ -62,7 +65,8 @@ const RES_DESKTOP      = [1920, 1080, 60];
 const RES_MOBILE       = [1280,  720, 30];
 
 const PX_RATIO = 1;
-const SW_ENABLED = (env.ENV=='production');
+// const SW_ENABLED = (env.ENV=='production');
+const SW_ENABLED = true; 
 const PLATFORM = get_platform();
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
@@ -1151,6 +1155,10 @@ document.addEventListener('keydown', e => {
   else if (e.key == 'l') {
     toggle_controls_enabled();
   }
+  else if (e.key == 'i') {
+    if (e.ctrlKey) { uninstall(); }
+    else { install(); }
+  }
   
 });
 
@@ -1177,17 +1185,58 @@ function log(msg) {
   console.log(`${ts_local()}: ${msg}`);
 }
 
+function on_sw_update(e) {
+  console.log('Updating service worker...');
+  e.target.installing.onstatechange = (e) => { // fired when the state changes
+    if (e.target.state === 'activated') {
+      console.log('Service worker installed and activated. Reloading in 3s ...');
+      setTimeout(() => { location.reload(); }, 3000);
+    }
+  };
+}
+
+async function install() {
+  try {
+    console.log('Registering service worker. Will only be installed if update is found.');
+    // Service worker URL is relative to web root (not this file)
+    const registration = await navigator.serviceWorker.register('./sw.js');
+    // fired when the registration acquires a new worker in the installing property
+    registration.onupdatefound = on_sw_update;
+    // console.log('Service worker registered');
+  } catch (e) {
+    console.log('Service worker registration failed', error);
+  }
+}
+
+async function uninstall() {
+  const registrations = await navigator.serviceWorker.getRegistrations();
+  if (registrations.length === 0) {
+    console.log(`No service workers registered.`);
+  } else {
+    console.log(`Unregistering ${registrations.length} service workers...`);
+    const results = await Promise.all(registrations.map(r => r.unregister())); // Result is true if the registration was found, regardless of the actual unregister status. Service workers finish all ongoing operations before unregisteing.
+    const count = results.filter(r => r).length;
+    console.log(`${count} service worker(s) set to be unregistered. Reloading in 3s ...`); 
+    setTimeout(() => { location.reload(); }, 3000);
+  }
+}
+
+const registration = await navigator.serviceWorker.getRegistration(); // can be undefined
+if (registration) {
+  console.log(`Service worker: 🟢 Registered${registration.active ? ' and active' : ''}`);
+  registration.onupdatefound = on_sw_update;
+  // registration.update();
+} else {
+  console.log('Service worker: ⚫️ None registered');
+}
 
 // Register service worker to control making site work offline
-if (SW_ENABLED && 'serviceWorker' in navigator) {
-  // Service worker URL is relative to web root (not this file)
-  navigator.serviceWorker.register('./sw.js').then(() => { 
-    console.log('Service Worker registered');
-  });
-} else {
-  const registrations = await navigator.serviceWorker.getRegistrations();
-  for (let r of registrations) { r.unregister(); }
-}
+// if (SW_ENABLED && 'serviceWorker' in navigator) {
+//   install();
+// } else {
+//   // TODO: Can't come in here when this file is cached with SW_ENABLED === true
+//   uninstall();
+// }
 
 // Install button (in menu) (Chrome, needs service worker)
 window.addEventListener('beforeinstallprompt', (e) => {
