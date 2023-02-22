@@ -251,6 +251,7 @@
                 '<li>(See log for details)</li>',
                 '</ul>'
             ]);
+            btn_verify.disabled = false;
             return false;
         }
         
@@ -267,7 +268,7 @@
             set_log_output(div_output);
             spinner.classList.remove('hidden');
             if (div_output.classList.contains('hidden')) { first_show_of_log = true; } // reset flag when log closed
-
+            btn_verify.disabled = true;
             
             let start_ts = new Date();
             log('Verification started:', util.ts_local(start_ts));
@@ -457,6 +458,7 @@
                     '</ul>'
                 ]);
             }
+            btn_verify.disabled = false;
         }
         
         btn_verify.onclick = verify;
