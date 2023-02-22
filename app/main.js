@@ -251,8 +251,8 @@ function update_info() {
   t += `Current: ${renderer.domElement.offsetWidth * devicePixelRatio} ✕ ${renderer.domElement.offsetHeight * devicePixelRatio}\n`;
   t += `</div>`;
   t += `<div style="margin-top: 8px;">`;
-  t += `Environment: ${env.ENV}\n`;
   t += `Service worker: ${sw_installed ? '● <a id="toggle_sw_install">Uninstall</a>' : '○ <a id="toggle_sw_install">Install</a>' }\n`;
+  t += `Environment: ${env.ENV}\n`;
   if (env.ENV === 'production') {
     t += `Build: ${env.BUILD_DATE}\n`;
   }
