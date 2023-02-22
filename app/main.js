@@ -82,7 +82,6 @@ let EXPORT_TILES = 2;
 let SIMULATING = true;
 let SCENE_ROTATION_PERIOD = 900;
 
-const ADD_FULLSCREEN_BUTTON = false;
 const LOCK_CAM_TARGET_TO_PLANE = false;
 
 const OVERLAY_TIMER_PERIOD = 60;
@@ -355,24 +354,6 @@ function setup() {
 
   // onResize();
   // window.addEventListener("resize", onResize);
-  
-  // fullscreen button
-  if (ADD_FULLSCREEN_BUTTON) {
-    const div = document.createElement('div');
-    div.innerText = '←→';
-    div.style.fontSize = '20px';
-    div.style.width = '40px';
-    div.style.height = '40px';
-    div.style.position = 'fixed';
-    div.style.top = '10px';
-    div.style.left = '10px';
-    div.style.cursor = 'pointer';
-    div.style.rotate = '-45deg';
-    div.style.userSelect = 'none';
-    div.style.webkitUserSelect = 'none';
-    div.addEventListener('click', toggle_fullscreen );
-    document.body.appendChild( div );
-  }
   
   // menu
   setup_menu();
