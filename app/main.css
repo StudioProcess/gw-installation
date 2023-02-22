@@ -61,6 +61,10 @@ canvas#three-js {
   src: url("../fonts/Inter-roman.ttf") format("truetype");
 }
 
+.hidden {
+  display: none;
+}
+
 #overlay {
   position: absolute;
   opacity: 100%;
@@ -106,10 +110,6 @@ canvas#three-js {
   background-color: rgba(0,0,0,0.75);
 }
 
-menu.hidden {
-  display: none;
-}
-
 #menu ul {
   list-style-type: none;
   /* list-style-type: ">"; */
@@ -122,10 +122,6 @@ menu.hidden {
   padding-left: 0.15em;
   -webkit-user-select: none; /* Safari */
   user-select: none;
-}
-
-#menu li.hidden {
-  display: none;
 }
 
 #menu li.install {
@@ -194,10 +190,6 @@ menu.hidden {
   background-color: rgba(0, 0, 34, 0.9);
 }
 
-#info.hidden {
-  display: none;
-}
-
 #info a, #info a:hover, #info a:active, #info a:visited {
   text-decoration: underline;
   cursor: pointer;
@@ -214,10 +206,6 @@ menu.hidden {
   user-select: none;
   text-transform: uppercase;
   white-space: pre;
-}
-
-#notify.hidden {
-  display: none;
 }
 
 #notify img {
