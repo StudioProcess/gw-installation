@@ -1,6 +1,6 @@
 {
     "background_color": "black",
-    "description": "Gravitational Waves by Process Studio",
+    "description": "Gravitational Waves — Process Studio, 2023",
     "display": "fullscreen",
     "icons": [
         {
@@ -14,6 +14,6 @@
         }
     ],
     "name": "Gravitational Waves",
-    "short_name": "GW",
-    "start_url": "index.html"
+    "short_name": "Waves",
+    "start_url": "./"
 }
