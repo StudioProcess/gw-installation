@@ -1217,6 +1217,7 @@ function on_sw_update(e) {
 }
 
 async function install() {
+  if (!navigator.serviceWorker) { return; }
   try {
     console.log('Registering service worker. Will only be installed if update is found.');
     // Service worker URL is relative to web root (not this file)
@@ -1230,6 +1231,7 @@ async function install() {
 }
 
 async function uninstall() {
+  if (!navigator.serviceWorker) { return; }
   const registrations = await navigator.serviceWorker.getRegistrations();
   if (registrations.length === 0) {
     console.log(`No service workers registered.`);
@@ -1246,19 +1248,23 @@ async function uninstall() {
 }
 
 let sw_installed;
-const sw_registration = await navigator.serviceWorker.getRegistration(); // can be undefined
-if (sw_registration) {
-  console.log(`Service worker: 🟢 Registered${sw_registration.active ? ' and active' : ''}`);
-  sw_registration.onupdatefound = on_sw_update;
-  sw_installed = true;
-  // registration.update();
-} else {
-  console.log('Service worker: ⚫️ None registered');
-  sw_installed = false;
-  
-  if (SW_INSTALL && !JSON.parse(localStorage.getItem('sw_manually_uninstalled'))) {
-    install();
+if (navigator.serviceWorker) {
+  const sw_registration = await navigator.serviceWorker.getRegistration(); // can be undefined
+  if (sw_registration) {
+    console.log(`Service worker: 🟢 Registered${sw_registration.active ? ' and active' : ''}`);
+    sw_registration.onupdatefound = on_sw_update;
+    sw_installed = true;
+    // registration.update();
+  } else {
+    console.log('Service worker: ⚫️ None registered');
+    sw_installed = false;
+    
+    if (SW_INSTALL && !JSON.parse(localStorage.getItem('sw_manually_uninstalled'))) {
+      install();
+    }
   }
+} else {
+  console.log('Service worker: 🔴 Not supported');
 }
 
 // Install app button
