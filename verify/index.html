@@ -82,7 +82,7 @@
         .ok { color: #00B202; }
         .qrcode { max-width: 150px; }
     </style>
-    <h1><a href="./">verify.process.studio</a></h1>
+    <h1 id="headline-top"><a href="./">verify<span>•</span>process<span>•</span>studio<br>verify<span>•</span>process<span>•</span>studio<br>verify<span>•</span>process<span>•</span>studio</a></h1>
     <input id="txt-url" type="text" placeholder="URL"></input><br>
     <input id="txt-sig" type="text" placeholder="(Optional) Signature"></input><br>
     <button id="btn-verify">Verify</button><br>
@@ -90,6 +90,7 @@
     <div id="output" class="hidden"> </div><br>
     <div id="spinner">⏱️ WORKING</div>
     <div id="result"></div>
+    <h1 id="headline-bottom"><a href="./">verify<span>•</span>process<span>•</span>studio<br>verify<span>•</span>process<span>•</span>studio<br>verify<span>•</span>process<span>•</span>studio</a></h1>
     
     <script type="module">
         import * as util from './util.mjs';
@@ -98,6 +99,7 @@
         const PUBLIC_KEY_URL = './public_key.pem'; // Relative to this file
         const INITIALLY_SHOW_LOG = false;
         
+        const headline = document.querySelector('#headline-bottom');
         const txt_url = document.querySelector('#txt-url');
         const txt_sig = document.querySelector('#txt-sig');
         const btn_verify = document.querySelector('#btn-verify');
@@ -252,6 +254,7 @@
                 '</ul>'
             ]);
             btn_verify.disabled = false;
+            headline.className = 'warn';
             return false;
         }
         
@@ -269,6 +272,7 @@
             spinner.classList.remove('hidden');
             if (div_output.classList.contains('hidden')) { first_show_of_log = true; } // reset flag when log closed
             btn_verify.disabled = true;
+            headline.className = '';
             
             let start_ts = new Date();
             log('Verification started:', util.ts_local(start_ts));
@@ -369,6 +373,7 @@
             log('Result:', valid ? 'valid' : 'invalid');
             
             spinner.classList.add('hidden');
+            headline.className = 'ok';
             set_log_output(div_result);
             if (valid) {
                 ok(`✅ SIGNATURE VALID`);
@@ -450,6 +455,7 @@
                 out.push('</table>');
                 append_log(out, 'metadata');
             } else {
+                headline.className = 'alert';
                 alert(`❌ SIGNATURE NOT VALID`);
                 append_log([
                     '<ul>',
