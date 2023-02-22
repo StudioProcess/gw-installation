@@ -219,3 +219,8 @@ menu.hidden {
 #notify.hidden {
   display: none;
 }
+
+#notify img {
+  width: 0.8em;
+  height: auto;
+}

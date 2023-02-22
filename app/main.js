@@ -232,6 +232,14 @@ function main() {
   
 }
 
+function display_mode() {
+  const modes = [ 'fullscreen', 'standalone', 'minimal-ui', 'browser', 'window-controls-overlay' ];
+  for (const mode of modes) {
+    if ( matchMedia(`(display-mode: ${mode})`).matches ) { return mode; }
+  }
+  return 'unknown';
+}
+
 function update_info() {
   const screen_w = screen.width * devicePixelRatio;
   const screen_h = screen.height * devicePixelRatio;
@@ -248,6 +256,7 @@ function update_info() {
   t += `Aspect: 1:${aspect.toFixed(2)}\n`;
   t += `Orientation: ${orientation}\n`;
   t += `Current: ${renderer.domElement.offsetWidth * devicePixelRatio} ✕ ${renderer.domElement.offsetHeight * devicePixelRatio}\n`;
+  t += `Display Mode: ${display_mode()}\n`;
   t += `</div>`;
   t += `<div style="margin-top: 8px;">`;
   t += `Service worker: ${sw_installed ? '● <a id="toggle_sw_install">Uninstall</a>' : '○ <a id="toggle_sw_install">Install</a>' }\n`;
@@ -643,7 +652,7 @@ function set_cam_by_idx(idx) {
   current_cam = idx;
   current_cam %= cams.length;
   if (current_cam < 0) { current_cam += cams.length; }
-  console.log('cam %i', current_cam);
+  console.log('cam', current_cam);
   set_cam_pos( cams[current_cam] );
 }
 
@@ -931,16 +940,16 @@ function setup_menu() {
   };
   
   let last_hidden = 0;
-  document.body.onclick = () => {
+  document.body.addEventListener('click', () => {
     if (!menu.classList.contains('hidden')) {
       last_hidden = Date.now();
     }
     toggle_menu(false);
-  };
-  document.body.ondblclick = () => {
+  });
+  document.body.addEventListener('dblclick', () => {
     if (Date.now() - last_hidden < 400) { return; }
     toggle_menu(true);
-  };
+  });
   
   menu.querySelector('.fullscreen').onclick = () => {
     toggleFullscreen();
@@ -1191,7 +1200,7 @@ function log(msg) {
 
 function notify(msg) {
   const div = document.querySelector('#notify');
-  div.textContent = msg;
+  div.innerHTML = msg;
   div.classList.remove('hidden');
 }
 
@@ -1252,18 +1261,39 @@ if (sw_registration) {
   }
 }
 
-
-
-
-// Install (as App) button in menu (Chrome only, needs service worker)
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); // Prevents the default mini-infobar or install dialog from appearing on mobile
-  const install_btn = document.querySelector('menu li.install');
-  install_btn.onclick = () => {
-    e.prompt();
-  };
-  install_btn.classList.remove('hidden');
-});
+// Install app button
+if (display_mode() !== 'standalone') { // only when not already running as standalone app
+  if (PLATFORM.os === 'ios') {
+    // On iOS show info on how to manually install (Add to Home Screen)
+    const install_btn = document.querySelector('menu li.install');
+    install_btn.onclick = () => {
+      notify('To install:\n• <img src="img/share.and.arrow.up.svg" /> Tap ‘Share’\n• <img src="img/plus.app.svg" /> Select ‘Add to Home Screen’');
+      const div_notify = document.querySelector('#notify');
+      const on_click = (e) => {
+        div_notify.classList.add('hidden');
+        document.body.removeEventListener('click', on_click);
+        div_notify.removeEventListener('click', on_click);
+        e.stopPropagation();
+      };
+      document.body.addEventListener('click', on_click);
+      div_notify.addEventListener('click', on_click);
+    };
+    install_btn.classList.remove('hidden');
+  } else {
+    // Install (as App) button in menu (Chrome only, needs service worker)
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); // Prevents the default mini-infobar or install dialog from appearing on mobile
+      const install_btn = document.querySelector('menu li.install');
+      install_btn.onclick = async () => {
+        const result = await e.prompt();
+        if (result?.userChoice === 'accepted' || result?.outcome === 'accepted') {
+          install_btn.classList.add('hidden');
+        }
+      };
+      install_btn.classList.remove('hidden');
+    });
+  }
+}
 
 // Reload on hash change
 window.addEventListener('hashchange', () => {
