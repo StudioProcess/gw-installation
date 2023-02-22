@@ -111,8 +111,8 @@ menu.hidden {
 }
 
 #menu ul {
-  /* list-style-type: none; */
-  list-style-type: ">";
+  list-style-type: none;
+  /* list-style-type: ">"; */
   margin:0;
   padding:0;
 }
