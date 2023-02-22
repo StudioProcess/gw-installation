@@ -252,6 +252,7 @@ function update_info() {
   t += `</div>`;
   t += `<div style="margin-top: 8px;">`;
   t += `Environment: ${env.ENV}\n`;
+  t += `Service worker: ${sw_installed ? '● <a id="toggle_sw_install">Uninstall</a>' : '○ <a id="toggle_sw_install">Install</a>' }\n`;
   if (env.ENV === 'production') {
     t += `Build: ${env.BUILD_DATE}\n`;
   }
@@ -259,6 +260,10 @@ function update_info() {
   
   const info = document.querySelector('#info');
   info.innerHTML = t;
+  document.querySelector('#toggle_sw_install').onclick = () => { 
+    if (sw_installed) { uninstall(); }
+    else { install(); }
+  };
 }
 
 
@@ -1231,13 +1236,16 @@ async function uninstall() {
   }
 }
 
-const registration = await navigator.serviceWorker.getRegistration(); // can be undefined
-if (registration) {
-  console.log(`Service worker: 🟢 Registered${registration.active ? ' and active' : ''}`);
-  registration.onupdatefound = on_sw_update;
+let sw_installed;
+const sw_registration = await navigator.serviceWorker.getRegistration(); // can be undefined
+if (sw_registration) {
+  console.log(`Service worker: 🟢 Registered${sw_registration.active ? ' and active' : ''}`);
+  sw_registration.onupdatefound = on_sw_update;
+  sw_installed = true;
   // registration.update();
 } else {
   console.log('Service worker: ⚫️ None registered');
+  sw_installed = false;
 }
 
 // Register service worker to control making site work offline
@@ -1248,7 +1256,8 @@ if (registration) {
 //   uninstall();
 // }
 
-// Install button (in menu) (Chrome, needs service worker)
+
+// Install (as App) button in menu (Chrome only, needs service worker)
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault(); // Prevents the default mini-infobar or install dialog from appearing on mobile
   const install_btn = document.querySelector('menu li.install');

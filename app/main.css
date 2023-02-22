@@ -198,6 +198,11 @@ menu.hidden {
   display: none;
 }
 
+#info a, #info a:hover, #info a:active, #info a:visited {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 #notify {
   position: absolute;
   background-color: black;
