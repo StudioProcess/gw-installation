@@ -1257,7 +1257,7 @@ if (navigator.serviceWorker) {
 }
 
 // Install app button
-if (display_mode() !== 'standalone') { // only when not already running as standalone app
+if ( ! ['standalone', 'fullscreen'].includes(display_mode()) ) { // only when not already running as standalone app
   if (PLATFORM.os === 'ios') {
     // On iOS show info on how to manually install (Add to Home Screen)
     const install_btn = document.querySelector('menu li.install');
