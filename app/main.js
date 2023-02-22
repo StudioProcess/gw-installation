@@ -258,7 +258,7 @@ function update_info() {
   t += `Display Mode: ${display_mode()}\n`;
   t += `</div>`;
   t += `<div style="margin-top: 8px;">`;
-  t += `Service worker: ${sw_installed ? '● <a id="toggle_sw_install">Uninstall</a>' : '○ <a id="toggle_sw_install">Install</a>' }\n`;
+  t += `Service worker: ${sw_installed ? '● <a id="sw_reinstall">Reinstall</a> <a id="sw_uninstall">Uninstall</a>' : '○ <a id="sw_install">Install</a>' }\n`;
   t += `Environment: ${env.ENV}\n`;
   if (env.ENV === 'production') {
     t += `Build: ${env.BUILD_DATE}\n`;
@@ -267,10 +267,10 @@ function update_info() {
   
   const info = document.querySelector('#info');
   info.innerHTML = t;
-  document.querySelector('#toggle_sw_install').onclick = () => { 
-    if (sw_installed) { uninstall(); }
-    else { install(); }
-  };
+  
+  document.querySelector('#sw_install')?.addEventListener('click', () => { sw_install(); });
+  document.querySelector('#sw_uninstall')?.addEventListener('click', () => { sw_uninstall(); });
+  document.querySelector('#sw_reinstall')?.addEventListener('click', () => { sw_reinstall(); });
 }
 
 
@@ -1158,8 +1158,8 @@ document.addEventListener('keydown', e => {
     toggle_controls_enabled();
   }
   else if (e.key == 'i') {
-    if (e.ctrlKey) { uninstall(); }
-    else { install(); }
+    if (e.ctrlKey) { sw_uninstall(); }
+    else { sw_install(); }
   }
   
 });
@@ -1198,14 +1198,14 @@ function on_sw_update(e) {
   notify('Update found\nInstalling...');
   e.target.installing.onstatechange = (e) => { // fired when the state changes
     if (e.target.state === 'activated') {
-      console.log('Service worker installed and activated. Reloading in 3s ...');
+      console.log('Service worker installed and activated. Reloading soon ...');
       notify('Update found\nReloading...');
       setTimeout(() => { location.reload(); }, 3000);
     }
   };
 }
 
-async function install() {
+async function sw_install() {
   if (!navigator.serviceWorker) { return; }
   try {
     console.log('Registering service worker. Will only be installed if update is found.');
@@ -1219,21 +1219,27 @@ async function install() {
   }
 }
 
-async function uninstall() {
+async function sw_uninstall(delay = 3000) {
   if (!navigator.serviceWorker) { return; }
   const registrations = await navigator.serviceWorker.getRegistrations();
   if (registrations.length === 0) {
     console.log(`No service workers registered.`);
   } else {
-    notify('Uninstalling...\n');
+    if (delay > 0) { notify('Uninstalling...\n'); }
     console.log(`Unregistering ${registrations.length} service workers...`);
     const results = await Promise.all(registrations.map(r => r.unregister())); // Result is true if the registration was found, regardless of the actual unregister status. Service workers finish all ongoing operations before unregisteing.
     const count = results.filter(r => r).length;
-    console.log(`${count} service worker(s) set to be unregistered. Reloading in 3s ...`); 
-    notify('Uninstalled\nReloading...');
-    setTimeout(() => { location.reload(); }, 3000);
+    console.log(`${count} service worker(s) set to be unregistered. Reloading soon ...`);
+    if (delay > 0) { notify('Uninstalled\nReloading...'); }
+    setTimeout(() => { location.reload(); }, delay);
     localStorage.setItem('sw_manually_uninstalled', true);
   }
+}
+
+async function sw_reinstall() {
+  if (!navigator.serviceWorker) { return; }
+  await sw_uninstall(0);
+  localStorage.setItem('sw_manually_uninstalled', false); // Causes installation on reload
 }
 
 let sw_installed;
@@ -1249,7 +1255,7 @@ if (navigator.serviceWorker) {
     sw_installed = false;
     
     if (SW_INSTALL && !JSON.parse(localStorage.getItem('sw_manually_uninstalled'))) {
-      install();
+      sw_install();
     }
   }
 } else {
