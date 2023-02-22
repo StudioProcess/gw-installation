@@ -65,8 +65,7 @@ const RES_DESKTOP      = [1920, 1080, 60];
 const RES_MOBILE       = [1280,  720, 30];
 
 const PX_RATIO = 1;
-// const SW_ENABLED = (env.ENV=='production');
-const SW_ENABLED = true; 
+const SW_INSTALL = true;
 const PLATFORM = get_platform();
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
@@ -1233,6 +1232,7 @@ async function uninstall() {
     console.log(`${count} service worker(s) set to be unregistered. Reloading in 3s ...`); 
     notify('Uninstalled\nReloading...');
     setTimeout(() => { location.reload(); }, 3000);
+    localStorage.setItem('sw_manually_uninstalled', true);
   }
 }
 
@@ -1246,15 +1246,13 @@ if (sw_registration) {
 } else {
   console.log('Service worker: ⚫️ None registered');
   sw_installed = false;
+  
+  if (SW_INSTALL && !JSON.parse(localStorage.getItem('sw_manually_uninstalled'))) {
+    install();
+  }
 }
 
-// Register service worker to control making site work offline
-// if (SW_ENABLED && 'serviceWorker' in navigator) {
-//   install();
-// } else {
-//   // TODO: Can't come in here when this file is cached with SW_ENABLED === true
-//   uninstall();
-// }
+
 
 
 // Install (as App) button in menu (Chrome only, needs service worker)
