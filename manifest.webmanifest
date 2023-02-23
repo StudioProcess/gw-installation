@@ -1,19 +1,25 @@
 {
-    "background_color": "black",
+    "name": "Gravitational Waves",
+    "short_name": "Waves",
     "description": "Gravitational Waves — Process Studio, 2023",
     "display": "fullscreen",
+    "background_color": "black",
+    "start_url": "./",
     "icons": [
+        {
+            "src": "img/32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
         {
             "src": "img/192.png",
             "sizes": "192x192",
             "type": "image/png"
-        },        {
+        },
+        {
             "src": "img/1024.png",
             "sizes": "1024x1024",
             "type": "image/png"
         }
-    ],
-    "name": "Gravitational Waves",
-    "short_name": "Waves",
-    "start_url": "./"
+    ]
 }
