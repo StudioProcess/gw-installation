@@ -484,7 +484,7 @@ function toggle_overlay(force) {
   update_menu_indicators();
   localStorage.setItem('overlay', !overlay.classList.contains('hidden'));
   // when showing the overlay, make sure position is correct
-  if (!overlay.classList.contains(hidden)) { adjust_overlay(); }
+  if (!overlay.classList.contains('hidden')) { adjust_overlay(); }
 }
 
 let overlay_timeout = null;
