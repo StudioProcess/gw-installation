@@ -5,7 +5,7 @@ const DEBUG = false;
 
 // Change this value to cause the service worker to be reinstalled
 // This will also re-cache all resources
-const UPDATE_SEQ = 22;
+const UPDATE_SEQ = 0;
 
 let latest_cache_name = null; // Remember name of cache between 'install' and 'activate' events
 
