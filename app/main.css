@@ -212,3 +212,8 @@ canvas#three-js {
   width: 0.8em;
   height: auto;
 }
+
+/* Disable double-tap zoom in on iOS */
+#menu, #stats_js, #info, #overlay, #notify {
+  touch-action: none;
+}
