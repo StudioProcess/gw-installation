@@ -1046,11 +1046,18 @@ function get_platform() {
     device = ['ios', 'android'].includes(os) ? 'mobile' : 'desktop';
   }
   
-  // Device overrides
-  if ( ['#clear', '#default', '#reset'].includes(hash) ) {
+  // Remember device choice from hash
+  if (['#installation', '#inst', '#hires', '#desktop', '#mobile'].includes(hash)) {
+    localStorage.setItem('force_device', device);
+  }
+  
+  // Clear device choice with special hashes
+  if ( ['#clear', '#default', '#reset', '#auto'].includes(hash) ) {
     localStorage.removeItem('force_device');
     location.hash = '';
   }
+  
+  // Force remembered device choice
   const forced_device = localStorage.getItem('force_device');
   if ( forced_device && ['installation', 'desktop', 'mobile'].includes(forced_device) ) {
     console.log('Forced device:', forced_device);
@@ -1303,8 +1310,6 @@ if ( ! ['standalone', 'fullscreen'].includes(display_mode()) ) { // only when no
         const result = await e.prompt();
         if (result?.userChoice === 'accepted' || result?.outcome === 'accepted') {
           install_btn.classList.add('hidden');
-          // Remember device mode when installing as Chrome App. This way installation mode can be forced
-          localStorage.setItem('force_device', PLATFORM.device);
         }
       };
       install_btn.classList.remove('hidden');
