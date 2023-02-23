@@ -932,7 +932,7 @@ function setup_menu() {
     toggle_menu(false);
   });
   document.body.addEventListener('dblclick', () => {
-    if (Date.now() - last_hidden < 400) { return; }
+    if (Date.now() - last_hidden < 250) { return; }
     toggle_menu(true);
   });
   
