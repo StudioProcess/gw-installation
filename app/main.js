@@ -1268,16 +1268,16 @@ if ( ! ['standalone', 'fullscreen'].includes(display_mode()) ) { // only when no
     // On iOS show info on how to manually install (Add to Home Screen)
     const install_btn = document.querySelector('menu li.install');
     install_btn.onclick = () => {
-      notify('To install:\n• <img src="img/share.and.arrow.up.svg" /> Tap ‘Share’\n• <img src="img/plus.app.svg" /> Select ‘Add to Home Screen’');
-      const div_notify = document.querySelector('#notify');
+      const div_ios_info = document.querySelector('#ios-install-info');
+      div_ios_info.classList.remove('hidden');
       const on_click = (e) => {
-        div_notify.classList.add('hidden');
+        div_ios_info.classList.add('hidden');
         document.body.removeEventListener('click', on_click);
-        div_notify.removeEventListener('click', on_click);
+        div_ios_info.removeEventListener('click', on_click);
         e.stopPropagation();
       };
       document.body.addEventListener('click', on_click);
-      div_notify.addEventListener('click', on_click);
+      div_ios_info.addEventListener('click', on_click);
     };
     install_btn.classList.remove('hidden');
   } else {

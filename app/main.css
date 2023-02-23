@@ -208,9 +208,27 @@ canvas#three-js {
   white-space: pre;
 }
 
-#notify img {
+#ios-install-info {
+  position: absolute;
+  background-color: white;
+  color: black;
+  font-family: "Inter";
+  font-weight: 500;
+  font-size: 36px !important;
+  line-height: 1.5;
+  padding: 1em;
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+}
+
+#ios-install-info li {
+  padding-left: 0.3em;
+}
+
+#ios-install-info img {
   width: 0.8em;
   height: auto;
+  padding-right: 0.05em;
 }
 
 /* Disable double-tap zoom in on iOS */
