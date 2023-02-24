@@ -21,7 +21,7 @@ async function fetch_resource_list() {
 async function install() {
   try {
     const resources = await fetch_resource_list();
-    latest_cache_name = new Date().toISOString();
+    latest_cache_name = 'gw-installation:' + new Date().toISOString();
     const cache = await caches.open(latest_cache_name);
     await cache.addAll(resources); // Always resolves to undefined
     console.log(`Service worker installed. Resources cached: ${resources.length}`);

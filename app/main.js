@@ -66,7 +66,9 @@ const RES_MOBILE       = [1280,  720, 30];
 
 const PX_RATIO = 1;
 const SW_INSTALL = true;
+const LS_PREFIX = 'gw-installation:'; // localstorage prefix (needs to be defined before get_platform)
 const PLATFORM = get_platform();
+
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
@@ -302,7 +304,7 @@ function setup() {
   controls = new OrbitControls( camera, renderer.domElement );
   if (env.ENV === 'production') { toggle_controls_enabled(false); } // lock controls in production mode
   set_cam_by_idx(0);
-  set_colors_by_idx( JSON.parse(localStorage.getItem('current_colors')) ?? 0 );
+  set_colors_by_idx( JSON.parse(localStorage.getItem(LS_PREFIX + 'current_colors')) ?? 0 );
 
   heightPingPong.setup(
     camera,
@@ -367,13 +369,13 @@ function setup() {
   window.addEventListener('resize', update_info);
   
   // overlay
-  set_overlay_pos( localStorage.getItem('overlay_pos_h') ?? 'center', localStorage.getItem('overlay_pos_v') ?? 'center' );
-  if (JSON.parse(localStorage.getItem('overlay_timer')) ?? false) {
+  set_overlay_pos( localStorage.getItem(LS_PREFIX + 'overlay_pos_h') ?? 'center', localStorage.getItem(LS_PREFIX + 'overlay_pos_v') ?? 'center' );
+  if (JSON.parse(localStorage.getItem(LS_PREFIX + 'overlay_timer')) ?? false) {
     toggle_overlay_timer(true)
-  } else if (JSON.parse(localStorage.getItem('overlay')) ?? false) {
+  } else if (JSON.parse(localStorage.getItem(LS_PREFIX + 'overlay')) ?? false) {
     toggle_overlay(true);
   }
-  toggle_overlay_bg( JSON.parse(localStorage.getItem('overlay_background')) ?? false );
+  toggle_overlay_bg( JSON.parse(localStorage.getItem(LS_PREFIX + 'overlay_background')) ?? false );
   window.addEventListener('resize', adjust_overlay);
   
   if (env.ENV === 'production') {
@@ -482,7 +484,7 @@ function toggle_overlay(force) {
   const overlay = document.querySelector('#overlay');
   overlay.classList.toggle('hidden', force !== undefined ? !force : undefined);
   update_menu_indicators();
-  localStorage.setItem('overlay', !overlay.classList.contains('hidden'));
+  localStorage.setItem(LS_PREFIX + 'overlay', !overlay.classList.contains('hidden'));
   // when showing the overlay, make sure position is correct
   if (!overlay.classList.contains('hidden')) { adjust_overlay(); }
 }
@@ -501,11 +503,11 @@ function toggle_overlay_timer(force) {
   
   if (!overlay_timeout || force === true) { // timer is not active
     show();
-    localStorage.setItem('overlay_timer', true);
+    localStorage.setItem(LS_PREFIX + 'overlay_timer', true);
   } else { // timer is active
     cancel_overlay_timer(); // stop timer
     toggle_overlay(false); // hide overlay
-    localStorage.setItem('overlay_timer', false);
+    localStorage.setItem(LS_PREFIX + 'overlay_timer', false);
   }
   
   update_menu_indicators();
@@ -523,7 +525,7 @@ function toggle_overlay_bg(force) {
   } else {
     overlay.classList.toggle('hidden-bg', !force);
   }
-  localStorage.setItem('overlay_background', !overlay.classList.contains('hidden-bg'));
+  localStorage.setItem(LS_PREFIX + 'overlay_background', !overlay.classList.contains('hidden-bg'));
   update_menu_indicators();
 }
 
@@ -588,8 +590,8 @@ function set_overlay_pos(pos_h = 'center', pos_v = 'center') {
   
   adjust_overlay();
   
-  localStorage.setItem('overlay_pos_v', overlay_pos_v);
-  localStorage.setItem('overlay_pos_h', overlay_pos_h);
+  localStorage.setItem(LS_PREFIX + 'overlay_pos_v', overlay_pos_v);
+  localStorage.setItem(LS_PREFIX + 'overlay_pos_h', overlay_pos_h);
 }
 
 function adjust_overlay() {
@@ -838,7 +840,7 @@ function set_colors_by_idx(idx) {
   if (current_colors < 0) { current_colors += colors.length; }
   console.log('colors', current_colors);
   set_colors( colors[current_colors] );
-  localStorage.setItem('current_colors', current_colors);
+  localStorage.setItem(LS_PREFIX + 'current_colors', current_colors);
 }
 
 function next_colors(offset = 1) {
@@ -1048,17 +1050,17 @@ function get_platform() {
   
   // Remember device choice from hash
   if (['#installation', '#inst', '#hires', '#desktop', '#mobile'].includes(hash)) {
-    localStorage.setItem('force_device', device);
+    localStorage.setItem(LS_PREFIX + 'force_device', device);
   }
   
   // Clear device choice with special hashes
   if ( ['#clear', '#default', '#reset', '#auto'].includes(hash) ) {
-    localStorage.removeItem('force_device');
+    localStorage.removeItem(LS_PREFIX + 'force_device');
     location.hash = '';
   }
   
   // Force remembered device choice
-  const forced_device = localStorage.getItem('force_device');
+  const forced_device = localStorage.getItem(LS_PREFIX + 'force_device');
   if ( forced_device && ['installation', 'desktop', 'mobile'].includes(forced_device) ) {
     console.log('Forced device:', forced_device);
     location.hash = forced_device;
@@ -1253,14 +1255,14 @@ async function sw_uninstall(delay = 3000) {
     console.log(`${count} service worker(s) set to be unregistered. Reloading soon ...`);
     if (delay > 0) { notify('Uninstalled\nReloading...'); }
     setTimeout(() => { location.reload(); }, delay);
-    localStorage.setItem('sw_manually_uninstalled', true);
+    localStorage.setItem(LS_PREFIX + 'sw_manually_uninstalled', true);
   }
 }
 
 async function sw_reinstall() {
   if (!navigator.serviceWorker) { return; }
   await sw_uninstall(0);
-  localStorage.setItem('sw_manually_uninstalled', false); // Causes installation on reload
+  localStorage.setItem(LS_PREFIX + 'sw_manually_uninstalled', false); // Causes installation on reload
 }
 
 let sw_installed;
@@ -1275,7 +1277,7 @@ if (navigator.serviceWorker) {
     console.log('Service worker: ⚫️ None registered');
     sw_installed = false;
     
-    if (SW_INSTALL && !JSON.parse(localStorage.getItem('sw_manually_uninstalled'))) {
+    if (SW_INSTALL && !JSON.parse(localStorage.getItem(LS_PREFIX + 'sw_manually_uninstalled'))) {
       sw_install();
     }
   }
