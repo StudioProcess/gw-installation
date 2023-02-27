@@ -4,7 +4,7 @@
 // Can be verified using the verification tool ./verify/index.html
 // 
 // Usage:
-// ./sign_node.js [<folder to sign>]
+// ./sign_node.mjs [<folder to sign>]
 
 import { generateKeyPairSync, createSign, getCurves, getHashes, createPrivateKey } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -34,7 +34,22 @@ try {
     siginfo = readFileSync(siginfo_path);
     siginfo = JSON.parse(siginfo);
 } catch {
-    console.log('Cannot load siginfo:', siginfo_path);
+    console.log('Cannot load siginfo. Creating', siginfo_path);
+    siginfo = {
+        "version": 1,
+        "sitemap": [
+            "siginfo.json",
+            "signature.timestamp"
+        ],
+        "metadata": {
+            "title": "New Project",
+            "author": "Process Studio",
+            "image_url": null
+        },
+        "timestamp_url": "signature.timestamp",
+        "signature_url": "signature.base64"
+    };
+    writeFileSync(siginfo_path, JSON.stringify(siginfo, null, 4));
 }
 const files = siginfo.sitemap.map(f => path.join(folder, f));
 
@@ -60,11 +75,11 @@ try {
     writeFileSync(`../verify/public_key.pem`, pair.publicKey); // also copy pyblic key to verify folder
     writeFileSync(`private_key.pem`, pair.privateKey);
     private_key = pair.privateKey;
-    console.log("Key pair generated:", pair);
+    console.log('Key pair generated:', pair);
 }
 
 const timestamp = new Date().toISOString();
-writeFileSync(path.join(folder, 'signature.timestamp'), timestamp);
+writeFileSync(path.join(folder, siginfo.timestamp_url), timestamp);
 console.log('Timestamp:', timestamp);
 
 const sign = createSign(config.hash);
@@ -84,4 +99,4 @@ const sig = sign.sign(key_object, 'base64');
 console.log('Signature:');
 console.log(sig);
 
-writeFileSync(path.join(folder, 'signature.base64'), sig);
+writeFileSync(path.join(folder, siginfo.signature_url), sig);

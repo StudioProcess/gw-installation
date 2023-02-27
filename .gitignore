@@ -10,3 +10,4 @@ sign/*.timestamp
 verify/*.base64
 verify/*.timestamp
 verify/*.pem
+sign_test/
