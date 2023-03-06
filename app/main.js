@@ -788,11 +788,12 @@ function randomize_cam() {
   set_cam_by_tilt( new_x, new_y, new_h, new_tilt );
   reset_rotation();
   if ( rnd_every(ROTATION_EVERY) ) {
-    toggle_rotation( true, rnd(...VIEW_ROTATION), rnd([true, false]) );
-    log(`randomize cam – rotation`);
+    const new_rot = rnd(...VIEW_ROTATION);
+    toggle_rotation( true, new_rot, rnd([true, false]) );
+    log(`randomize cam – rotation (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)}, rot=${new_rot.toFixed(0)})`);
   } else {
     toggle_rotation(false);
-    log(`randomize cam`);
+    log(`randomize cam (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)})`);
   }
 }
 
