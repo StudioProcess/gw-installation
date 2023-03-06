@@ -1,17 +1,6 @@
 {
     "version": 1,
     "sitemap": [
-        "LICENSE",
-        "README.md",
-        "hash.sh",
-        "index.html",
-        "manifest.webmanifest",
-        "package-lock.json",
-        "package.json",
-        "siginfo.json",
-        "signature.timestamp",
-        "sw.js",
-        "update_sitemap.mjs",
         "app/env.js",
         "app/main.css",
         "app/main.js",
@@ -41,13 +30,23 @@
         "vendor/Stats.js",
         "vendor/es-module-shims.js",
         "vendor/lil-gui.esm.js",
-        "vendor/three.module.js"
+        "vendor/three.module.js",
+        "LICENSE",
+        "README.md",
+        "hash.sh",
+        "index.html",
+        "manifest.webmanifest",
+        "package-lock.json",
+        "package.json",
+        "siginfo.json",
+        "signature.timestamp",
+        "sw.js"
     ],
     "metadata": {
         "title": "Gravitational Waves",
         "author": "Process Studio",
         "image_url": "./img/1024.png"
     },
-    "timestamp_url": "./signature.timestamp",
-    "signature_url": "./signature.base64"
+    "timestamp_url": "signature.timestamp",
+    "signature_url": "signature.base64"
 }

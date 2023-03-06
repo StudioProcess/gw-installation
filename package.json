@@ -19,10 +19,11 @@
     "build": "rsync -a ./ dist/ --exclude='dist' --exclude='node_modules' --exclude='sign' --exclude='verify' --exclude='.git' --exclude='.nova' --exclude='.DS_Store' --exclude='.eslintrc.json' --exclude='.gitignore'; sed -i'.orig' -e \"s/ENV: \\x27development\\x27/ENV: \\x27production\\x27/g;s/### BUILD_DATE ###/$(date)/g\" 'dist/app/env.js'; rm -f dist/app/env.js.orig",
     "prebuild": "npm run copy-vendor-scripts; npm run sign",
     "postbuild": "npm run sign-build",
-    "update-sitemap": "./update_sitemap.mjs",
-    "sign": "npm run update-sitemap; ./sign/sign_node.mjs; ./sign/sign_node.mjs ./verify",
+    "sign": "./sign/sign_node.mjs --update --ignore '.git/**,.nova/**,node_modules/**,dist/**,sign/**,verify/**,sign_test/**,.gitignore,.htaccess'",
+    "sign-verify": "./sign/sign_node.mjs --update ./verify",
     "sign-build": "./sign/sign_node.mjs ./dist",
     "verify": "./sign/verify_node.mjs",
+    "verify-verify": "./sign/verify_node.mjs ./verify",
     "verify-build": "./sign/verify_node.mjs ./dist"
   },
   "keywords": [],
@@ -35,6 +36,7 @@
     "three": "^0.149.0"
   },
   "devDependencies": {
-    "browser-sync": "^2.27.11"
+    "browser-sync": "^2.27.11",
+    "glob": "^9.2.1"
   }
 }

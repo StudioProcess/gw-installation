@@ -1,19 +1,19 @@
 {
     "version": 1,
     "sitemap": [
-        "./index.html",
-        "./util.mjs",
-        "./public_key.pem",
-        "./siginfo.json",
-        "./signature.timestamp",
-        "./img/192.png",
-        "./vendor/qrcode.js"
+        "img/192.png",
+        "vendor/qrcode.js",
+        "index.html",
+        "public_key.pem",
+        "siginfo.json",
+        "signature.timestamp",
+        "util.mjs"
     ],
     "metadata": {
         "title": "VERIFY•PROCESS•STUDIO",
         "author": "Process Studio",
         "image_url": "./img/192.png"
     },
-    "timestamp_url": "./signature.timestamp",
-    "signature_url": "./signature.base64"
+    "timestamp_url": "signature.timestamp",
+    "signature_url": "signature.base64"
 }
