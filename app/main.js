@@ -88,6 +88,11 @@ const VIEW_ROTATION = [750, 1000];
 const VIEW_MIN_CHANGE = 4;
 const VIEW_MIN_HEIGHT_CHANGE = 0.4;
 
+// randomize emitter params
+const EMITTER_BORDER_X = [0.25, 0.00]; // outer, inner (sum <= 0.5)
+const EMITTER_BORDER_Y = [0.25, 0.25]; // top, bottom (sum <= 1.0)
+const EMITTER_PERIOD = [2, 8];
+
 let EXPORT_TILES = 2;
 
 let SIMULATING = true;
@@ -780,19 +785,19 @@ function randomize_emitters() {
 
 function randomize_emitters_once() {
   // position left emitter
-  uniforms.pointPositions.value[0].x = rnd(0.25, 0.5);
-  uniforms.pointPositions.value[0].y = rnd(0.25, 0.75);
+  uniforms.pointPositions.value[0].x = rnd(0.0 + EMITTER_BORDER_X[0], 0.5 - EMITTER_BORDER_X[1]);
+  uniforms.pointPositions.value[0].y = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
   gui.children[10].children[0].controllers[0].updateDisplay();
   gui.children[10].children[0].controllers[1].updateDisplay();
 
   // position right emitter
-  uniforms.pointPositions.value[1].x = rnd(0.5, 0.75);
-  uniforms.pointPositions.value[1].y = rnd(0.25, 0.75);
+  uniforms.pointPositions.value[1].x = rnd(0.5 + EMITTER_BORDER_X[1], 1.0 - EMITTER_BORDER_X[0]);
+  uniforms.pointPositions.value[1].y = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1])
   gui.children[10].children[1].controllers[0].updateDisplay();
   gui.children[10].children[1].controllers[1].updateDisplay();
   
   // randomize period
-  const period = rnd(2, 8);
+  const period = rnd(...EMITTER_PERIOD);
   uniforms.pointPeriods.value[0] = period;
   uniforms.pointPeriods.value[1] = period;
   gui.children[11].controllers[0].updateDisplay();
