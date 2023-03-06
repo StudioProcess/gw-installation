@@ -87,6 +87,7 @@ const VIEW_TILT = [0, 30];
 const VIEW_ROTATION = [750, 1000];
 const VIEW_MIN_CHANGE = 4;
 const VIEW_MIN_HEIGHT_CHANGE = 0.4;
+const VIEW_EMITTER_DIST = 4; // exclusion radius for views around emitters
 
 // randomize emitter params
 const EMITTER_BORDER_X = [0.25, 0.00]; // outer, inner (sum <= 0.5)
@@ -735,20 +736,40 @@ function randomize_cam() {
     return;
   }
   
+  function uv_to_plane(u, v) {
+    return [
+      (u - 0.5) * uniforms.extent.value[0],
+      (v - 0.5) * uniforms.extent.value[1],
+    ];
+  }
+  
+  // distance to closest emitter
+  function emitter_dist(x, y) {
+    // distance to left emitter
+    const el = uv_to_plane(...uniforms.pointPositions.value[0]);
+    const dl = Math.sqrt( (x - el[0])**2 + (y - el[1])**2 );
+    // console.log(dl);
+    // distance to right emitter
+    const er = uv_to_plane(...uniforms.pointPositions.value[1]);
+    const dr = Math.sqrt( (x - er[0])**2 + (y - er[1])**2 );
+    // console.log(dr);
+    return Math.min(dl, dr);
+  }
+  
   let new_x, new_y, new_h;
-  let d = 0, dh = 0;
+  let d = 0, dh = 0, de = 0;
   
   // make sure change distance is big enough
   let count = 0;
-  while (d < VIEW_MIN_CHANGE) {
+  while (d < VIEW_MIN_CHANGE || de < VIEW_EMITTER_DIST) {
     new_x = rnd(...VIEW_X);
     new_y = rnd(...VIEW_Y);
     d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 );
+    de = emitter_dist(new_x, new_y);
     if (++count > 100) {
       console.warn('Breaking out VIEW_MIN_CHANGE loop');
       break;
     }
-    // console.log('d', d);
   }
   
   // make sure change in height is big enough
@@ -763,7 +784,8 @@ function randomize_cam() {
     }
   }
   
-  set_cam_by_tilt( new_x, new_y, new_h, rnd(...VIEW_TILT) );
+  const new_tilt = rnd(...VIEW_TILT)
+  set_cam_by_tilt( new_x, new_y, new_h, new_tilt );
   reset_rotation();
   if ( rnd_every(ROTATION_EVERY) ) {
     toggle_rotation( true, rnd(...VIEW_ROTATION), rnd([true, false]) );
