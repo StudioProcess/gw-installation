@@ -79,6 +79,15 @@ const SPECIAL_VIEW_EVERY = 600; // once every x seconds
 const SPECIAL_VIEWS = [2]; // indices into cams array
 const EMITTER_BURST_EVERY = 450; // seconds
 
+// randomize view params
+const VIEW_X = [-10, 10];
+const VIEW_Y = [-10, 10];
+const VIEW_Z = [0.2, 3];
+const VIEW_TILT = [0, 30];
+const VIEW_ROTATION = [750, 1000];
+const VIEW_MIN_CHANGE = 4;
+const VIEW_MIN_HEIGHT_CHANGE = 0.4;
+
 let EXPORT_TILES = 2;
 
 let SIMULATING = true;
@@ -716,7 +725,7 @@ function randomize_cam() {
     if (special_views_idx >= SPECIAL_VIEWS.length) { special_views_idx = 0 };
     set_cam_by_idx(SPECIAL_VIEWS[special_views_idx]);
     reset_rotation();
-    toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
+    toggle_rotation( true, rnd(...VIEW_ROTATION), rnd([true, false]) );
     log(`randomize cam – special ${SPECIAL_VIEWS[special_views_idx]}`);
     return;
   }
@@ -724,23 +733,35 @@ function randomize_cam() {
   let new_x, new_y, new_h;
   let d = 0, dh = 0;
   
-  while (d < 4) {
-    new_x = rnd(-10, 10);
-    new_y = rnd(-10, 10);
+  // make sure change distance is big enough
+  let count = 0;
+  while (d < VIEW_MIN_CHANGE) {
+    new_x = rnd(...VIEW_X);
+    new_y = rnd(...VIEW_Y);
     d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 );
+    if (++count > 100) {
+      console.warn('Breaking out VIEW_MIN_CHANGE loop');
+      break;
+    }
     // console.log('d', d);
   }
   
-  while (dh < 0.4) {
-    new_h = rnd(0.2, 3);
+  // make sure change in height is big enough
+  count = 0;
+  while (dh < VIEW_MIN_HEIGHT_CHANGE ) {
+    new_h = rnd(...VIEW_Z);
     dh = Math.abs(camera.position.z - new_h);
     // console.log('dh', dh);
+    if (++count > 100) {
+      console.warn('Breaking out VIEW_MIN_HEIGHT_CHANGE loop');
+      break;
+    }
   }
   
-  set_cam_by_tilt( new_x, new_y, new_h, rnd(0, 30) );
+  set_cam_by_tilt( new_x, new_y, new_h, rnd(...VIEW_TILT) );
   reset_rotation();
   if ( rnd_every(ROTATION_EVERY) ) {
-    toggle_rotation( true, rnd(750,1000), rnd([true, false]) );
+    toggle_rotation( true, rnd(...VIEW_ROTATION), rnd([true, false]) );
     log(`randomize cam – rotation`);
   } else {
     toggle_rotation(false);
