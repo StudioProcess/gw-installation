@@ -89,8 +89,8 @@ try {
 }
 
 
-// Update siginfo
-if (args.flags['-u'] || args.flags['--update']) {
+// Update siginfo (when flag is used or new siginfo was generated)
+if (args.flags['-u'] || args.flags['--update'] || new_siginfo) {
     console.log('Updating sitemap');
     const ignore_flag = args.flags['-i'] || args.flags['--ignore'];
     let ignore = [];
