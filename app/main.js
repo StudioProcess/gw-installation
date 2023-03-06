@@ -802,7 +802,6 @@ function randomize_emitters() {
     randomize_emitters_burst();
   } else {
     randomize_emitters_once();
-    log(`randomize emitters`);
   }
 }
 
@@ -825,6 +824,8 @@ function randomize_emitters_once() {
   uniforms.pointPeriods.value[1] = period;
   gui.children[11].controllers[0].updateDisplay();
   gui.children[11].controllers[1].updateDisplay();
+  
+  log(`randomize emitters (l=${uniforms.pointPositions.value[0].x.toFixed(2)}|${uniforms.pointPositions.value[0].y.toFixed(2)}, r=${uniforms.pointPositions.value[1].x.toFixed(2)}|${uniforms.pointPositions.value[1].y.toFixed(2)}, period=${period.toFixed(1)})`);
 }
 
 function randomize_emitters_burst() {
