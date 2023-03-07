@@ -73,18 +73,18 @@ const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
 const CHANGE_VIEW = [15, 25]; // seconds
-const CHANGE_EMITTERS = 60; // seconds
+const CHANGE_EMITTERS = 55; // seconds
 const ROTATION_EVERY = 90; // once every x seconds 
-const SPECIAL_VIEW_EVERY = 600; // once every x seconds
+const SPECIAL_VIEW_EVERY = 480; // once every x seconds
 const SPECIAL_VIEWS = [2, 4]; // indices into cams array
 const EMITTER_BURST_EVERY = 150; // seconds
-const EMITTER_BURST_COUNT = [2, 6];
+const EMITTER_BURST_COUNT = [3, 6];
 
 // randomize view params
 const VIEW_X = [-7.5, 7.5];
 const VIEW_Y = [-7.5, 7.5];
-const VIEW_Z = [1, 3];
-const VIEW_TILT = [0, 30];
+const VIEW_Z = [1.3, 3];
+const VIEW_TILT = [0, 25];
 const VIEW_ROTATION = [750, 1000];
 const VIEW_MIN_CHANGE = 4; // minimum amount the camera needs to change position
 const VIEW_MIN_HEIGHT_CHANGE = 0.4; // minimum amount the camera needs to change height
@@ -734,7 +734,7 @@ function randomize_cam() {
     set_cam_by_idx(SPECIAL_VIEWS[special_views_idx]);
     reset_rotation();
     toggle_rotation( true, rnd(...VIEW_ROTATION), rnd([true, false]) );
-    log(`randomize cam – special ${SPECIAL_VIEWS[special_views_idx]}`);
+    log(`🎥 🎬 randomize cam – special ${SPECIAL_VIEWS[special_views_idx]}`);
     return;
   }
   
@@ -799,10 +799,10 @@ function randomize_cam() {
   if ( rnd_every(ROTATION_EVERY) ) {
     const new_rot = rnd(...VIEW_ROTATION);
     toggle_rotation( true, new_rot, rnd([true, false]) );
-    log(`randomize cam – rotation (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)} > ${de_min.toFixed(1)}, rot=${new_rot.toFixed(0)})`);
+    log(`🎥 🔄 randomize cam – rotation (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)} > ${de_min.toFixed(1)}, rot=${new_rot.toFixed(0)})`);
   } else {
     toggle_rotation(false);
-    log(`randomize cam (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)} > ${de_min.toFixed(1)})`);
+    log(`🎥 randomize cam (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)} > ${de_min.toFixed(1)})`);
   }
 }
 
@@ -834,12 +834,12 @@ function randomize_emitters_once() {
   gui.children[11].controllers[0].updateDisplay();
   gui.children[11].controllers[1].updateDisplay();
   
-  log(`randomize emitters (l=${uniforms.pointPositions.value[0].x.toFixed(2)}|${uniforms.pointPositions.value[0].y.toFixed(2)}, r=${uniforms.pointPositions.value[1].x.toFixed(2)}|${uniforms.pointPositions.value[1].y.toFixed(2)}, period=${period.toFixed(1)})`);
+  log(`🌊 randomize emitters (l=${uniforms.pointPositions.value[0].x.toFixed(2)}|${uniforms.pointPositions.value[0].y.toFixed(2)}, r=${uniforms.pointPositions.value[1].x.toFixed(2)}|${uniforms.pointPositions.value[1].y.toFixed(2)}, period=${period.toFixed(1)})`);
 }
 
 function randomize_emitters_burst() {
   const count = Math.floor(rnd(...EMITTER_BURST_COUNT));
-  log(`randomize emitters – burst ${count}x`);
+  log(`💥 randomize emitters – burst ${count}x`);
   const t_burst = make_timer([0.07, 0.3], randomize_emitters_once, count);
   t_burst.start();
 }
