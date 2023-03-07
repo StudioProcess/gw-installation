@@ -72,17 +72,18 @@ const PLATFORM = get_platform();
 const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
-const CHANGE_VIEW = [15, 30]; // seconds
-const CHANGE_EMITTERS = 150; // seconds
+const CHANGE_VIEW = [15, 25]; // seconds
+const CHANGE_EMITTERS = 60; // seconds
 const ROTATION_EVERY = 90; // once every x seconds 
 const SPECIAL_VIEW_EVERY = 600; // once every x seconds
-const SPECIAL_VIEWS = [2]; // indices into cams array
-const EMITTER_BURST_EVERY = 450; // seconds
+const SPECIAL_VIEWS = [2, 4]; // indices into cams array
+const EMITTER_BURST_EVERY = 150; // seconds
+const EMITTER_BURST_COUNT = [2, 6];
 
 // randomize view params
-const VIEW_X = [-10, 10];
-const VIEW_Y = [-10, 10];
-const VIEW_Z = [0.2, 3];
+const VIEW_X = [-7.5, 7.5];
+const VIEW_Y = [-7.5, 7.5];
+const VIEW_Z = [1, 3];
 const VIEW_TILT = [0, 30];
 const VIEW_ROTATION = [750, 1000];
 const VIEW_MIN_CHANGE = 4; // minimum amount the camera needs to change position
@@ -93,7 +94,7 @@ const VIEW_EMITTER_DIST_LIMIT = 10; // limit minimum distance
 // randomize emitter params
 const EMITTER_BORDER_X = [0.25, 0.00]; // outer, inner (sum <= 0.5)
 const EMITTER_BORDER_Y = [0.25, 0.25]; // top, bottom (sum <= 1.0)
-const EMITTER_PERIOD = [2, 8];
+const EMITTER_PERIOD = [3, 8];
 
 let EXPORT_TILES = 2;
 
@@ -806,7 +807,7 @@ function randomize_cam() {
 }
 
 function randomize_emitters() {
-  if (rnd_every(EMITTER_BURST_EVERY)) {
+  if (rnd_every(EMITTER_BURST_EVERY, CHANGE_EMITTERS)) {
     randomize_emitters_burst();
   } else {
     randomize_emitters_once();
@@ -837,7 +838,7 @@ function randomize_emitters_once() {
 }
 
 function randomize_emitters_burst() {
-  const count = Math.floor(rnd(3,10));
+  const count = Math.floor(rnd(...EMITTER_BURST_COUNT));
   log(`randomize emitters – burst ${count}x`);
   const t_burst = make_timer([0.07, 0.3], randomize_emitters_once, count);
   t_burst.start();
@@ -967,7 +968,7 @@ function toggle_sequence(force, emitters_immediate = false) {
     if (force) { start(); }
     else { stop(); }
   } else {
-    toggle_sequence(!sequence_running);
+    toggle_sequence(!sequence_running, emitters_immediate);
   }
 }
 
@@ -1226,7 +1227,7 @@ document.addEventListener('keydown', e => {
     toggle_rotation();
   }
   else if (e.key == 'Enter') {
-    toggle_sequence();
+    toggle_sequence(undefined, true);
   }
   else if (e.key == 's') {
     toggle_stats();
