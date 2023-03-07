@@ -85,9 +85,10 @@ const VIEW_Y = [-10, 10];
 const VIEW_Z = [0.2, 3];
 const VIEW_TILT = [0, 30];
 const VIEW_ROTATION = [750, 1000];
-const VIEW_MIN_CHANGE = 4;
-const VIEW_MIN_HEIGHT_CHANGE = 0.4;
-const VIEW_EMITTER_DIST = 4; // exclusion radius for views around emitters
+const VIEW_MIN_CHANGE = 4; // minimum amount the camera needs to change position
+const VIEW_MIN_HEIGHT_CHANGE = 0.4; // minimum amount the camera needs to change height
+const VIEW_EMITTER_DIST_FACTOR = 2; // factor for exclusion radius for views around emitters
+const VIEW_EMITTER_DIST_LIMIT = 10; // limit minimum distance
 
 // randomize emitter params
 const EMITTER_BORDER_X = [0.25, 0.00]; // outer, inner (sum <= 0.5)
@@ -757,20 +758,7 @@ function randomize_cam() {
   }
   
   let new_x, new_y, new_h;
-  let d = 0, dh = 0, de = 0;
-  
-  // make sure change distance is big enough
-  let count = 0;
-  while (d < VIEW_MIN_CHANGE || de < VIEW_EMITTER_DIST) {
-    new_x = rnd(...VIEW_X);
-    new_y = rnd(...VIEW_Y);
-    d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 );
-    de = emitter_dist(new_x, new_y);
-    if (++count > 100) {
-      console.warn('Breaking out VIEW_MIN_CHANGE loop');
-      break;
-    }
-  }
+  let d = 0, dh = 0, de = 0, count = 0;
   
   // make sure change in height is big enough
   count = 0;
@@ -784,16 +772,36 @@ function randomize_cam() {
     }
   }
   
+  // Calculate approximate view radius, based on FOV and view height. Add in an exclusion factor (to compensate for tilt etc.)
+  let de_min = 0;
+  try {
+    de_min = new_h * Math.tan((camera.fov/180 * Math.PI) / 2) * camera.aspect * VIEW_EMITTER_DIST_FACTOR;
+  } catch {} // Ignore any calculation errors
+  de_min = Math.min(de_min, VIEW_EMITTER_DIST_LIMIT); // limit min radius
+  
+  // make sure change distance is big enough
+  count = 0;
+  while (d < VIEW_MIN_CHANGE || de < de_min) {
+    new_x = rnd(...VIEW_X);
+    new_y = rnd(...VIEW_Y);
+    d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 );
+    de = emitter_dist(new_x, new_y);
+    if (++count > 100) {
+      console.warn('Breaking out VIEW_MIN_CHANGE loop');
+      break;
+    }
+  }
+  
   const new_tilt = rnd(...VIEW_TILT)
   set_cam_by_tilt( new_x, new_y, new_h, new_tilt );
   reset_rotation();
   if ( rnd_every(ROTATION_EVERY) ) {
     const new_rot = rnd(...VIEW_ROTATION);
     toggle_rotation( true, new_rot, rnd([true, false]) );
-    log(`randomize cam – rotation (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)}, rot=${new_rot.toFixed(0)})`);
+    log(`randomize cam – rotation (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)} > ${de_min.toFixed(1)}, rot=${new_rot.toFixed(0)})`);
   } else {
     toggle_rotation(false);
-    log(`randomize cam (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)})`);
+    log(`randomize cam (x=${new_x.toFixed(1)}, y=${new_y.toFixed(1)}, z=${new_h.toFixed(1)}, tilt=${new_tilt.toFixed(0)}, de=${de.toFixed(1)} > ${de_min.toFixed(1)})`);
   }
 }
 
