@@ -31,9 +31,9 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "es-module-shims": "^1.6.3",
-    "lil-gui": "^0.17.0",
+    "lil-gui": "^0.18.0",
     "stats.js": "^0.17.0",
-    "three": "^0.149.0"
+    "three": "^0.150.1"
   },
   "devDependencies": {
     "browser-sync": "^2.27.11",
