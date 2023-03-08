@@ -73,7 +73,7 @@ const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
 const CHANGE_VIEW = [15, 25]; // seconds
-const CHANGE_EMITTERS = 55; // seconds
+const CHANGE_EMITTERS = 45; // seconds
 const ROTATION_EVERY = 90; // once every x seconds 
 const SPECIAL_VIEW_EVERY = 540; // once every x seconds
 const SPECIAL_VIEWS = [2, 4]; // indices into cams array
@@ -84,8 +84,8 @@ const EMITTER_BURST_COUNT = [3, 6];
 const VIEW_X = [-7.5, 7.5];
 const VIEW_Y = [-7.5, 7.5];
 const VIEW_Z = [1.3, 3];
-const VIEW_TILT = [0, 25];
-const VIEW_ROTATION = [750, 1000];
+const VIEW_TILT = [0, 30];
+const VIEW_ROTATION = [1000, 1250]; // rotation period in seconds (per full rotation)
 const VIEW_MIN_CHANGE = 4; // minimum amount the camera needs to change position
 const VIEW_MIN_HEIGHT_CHANGE = 0.4; // minimum amount the camera needs to change height
 const VIEW_EMITTER_DIST_FACTOR = 2; // factor for exclusion radius for views around emitters
@@ -726,6 +726,13 @@ function rnd_every( every, call_period = (CHANGE_VIEW[0] + CHANGE_VIEW[1])/2 ) {
   return rnd() < 1/(every/call_period);
 }
 
+function uv_to_plane(u, v) {
+  return [
+    (u - 0.5) * uniforms.extent.value[0],
+    (v - 0.5) * uniforms.extent.value[1],
+  ];
+}
+
 let special_views_idx = -1;
 function randomize_cam() {
   if (rnd_every(SPECIAL_VIEW_EVERY)) {
@@ -736,13 +743,6 @@ function randomize_cam() {
     toggle_rotation( true, rnd(...VIEW_ROTATION), rnd([true, false]) );
     log(`🎥 🎬 randomize cam – special ${SPECIAL_VIEWS[special_views_idx]}`);
     return;
-  }
-  
-  function uv_to_plane(u, v) {
-    return [
-      (u - 0.5) * uniforms.extent.value[0],
-      (v - 0.5) * uniforms.extent.value[1],
-    ];
   }
   
   // distance to closest emitter
@@ -782,7 +782,7 @@ function randomize_cam() {
   
   // make sure change distance is big enough
   count = 0;
-  while (d < VIEW_MIN_CHANGE || de < de_min) {
+  while (d < VIEW_MIN_CHANGE || de <= de_min) {
     new_x = rnd(...VIEW_X);
     new_y = rnd(...VIEW_Y);
     d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 );
@@ -810,20 +810,64 @@ function randomize_emitters() {
   if (rnd_every(EMITTER_BURST_EVERY, CHANGE_EMITTERS)) {
     randomize_emitters_burst();
   } else {
-    randomize_emitters_once();
+    randomize_emitters_once(true);
   }
 }
 
-function randomize_emitters_once() {
+function randomize_emitters_once(avoid_view = false) {
+  let lx, ly, rx, ry;
   // position left emitter
-  uniforms.pointPositions.value[0].x = rnd(0.0 + EMITTER_BORDER_X[0], 0.5 - EMITTER_BORDER_X[1]);
-  uniforms.pointPositions.value[0].y = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
+  if (avoid_view) {
+    // distance to center of camera view (in plane units, not uv)
+    function view_dist(x, y) {
+      const e = uv_to_plane(x, y); // emitter position in plane units
+      return Math.sqrt( (camera.position.x - e[0])**2 + (camera.position.y - e[1])**2 );
+    }
+    
+    // Calculate approximate view radius, based on FOV and view height. Add in an exclusion factor (to compensate for tilt etc.)
+    let d_min = 0;
+    try {
+      d_min = camera.position.z * Math.tan((camera.fov/180 * Math.PI) / 2) * camera.aspect * VIEW_EMITTER_DIST_FACTOR;
+    } catch {} // Ignore any calculation errors
+    d_min = Math.min(d_min, VIEW_EMITTER_DIST_LIMIT); // limit min radius
+    let d, count;
+    
+    d = 0; count = 0;
+    while ( d <= d_min ) {
+      lx = rnd(0.0 + EMITTER_BORDER_X[0], 0.5 - EMITTER_BORDER_X[1]);
+      ly = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
+      d = view_dist(lx, ly);
+      if (++count > 100) {
+        console.warn('Breaking out L emitter positioning loop');
+        break;
+      }
+    }
+    
+    d = 0; count = 0;
+    while ( d <= d_min ) {
+      rx = rnd(0.5 + EMITTER_BORDER_X[1], 1.0 - EMITTER_BORDER_X[0]);
+      ry = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
+      d = view_dist(rx, ry);
+      if (++count > 100) {
+        console.warn('Breaking out R emitter positioning loop');
+        break;
+      }
+    }
+  } else {
+    lx = rnd(0.0 + EMITTER_BORDER_X[0], 0.5 - EMITTER_BORDER_X[1]);
+    ly = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
+    rx = rnd(0.5 + EMITTER_BORDER_X[1], 1.0 - EMITTER_BORDER_X[0]);
+    ry = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
+  }
+  
+  uniforms.pointPositions.value[0].x = lx;
+  uniforms.pointPositions.value[0].y = ly;
   gui.children[10].children[0].controllers[0].updateDisplay();
   gui.children[10].children[0].controllers[1].updateDisplay();
 
   // position right emitter
-  uniforms.pointPositions.value[1].x = rnd(0.5 + EMITTER_BORDER_X[1], 1.0 - EMITTER_BORDER_X[0]);
-  uniforms.pointPositions.value[1].y = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1])
+  uniforms.pointPositions.value[1].x = rx;
+  uniforms.pointPositions.value[1].y = ry;
   gui.children[10].children[1].controllers[0].updateDisplay();
   gui.children[10].children[1].controllers[1].updateDisplay();
   
@@ -840,7 +884,7 @@ function randomize_emitters_once() {
 function randomize_emitters_burst() {
   const count = Math.floor(rnd(...EMITTER_BURST_COUNT));
   log(`💥 randomize emitters – burst ${count}x`);
-  const t_burst = make_timer([0.07, 0.3], randomize_emitters_once, count);
+  const t_burst = make_timer([0.07, 0.3], i => randomize_emitters_once(i==count-1), count); // avoid view on last randomize
   t_burst.start();
 }
 
