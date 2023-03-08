@@ -884,7 +884,7 @@ function randomize_emitters_once(avoid_view = false) {
 function randomize_emitters_burst() {
   const count = Math.floor(rnd(...EMITTER_BURST_COUNT));
   log(`💥 randomize emitters – burst ${count}x`);
-  const t_burst = make_timer([0.07, 0.3], i => randomize_emitters_once(i==count-1), count); // avoid view on last randomize
+  const t_burst = make_timer([0.07, 0.3], (i) => randomize_emitters_once(true), count); // avoid view when randomizing
   t_burst.start();
 }
 
