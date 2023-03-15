@@ -73,11 +73,11 @@ const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
 const CHANGE_VIEW = [15, 25]; // seconds
-const CHANGE_EMITTERS = 45; // seconds
+const CHANGE_EMITTERS = 40; // seconds
 const ROTATION_EVERY = 90; // once every x seconds 
 const SPECIAL_VIEW_EVERY = 540; // once every x seconds
 const SPECIAL_VIEWS = [2, 4]; // indices into cams array
-const EMITTER_BURST_EVERY = 150; // seconds
+const EMITTER_BURST_EVERY = 80; // seconds
 const EMITTER_BURST_COUNT = [3, 6];
 const EMITTER_OUT_OF_PHASE_EVERY = 90; // seconds
 
@@ -95,7 +95,7 @@ const VIEW_EMITTER_DIST_LIMIT = 10; // limit minimum distance
 // randomize emitter params
 const EMITTER_BORDER_X = [0.25, 0.00]; // outer, inner (sum <= 0.5)
 const EMITTER_BORDER_Y = [0.25, 0.25]; // top, bottom (sum <= 1.0)
-const EMITTER_PERIOD = [3, 8];
+const EMITTER_PERIOD = [1.5, 8];
 
 let EXPORT_TILES = 2;
 
