@@ -73,11 +73,11 @@ const WALZE = false;
 const WALZE_PERIOD = 3; // duration in seconds (originial value: 10)
 
 const CHANGE_VIEW = [15, 25]; // seconds
-const CHANGE_EMITTERS = 40; // seconds
+const CHANGE_EMITTERS = 30; // seconds
 const ROTATION_EVERY = 90; // once every x seconds 
 const SPECIAL_VIEW_EVERY = 540; // once every x seconds
 const SPECIAL_VIEWS = [2, 4]; // indices into cams array
-const EMITTER_BURST_EVERY = 80; // seconds
+const EMITTER_BURST_EVERY = 75; // seconds
 const EMITTER_BURST_COUNT = [3, 6];
 const EMITTER_OUT_OF_PHASE_EVERY = 90; // seconds
 
