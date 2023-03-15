@@ -79,6 +79,7 @@ const SPECIAL_VIEW_EVERY = 540; // once every x seconds
 const SPECIAL_VIEWS = [2, 4]; // indices into cams array
 const EMITTER_BURST_EVERY = 150; // seconds
 const EMITTER_BURST_COUNT = [3, 6];
+const EMITTER_OUT_OF_PHASE_EVERY = 90; // seconds
 
 // randomize view params
 const VIEW_X = [-7.5, 7.5];
@@ -872,13 +873,17 @@ function randomize_emitters_once(avoid_view = false) {
   gui.children[10].children[1].controllers[1].updateDisplay();
   
   // randomize period
-  const period = rnd(...EMITTER_PERIOD);
-  uniforms.pointPeriods.value[0] = period;
-  uniforms.pointPeriods.value[1] = period;
+  const lperiod = rnd(...EMITTER_PERIOD);
+  let rperiod = lperiod;
+  if (rnd_every(EMITTER_OUT_OF_PHASE_EVERY, CHANGE_EMITTERS) ) {
+    rperiod = rnd(...EMITTER_PERIOD);
+  }
+  uniforms.pointPeriods.value[0] = lperiod;
+  uniforms.pointPeriods.value[1] = rperiod;
   gui.children[11].controllers[0].updateDisplay();
   gui.children[11].controllers[1].updateDisplay();
   
-  log(`🌊 randomize emitters (l=${uniforms.pointPositions.value[0].x.toFixed(2)}|${uniforms.pointPositions.value[0].y.toFixed(2)}, r=${uniforms.pointPositions.value[1].x.toFixed(2)}|${uniforms.pointPositions.value[1].y.toFixed(2)}, period=${period.toFixed(1)})`);
+  log(`🌊 randomize emitters${lperiod !== rperiod ? ' – out-of-phase' : ''} (l=${uniforms.pointPositions.value[0].x.toFixed(2)}|${uniforms.pointPositions.value[0].y.toFixed(2)}, r=${uniforms.pointPositions.value[1].x.toFixed(2)}|${uniforms.pointPositions.value[1].y.toFixed(2)}, period=${lperiod.toFixed(1) + (lperiod !== rperiod ? '|' + rperiod.toFixed(1) : '')})`);
 }
 
 function randomize_emitters_burst() {
