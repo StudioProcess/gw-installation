@@ -79,6 +79,7 @@ const SPECIAL_VIEW_EVERY = 540; // once every x seconds
 const SPECIAL_VIEWS = [2, 4]; // indices into cams array
 const EMITTER_BURST_EVERY = 75; // seconds
 const EMITTER_BURST_COUNT = [3, 6];
+const EMITTER_MANUAL_BURST_COUNT = 6;
 const EMITTER_OUT_OF_PHASE_EVERY = 90; // seconds
 
 // randomize view params
@@ -886,10 +887,15 @@ function randomize_emitters_once(avoid_view = false) {
   log(`🌊 randomize emitters${lperiod !== rperiod ? ' – out-of-phase' : ''} (l=${uniforms.pointPositions.value[0].x.toFixed(2)}|${uniforms.pointPositions.value[0].y.toFixed(2)}, r=${uniforms.pointPositions.value[1].x.toFixed(2)}|${uniforms.pointPositions.value[1].y.toFixed(2)}, period=${lperiod.toFixed(1) + (lperiod !== rperiod ? '|' + rperiod.toFixed(1) : '')})`);
 }
 
-function randomize_emitters_burst() {
-  const count = Math.floor(rnd(...EMITTER_BURST_COUNT));
+function randomize_emitters_burst(force_count = null, cb = null) {
+  const count = force_count ?? Math.floor(rnd(...EMITTER_BURST_COUNT));
   log(`💥 randomize emitters – burst ${count}x`);
-  const t_burst = make_timer([0.07, 0.3], (i) => randomize_emitters_once(true), count); // avoid view when randomizing
+  const t_burst = make_timer([0.07, 0.3], (i) => {
+    randomize_emitters_once(true);
+    if (i == count-1 && typeof cb === 'function') { // last call
+      cb();
+    }
+  }, count); // avoid view when randomizing
   t_burst.start();
 }
 
@@ -1083,8 +1089,11 @@ function setup_menu() {
     next_sequence();
   };
   
-  menu.querySelector('.trigger').onclick = () => {
-    randomize_emitters_burst();
+  menu.querySelector('.trigger').onclick = (e) => {
+    e.target.classList.add('dot-on');
+    randomize_emitters_burst(EMITTER_MANUAL_BURST_COUNT, () => {
+      e.target.classList.remove('dot-on');
+    });
   };
   
   menu.querySelector('.fps').onclick = () => {
