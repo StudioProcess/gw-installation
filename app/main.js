@@ -1083,6 +1083,10 @@ function setup_menu() {
     next_sequence();
   };
   
+  menu.querySelector('.trigger').onclick = () => {
+    randomize_emitters_burst();
+  };
+  
   menu.querySelector('.fps').onclick = () => {
     toggle_stats();
   };
