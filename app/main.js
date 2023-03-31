@@ -77,6 +77,7 @@ const CHANGE_EMITTERS = 30; // seconds
 const ROTATION_EVERY = 90; // once every x seconds 
 const SPECIAL_VIEW_EVERY = 540; // once every x seconds
 const SPECIAL_VIEWS = [2, 4]; // indices into cams array
+const SPECIAL_VIEWS_MANUAL = [2, 4]; // indices into cams array (can be triggered manually)
 const EMITTER_BURST_EVERY = 75; // seconds
 const EMITTER_BURST_COUNT = [3, 5];
 const EMITTER_MANUAL_BURST_COUNT = [4, 6];
@@ -565,6 +566,20 @@ function toggle_stats(force) {
   update_menu_indicators();
 }
 
+let special_views_manual_idx = -1;
+function cycle_special_view() {
+  special_views_manual_idx += 1;
+  if (special_views_manual_idx >= SPECIAL_VIEWS_MANUAL.length) {
+    special_views_manual_idx = -1;
+    toggle_sequence(true);
+  } else {
+    set_cam_by_idx(SPECIAL_VIEWS_MANUAL[special_views_manual_idx]);
+    reset_rotation();
+    toggle_sequence(false);
+  }
+  return special_views_manual_idx;
+}
+
 function get_cam_pos() {
   return {
     position: camera.position.toArray(),
@@ -1034,6 +1049,8 @@ function next_sequence() {
     t_view.start(); // change view, with new timer
     // Don't reset emitter change
   }
+  special_views_manual_idx = -1;
+  update_menu_indicators();
 }
 
 function setup_menu() {
@@ -1089,6 +1106,11 @@ function setup_menu() {
     next_sequence();
   };
   
+  menu.querySelector('.special-view').onclick = (e) => {
+    const idx = cycle_special_view();
+    e.target.classList.toggle('dot-pulse', idx >= 0);
+  };
+  
   menu.querySelector('.trigger').onclick = (e) => {
     e.target.classList.add('dot-on');
     randomize_emitters_burst(Math.round(rnd(...EMITTER_MANUAL_BURST_COUNT)), () => {
@@ -1134,6 +1156,7 @@ function update_menu_indicators() {
   menu.querySelector('.text').classList.toggle('dot-pulse', overlay_timeout !== null);
   menu.querySelector('.text-background').classList.toggle('dot-on', !overlay.classList.contains('hidden-bg'));
   menu.querySelector('.fps').classList.toggle('dot-on', stats.dom.style.display === '');
+  menu.querySelector('.special-view').classList.toggle('dot-pulse', special_views_manual_idx >= 0);
 }
 
 // https://stackoverflow.com/a/38241481
