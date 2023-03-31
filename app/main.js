@@ -1154,6 +1154,8 @@ function update_menu_indicators() {
   const overlay = document.querySelector('#overlay');
   menu.querySelector('.text').classList.toggle('dot-on', !overlay.classList.contains('hidden'));
   menu.querySelector('.text').classList.toggle('dot-pulse', overlay_timeout !== null);
+  menu.querySelector('.text-background').classList.toggle('disabled', overlay.classList.contains('hidden'));
+  menu.querySelector('.text-position').classList.toggle('disabled', overlay.classList.contains('hidden'));
   menu.querySelector('.text-background').classList.toggle('dot-on', !overlay.classList.contains('hidden-bg'));
   menu.querySelector('.fps').classList.toggle('dot-on', stats.dom.style.display === '');
   menu.querySelector('.special-view').classList.toggle('dot-pulse', special_views_manual_idx >= 0);

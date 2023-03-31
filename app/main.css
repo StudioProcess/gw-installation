@@ -124,6 +124,12 @@ canvas#three-js {
   user-select: none;
 }
 
+#menu li.disabled {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.30;
+}
+
 #menu li.install {
   list-style-type: none;
 }
