@@ -33,6 +33,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
   
   Space ....... Toggle simulation
   Backspace ... Reset simulation
+  D ........... Cycle wave speeds (Wave equation "C" parameter)
 
   C ........... Log camera and colors
   N ........... Next camera
@@ -82,6 +83,8 @@ const EMITTER_BURST_EVERY = 75; // seconds
 const EMITTER_BURST_COUNT = [3, 5];
 const EMITTER_MANUAL_BURST_COUNT = [4, 6];
 const EMITTER_OUT_OF_PHASE_EVERY = 90; // seconds
+const WAVE_SPEEDS = [0.15, 0.425, 0.7]; // c parameter (spped of light) in simulation
+const WAVE_SPEED_TRANSITION_TIME = 5000; // time for transitions to another SIM_SPEED (milliseconds)
 
 // randomize view params
 const VIEW_X = [-7.5, 7.5];
@@ -129,6 +132,7 @@ let walzeLoopValue = 0; // position inside the loop [0..1)
 let frameRequest;
 let sceneRotationPeriod = 0;
 let stats;
+let current_speed = 1; // index to WAVE_SPEEDS
 
 const cams = [
   // overview (development)
@@ -325,6 +329,7 @@ function setup() {
   if (env.ENV === 'production') { toggle_controls_enabled(false); } // lock controls in production mode
   set_cam_by_idx(0);
   set_colors_by_idx( JSON.parse(localStorage.getItem(LS_PREFIX + 'current_colors')) ?? 0 );
+  set_speed_by_idx(current_speed, 0);
 
   heightPingPong.setup(
     camera,
@@ -722,6 +727,49 @@ function set_cam_by_tilt(plane_x, plane_y, height, tilt_up) {
     controls.target.set( plane_x, plane_y + target_offset_y, 0 );
   }
   controls.update();
+}
+
+function animate(from_val, to_val, time, cb) {
+  const start = performance.now();
+  let should_stop = false;
+  
+  function update(ts) {
+    if (should_stop) { return; }
+    let elapsed = ts - start;
+    if (elapsed < 0) { elapsed = 0; }
+    if (elapsed > time) { elapsed = time; }
+    const val = time == 0 ? to_val : from_val + (to_val - from_val) / time * elapsed;
+    if (typeof cb === 'function') { cb(val, elapsed); }
+    if (elapsed < time) { requestAnimationFrame(update); }
+  }
+  
+  update(start);
+  
+  return {
+    stop() { should_stop = true; }
+  };
+}
+
+let speed_anim = null;
+
+function set_speed_by_idx(idx, transition_time = WAVE_SPEED_TRANSITION_TIME) {
+  idx = Math.min(WAVE_SPEEDS.length-1 , Math.max(0, idx));
+  console.log('speed', idx);
+  current_speed = idx;
+  if (speed_anim) { speed_anim.stop(); } // cancel previous animation
+  speed_anim = animate(uniforms.c.value, WAVE_SPEEDS[idx], transition_time, val => {
+    // console.log(val);
+    uniforms.c.value = val;
+    gui.children[15].updateDisplay();
+    // console.log('c', val)
+  });
+}
+
+function next_speed(offset = 1) {
+  current_speed += offset;
+  current_speed %= WAVE_SPEEDS.length;
+  if (current_speed < 0) { current_speed += WAVE_SPEEDS.length; }
+  set_speed_by_idx(current_speed);
 }
 
 function rnd(min, max) {
@@ -1329,6 +1377,9 @@ document.addEventListener('keydown', e => {
   else if (e.key == 'i') {
     if (e.ctrlKey) { sw_uninstall(); }
     else { sw_install(); }
+  } 
+  else if (e.key == 'd') {
+    next_speed();
   }
   
 });
