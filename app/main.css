@@ -104,22 +104,18 @@ canvas#three-js {
   font-weight: 500;
   line-height: 2.0;
   left: 0;
-  padding: 0.5em;
+  padding: 1em;
   text-transform: uppercase;
   /* text-decoration: underline; */
   background-color: rgba(0,0,0,0.75);
-}
-
-#menu ul {
   list-style-type: none;
   /* list-style-type: ">"; */
   margin:0;
-  padding:0;
 }
 
 #menu li {
   cursor: pointer;
-  padding-left: 0.15em;
+  padding-right: 1.1em;
   -webkit-user-select: none; /* Safari */
   user-select: none;
 }
@@ -150,75 +146,102 @@ canvas#three-js {
 
 .dot-off::after {
   content: "○";
-  padding-left: 0.4em;
-  font-size: 120%;
+  padding-left: 8px;
+  padding-right: 0.5em;
+  font-size: 110%;
   line-height: 1;
   vertical-align: text-top;
   display: inline-block;
   margin-top: 1px;
+  position: absolute;
+  right: 0;
+  margin-top: 0.375em;
 }
 
 .dot-on::after {
   content: "●";
-  font-size: 150%;
-  padding-left: 0.4em;
-  font-size: 120%;
+  padding-left: 8px;
+  padding-right: 0.5em;
+  font-size: 110%;
   line-height: 1;
   vertical-align: text-top;
   display: inline-block;
   margin-top: 1px;
+  position: absolute;
+  right: 0;
+  margin-top: 0.375em;
 }
 
 .dot-pulse::after {
   content: "●";
-  padding-left: 0.4em;
-  font-size: 120%;
+  padding-left: 8px;
+  padding-right: 0.5em;
+  font-size: 110%;
   line-height: 1;
   vertical-align: text-top;
   display: inline-block;
   margin-top: 1px;
   -webkit-animation: pulse 0.75s ease-in-out alternate;
   animation: pulse 0.75s ease-in-out infinite alternate;
+  position: absolute;
+  right: 0;
+  margin-top: 0.375em;
 }
 
 .three-dots-0::after {
   content: "○○○";
-  padding-left: 10px;
-  font-size: 70%;
+  padding-left: 8px;
+  font-size: 80%;
   line-height: 1;
   vertical-align: text-top;
   display: inline-block;
   margin-top: 4px;
+  position: absolute;
+  right: 0;
+  margin-top: 0.7em;
+  padding-right: 0.7em;
 }
 
 .three-dots-1::after {
   content: "●○○";
-  padding-left: 10px;
-  font-size: 70%;
+  padding-left: 8px;
+  font-size: 80%;
   line-height: 1;
   vertical-align: text-top;
   display: inline-block;
-  margin-top: 4px;
+  margin-top: 5px;
+  position: absolute;
+  right: 0;
+  margin-top: 0.7em;
+  padding-right: 0.7em;
 }
 
 .three-dots-2::after {
   content: "●●○";
-  padding-left: 10px;
-  font-size: 70%;
+  padding-left: 8px;
+  font-size: 80%;
   line-height: 1;
   vertical-align: text-top;
   display: inline-block;
-  margin-top: 4px;
+  margin-top: 5px;
+  position: absolute;
+  right: 0;
+  margin-top: 0.7em;
+  padding-right: 0.7em;
 }
 
 .three-dots-3::after {
   content: "●●●";
-  padding-left: 10px;
-  font-size: 70%;
+  padding-left: 8px;
+  font-size: 80%;
   line-height: 1;
   vertical-align: text-top;
   display: inline-block;
-  margin-top: 4px;
+  margin-top: 5px;
+  position: absolute;
+  right: 0;
+  margin-top: 0.7em;
+  padding-right: 0.7em;
 }
 
 @-webkit-keyframes pulse {
