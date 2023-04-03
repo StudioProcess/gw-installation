@@ -83,7 +83,7 @@ const EMITTER_BURST_EVERY = 75; // seconds
 const EMITTER_BURST_COUNT = [3, 5];
 const EMITTER_MANUAL_BURST_COUNT = [4, 6];
 const EMITTER_OUT_OF_PHASE_EVERY = 90; // seconds
-const WAVE_SPEEDS = [0.15, 0.425, 0.7]; // c parameter (spped of light) in simulation
+const WAVE_SPEEDS = [0.2, 0.4, 0.7]; // c parameter (spped of light) in simulation
 const WAVE_SPEED_TRANSITION_TIME = 5000; // time for transitions to another SIM_SPEED (milliseconds)
 
 // randomize view params
