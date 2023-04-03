@@ -329,7 +329,6 @@ function setup() {
   if (env.ENV === 'production') { toggle_controls_enabled(false); } // lock controls in production mode
   set_cam_by_idx(0);
   set_colors_by_idx( JSON.parse(localStorage.getItem(LS_PREFIX + 'current_colors')) ?? 0 );
-  set_speed_by_idx(current_speed, 0);
 
   heightPingPong.setup(
     camera,
@@ -392,6 +391,8 @@ function setup() {
   toggle_stats(false);
   update_info();
   window.addEventListener('resize', update_info);
+  
+  set_speed_by_idx(current_speed, 0); // needs to happen after stats (since, menu indicators are updated)
   
   // overlay
   set_overlay_pos( localStorage.getItem(LS_PREFIX + 'overlay_pos_h') ?? 'center', localStorage.getItem(LS_PREFIX + 'overlay_pos_v') ?? 'center' );
@@ -763,6 +764,7 @@ function set_speed_by_idx(idx, transition_time = WAVE_SPEED_TRANSITION_TIME) {
     gui.children[15].updateDisplay();
     // console.log('c', val)
   });
+  update_menu_indicators();
 }
 
 function next_speed(offset = 1) {
@@ -770,6 +772,7 @@ function next_speed(offset = 1) {
   current_speed %= WAVE_SPEEDS.length;
   if (current_speed < 0) { current_speed += WAVE_SPEEDS.length; }
   set_speed_by_idx(current_speed);
+  return current_speed;
 }
 
 function rnd(min, max) {
@@ -1166,6 +1169,10 @@ function setup_menu() {
     });
   };
   
+  menu.querySelector('.speed').onclick = (e) => {
+    next_speed();
+  };
+  
   menu.querySelector('.fps').onclick = () => {
     toggle_stats();
   };
@@ -1207,6 +1214,9 @@ function update_menu_indicators() {
   menu.querySelector('.text-background').classList.toggle('dot-on', !overlay.classList.contains('hidden-bg'));
   menu.querySelector('.fps').classList.toggle('dot-on', stats.dom.style.display === '');
   menu.querySelector('.special-view').classList.toggle('dot-pulse', special_views_manual_idx >= 0);
+  menu.querySelector('.speed').classList.toggle('three-dots-1', current_speed === 0);
+  menu.querySelector('.speed').classList.toggle('three-dots-2', current_speed === 1);
+  menu.querySelector('.speed').classList.toggle('three-dots-3', current_speed === 2);
 }
 
 // https://stackoverflow.com/a/38241481
