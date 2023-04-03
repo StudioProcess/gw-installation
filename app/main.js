@@ -392,7 +392,8 @@ function setup() {
   update_info();
   window.addEventListener('resize', update_info);
   
-  set_speed_by_idx(current_speed, 0); // needs to happen after stats (since, menu indicators are updated)
+  // needs to happen after stats (since, menu indicators are updated)
+  set_speed_by_idx(localStorage.getItem(LS_PREFIX + 'wave_speed') ?? current_speed, 0);
   
   // overlay
   set_overlay_pos( localStorage.getItem(LS_PREFIX + 'overlay_pos_h') ?? 'center', localStorage.getItem(LS_PREFIX + 'overlay_pos_v') ?? 'center' );
@@ -752,7 +753,6 @@ function animate(from_val, to_val, time, cb) {
 }
 
 let speed_anim = null;
-
 function set_speed_by_idx(idx, transition_time = WAVE_SPEED_TRANSITION_TIME) {
   idx = Math.min(WAVE_SPEEDS.length-1 , Math.max(0, idx));
   console.log('speed', idx);
@@ -764,10 +764,20 @@ function set_speed_by_idx(idx, transition_time = WAVE_SPEED_TRANSITION_TIME) {
     gui.children[15].updateDisplay();
     // console.log('c', val)
   });
+  localStorage.setItem(LS_PREFIX + 'wave_speed', idx);
   update_menu_indicators();
 }
 
-function next_speed(offset = 1) {
+let speed_offset = 1;
+function next_speed(offset) {
+  if (offset === undefined) { // bounce speed value up and down, instead of wrapping around
+    offset = speed_offset;
+    if (current_speed + offset >= WAVE_SPEEDS.length-1) {
+      speed_offset = -1;
+    } else if (current_speed + offset <= 0) {
+      speed_offset = 1;
+    }
+  }
   current_speed += offset;
   current_speed %= WAVE_SPEEDS.length;
   if (current_speed < 0) { current_speed += WAVE_SPEEDS.length; }
