@@ -1183,6 +1183,10 @@ function setup_menu() {
     next_speed();
   };
   
+  menu.querySelector('.reset').onclick = (e) => {
+    reset_simulation();
+  };
+  
   menu.querySelector('.fps').onclick = () => {
     toggle_stats();
   };
