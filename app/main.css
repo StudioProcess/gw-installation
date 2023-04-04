@@ -105,6 +105,7 @@ canvas#three-js {
   line-height: 2.0;
   left: 0;
   padding: 1em;
+  padding-right: 0.5em;
   text-transform: uppercase;
   /* text-decoration: underline; */
   background-color: rgba(0,0,0,0.85);
@@ -115,9 +116,19 @@ canvas#three-js {
 
 #menu li {
   cursor: pointer;
-  padding-right: 1.1em;
+  padding-right: 1.6em;
   -webkit-user-select: none; /* Safari */
   user-select: none;
+  position: relative;
+}
+
+#menu li:active {
+  color:rgb(230, 230, 230);
+  transform: translate(1px, 1px);
+}
+#menu li:active::after {
+  transform: translate(-1px, -1px);
+  color: white;
 }
 
 #menu li.disabled {
@@ -146,8 +157,6 @@ canvas#three-js {
 
 .dot-off::after {
   content: "○";
-  padding-left: 8px;
-  padding-right: 0.5em;
   font-size: 110%;
   line-height: 1;
   vertical-align: text-top;
@@ -160,8 +169,6 @@ canvas#three-js {
 
 .dot-on::after {
   content: "●";
-  padding-left: 8px;
-  padding-right: 0.5em;
   font-size: 110%;
   line-height: 1;
   vertical-align: text-top;
@@ -174,8 +181,6 @@ canvas#three-js {
 
 .dot-pulse::after {
   content: "●";
-  padding-left: 8px;
-  padding-right: 0.5em;
   font-size: 110%;
   line-height: 1;
   vertical-align: text-top;
@@ -190,7 +195,6 @@ canvas#three-js {
 
 .three-dots-0::after {
   content: "○○○";
-  padding-left: 8px;
   font-size: 80%;
   line-height: 1;
   vertical-align: text-top;
@@ -199,12 +203,10 @@ canvas#three-js {
   position: absolute;
   right: 0;
   margin-top: 0.7em;
-  padding-right: 0.7em;
 }
 
 .three-dots-1::after {
   content: "●○○";
-  padding-left: 8px;
   font-size: 80%;
   line-height: 1;
   vertical-align: text-top;
@@ -213,12 +215,10 @@ canvas#three-js {
   position: absolute;
   right: 0;
   margin-top: 0.7em;
-  padding-right: 0.7em;
 }
 
 .three-dots-2::after {
   content: "●●○";
-  padding-left: 8px;
   font-size: 80%;
   line-height: 1;
   vertical-align: text-top;
@@ -227,12 +227,10 @@ canvas#three-js {
   position: absolute;
   right: 0;
   margin-top: 0.7em;
-  padding-right: 0.7em;
 }
 
 .three-dots-3::after {
   content: "●●●";
-  padding-left: 8px;
   font-size: 80%;
   line-height: 1;
   vertical-align: text-top;
@@ -241,7 +239,6 @@ canvas#three-js {
   position: absolute;
   right: 0;
   margin-top: 0.7em;
-  padding-right: 0.7em;
 }
 
 @-webkit-keyframes pulse {
