@@ -1,3 +1,8 @@
+// 
+// This version shows a banner that redirects the user to the new domain: waves.process.studio
+// 
+const REDIRECT = true;
+
 import env from './env.js';
 
 import * as THREE from 'three';
@@ -1393,7 +1398,7 @@ if (navigator.serviceWorker) {
     console.log(`Service worker: 🟢 Registered${sw_registration.active ? ' and active' : ''}`);
     sw_registration.onupdatefound = on_sw_update;
     sw_installed = true;
-    // registration.update();
+    sw_registration.update(); // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/update
   } else {
     console.log('Service worker: ⚫️ None registered');
     sw_installed = false;
@@ -1406,37 +1411,66 @@ if (navigator.serviceWorker) {
   console.log('Service worker: 🔴 Not supported');
 }
 
-// Install app button
-if ( ! ['standalone', 'fullscreen'].includes(display_mode()) ) { // only when not already running as standalone app
-  if (PLATFORM.os === 'ios') {
-    // On iOS show info on how to manually install (Add to Home Screen)
-    const install_btn = document.querySelector('menu li.install');
-    install_btn.onclick = () => {
-      const div_ios_info = document.querySelector('#ios-install-info');
-      div_ios_info.classList.remove('hidden');
-      const on_click = (e) => {
-        div_ios_info.classList.add('hidden');
-        document.body.removeEventListener('click', on_click);
-        div_ios_info.removeEventListener('click', on_click);
-        e.stopPropagation();
-      };
-      document.body.addEventListener('click', on_click);
-      div_ios_info.addEventListener('click', on_click);
+if (REDIRECT) {
+  // Running standalone or fullscreen
+  if ( ['standalone', 'fullscreen'].includes(display_mode()) ) { 
+    let update_info;
+    if (PLATFORM.os === 'ios') {
+      update_info = document.querySelector('#ios-update-info')
+    } else {
+      update_info = document.querySelector('#update-info')
+    }
+    const on_click = (e) => {
+      update_info.classList.add('hidden');
+      document.body.removeEventListener('click', on_click);
+      e.stopPropagation();
     };
-    install_btn.classList.remove('hidden');
+    document.body.addEventListener('click', on_click);
+    update_info.onclick = (e) => {
+      e.stopPropagation();
+    }
+    update_info.classList.remove('hidden');
+    
   } else {
-    // Install (as App) button in menu (Chrome only, needs service worker)
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); // Prevents the default mini-infobar or install dialog from appearing on mobile
+    notify('Outdated version\nRedirecting...');
+    setTimeout(() => { location = 'https://waves.process.studio/' }, 3000);
+  }
+}
+
+
+if (!REDIRECT) {
+  // Install app button
+  if ( ! ['standalone', 'fullscreen'].includes(display_mode()) ) { // only when not already running as standalone app
+    if (PLATFORM.os === 'ios') {
+      // On iOS show info on how to manually install (Add to Home Screen)
       const install_btn = document.querySelector('menu li.install');
-      install_btn.onclick = async () => {
-        const result = await e.prompt();
-        if (result?.userChoice === 'accepted' || result?.outcome === 'accepted') {
-          install_btn.classList.add('hidden');
-        }
+      install_btn.onclick = () => {
+        const div_ios_info = document.querySelector('#ios-install-info');
+        div_ios_info.classList.remove('hidden');
+        const on_click = (e) => {
+          div_ios_info.classList.add('hidden');
+          document.body.removeEventListener('click', on_click);
+          div_ios_info.removeEventListener('click', on_click);
+          e.stopPropagation();
+        };
+        document.body.addEventListener('click', on_click);
+        div_ios_info.addEventListener('click', on_click);
       };
       install_btn.classList.remove('hidden');
-    });
+    } else {
+      // Install (as App) button in menu (Chrome only, needs service worker)
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault(); // Prevents the default mini-infobar or install dialog from appearing on mobile
+        const install_btn = document.querySelector('menu li.install');
+        install_btn.onclick = async () => {
+          const result = await e.prompt();
+          if (result?.userChoice === 'accepted' || result?.outcome === 'accepted') {
+            install_btn.classList.add('hidden');
+          }
+        };
+        install_btn.classList.remove('hidden');
+      });
+    }
   }
 }
 

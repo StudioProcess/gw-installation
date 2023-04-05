@@ -208,7 +208,7 @@ canvas#three-js {
   white-space: pre;
 }
 
-#ios-install-info {
+#ios-install-info, #ios-update-info, #update-info {
   position: absolute;
   background-color: white;
   color: black;
@@ -219,6 +219,10 @@ canvas#three-js {
   padding: 1em;
   -webkit-user-select: none; /* Safari */
   user-select: none;
+}
+
+#ios-update-info a, #update-info a {
+  color: inherit !important;
 }
 
 #ios-install-info li {
