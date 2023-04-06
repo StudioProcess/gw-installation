@@ -109,6 +109,7 @@ let SIMULATING = true;
 let SCENE_ROTATION_PERIOD = 900;
 
 const LOCK_CAM_TARGET_TO_PLANE = false;
+const RANDOMIZE_RETRY_COUNT = 100; // max tries to get random values that fit conditions (randomize_cam and randomize_emitters_once)
 
 const OVERLAY_TIMER_PERIOD = 60;
 const OVERLAY_TIMER_ON = 20;
@@ -847,7 +848,7 @@ function randomize_cam() {
     new_h = rnd(...VIEW_Z);
     dh = Math.abs(camera.position.z - new_h);
     // console.log('dh', dh);
-    if (++count > 100) {
+    if (++count > RANDOMIZE_RETRY_COUNT) {
       console.warn('Breaking out VIEW_MIN_HEIGHT_CHANGE loop');
       break;
     }
@@ -873,7 +874,7 @@ function randomize_cam() {
     // distances
     d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 ); // distance from old position
     de = emitter_dist(view_x, view_y); // distance to closest emitter
-    if (++count > 100) {
+    if (++count > RANDOMIZE_RETRY_COUNT) {
       console.warn('Breaking out VIEW_MIN_CHANGE loop');
       break;
     }
@@ -922,7 +923,7 @@ function randomize_emitters_once(avoid_view = false) {
       lx = rnd(0.0 + EMITTER_BORDER_X[0], 0.5 - EMITTER_BORDER_X[1]);
       ly = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
       d = view_dist(lx, ly);
-      if (++count > 100) {
+      if (++count > RANDOMIZE_RETRY_COUNT) {
         console.warn('Breaking out L emitter positioning loop');
         break;
       }
@@ -933,7 +934,7 @@ function randomize_emitters_once(avoid_view = false) {
       rx = rnd(0.5 + EMITTER_BORDER_X[1], 1.0 - EMITTER_BORDER_X[0]);
       ry = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
       d = view_dist(rx, ry);
-      if (++count > 100) {
+      if (++count > RANDOMIZE_RETRY_COUNT) {
         console.warn('Breaking out R emitter positioning loop');
         break;
       }
