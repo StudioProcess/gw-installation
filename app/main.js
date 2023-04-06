@@ -114,6 +114,7 @@ const OVERLAY_TIMER_ON = 20;
 const OVERLAY_RELATIVE_TO_CANVAS = true;
 
 const HIDE_CURSOR_AFTER = 3; // seconds
+const HIDE_MENU_AFTER = 180; // seconds
 
 let W, H, SIMULATION_FPS;
 let renderer, scene, camera;
@@ -1116,12 +1117,12 @@ function next_sequence() {
 
 function setup_menu() {
   const menu = document.querySelector('#menu');
-  menu.onclick = (e) => {
+  menu.onmousedown = (e) => {
     e.stopPropagation();
   };
   
   let last_hidden = 0;
-  document.body.addEventListener('click', () => {
+  document.body.addEventListener('mousedown', () => {
     if (!menu.classList.contains('hidden')) {
       last_hidden = Date.now();
     }
@@ -1209,11 +1210,66 @@ function toggle_menu(force) {
   if (force !== undefined) {
     if (force) {
       menu.classList.remove('hidden');
+      toggle_menu_autohide(true);
     } else {
       menu.classList.add('hidden');
+      toggle_menu_autohide(false);
     }
   } else {
     toggle_menu(menu.classList.contains('hidden'));
+  }
+}
+
+let autohide_timer = null;
+let autohide_abort = null;
+function toggle_menu_autohide(force) {
+  if (force === undefined) {
+    toggle_menu_autohide(autohide_timer === null);
+    return;
+  }
+  
+  function add_events() {
+    if (autohide_abort === null) {
+      // console.log('add listerners');
+      autohide_abort = new AbortController();
+      ['mousemove', 'mousedown', 'resize', 'keydown'].forEach(e => window.addEventListener(e, restart, {signal: autohide_abort.signal}));
+    }
+  }
+  
+  function remove_events() {
+    if (autohide_abort !== null) {
+      // console.log('remove listerners');
+      autohide_abort.abort();
+      autohide_abort = null;
+    }
+  }
+  
+  function stop() {
+    if (autohide_timer !== null) { 
+      // console.log('stop timer');
+      clearTimeout(autohide_timer);
+      remove_events();
+      autohide_timer = null;
+    }
+  }
+  
+  function restart() {
+    // console.log('restart');
+    clearTimeout(autohide_timer);
+    autohide_timer = setTimeout(() => {
+      document.querySelector('#menu').classList.add('hidden');
+      stop();
+    }, HIDE_MENU_AFTER * 1000);
+  }
+  
+  if (force) {
+    // console.log('autohide true');
+    restart();
+    remove_events();
+    add_events();
+  } else {
+    // console.log('autohide false');
+    stop();
   }
 }
 
