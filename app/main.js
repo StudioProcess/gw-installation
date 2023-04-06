@@ -200,6 +200,7 @@ const uniforms = {
   displaceGain: {type: "f", value: 0.13, min: 0.0, max: 0.5, step: 0.0001}, // original: value: 0.13, min: 0.0, max: 2.0, step: 0.0001
   displaceHeight: {type: "f", value: 1.0, min: 0.0, max: 3.0, step: 0.0001}, // original: value: 1.0, min: -2.0, max: 2.0, step: 0.0001
   displaceLimit: {type: "f", value: 1.5, min: 0.0, max: 3.0, step: 0.0001},
+  waveSmoothing: {type: "f", value: 1.0, min: 0.0, max: 1.0, step: 0.0001, hideinGui: true},
   
   //
   // computeWaveHeightFS uniforms:

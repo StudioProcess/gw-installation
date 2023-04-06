@@ -11,6 +11,7 @@ uniform vec2 computeResolution;
 uniform float displaceGain;
 uniform float displaceHeight;
 uniform float displaceLimit;
+uniform float waveSmoothing;
 
 uniform float numLines;
 
@@ -100,6 +101,23 @@ vec2 getTransformedUV(vec2 uv) {
   return uv;
 }
 
+// sample wave height with a 3x3 gauss kernel
+// filter_level ... [0.0, 1.0]
+float wave_height_filtered(vec2 uv_, float filter_level) {
+  vec2 uvm = uv_ - computeResolution;
+  vec2 uvp = uv_ + computeResolution;
+  return
+      mix(0.0, 0.0625, filter_level) * texture(pingPongOutMap, vec2(uvm.s, uvm.t)).r
+    + mix(0.0, 0.125,  filter_level) * texture(pingPongOutMap, vec2(uv_.s, uvm.t)).r
+    + mix(0.0, 0.0625, filter_level) * texture(pingPongOutMap, vec2(uvp.s, uvm.t)).r
+    + mix(0.0, 0.125,  filter_level) * texture(pingPongOutMap, vec2(uvm.s, uv_.t)).r
+    + mix(1.0, 0.25,   filter_level) * texture(pingPongOutMap, vec2(uv_.s, uv_.t)).r
+    + mix(0.0, 0.125,  filter_level) * texture(pingPongOutMap, vec2(uvp.s, uv_.t)).r
+    + mix(0.0, 0.0625, filter_level) * texture(pingPongOutMap, vec2(uvm.s, uvp.t)).r
+    + mix(0.0, 0.125,  filter_level) * texture(pingPongOutMap, vec2(uv_.s, uvp.t)).r
+    + mix(0.0, 0.0625, filter_level) * texture(pingPongOutMap, vec2(uvp.s, uvp.t)).r;
+}
+
 void main()	{
 
   vec2 prevUV = vec2(uvX - computeResolution.x, uvY);
@@ -124,19 +142,22 @@ void main()	{
   float heightMultiplier = smoothstep(walzeLeft, walzeLeft + walzeWidth, vUV.x);
   heightMultiplier *= smoothstep(walzeRight, walzeRight - walzeWidth, vUV.x);
 
-  float waveDataPrev = texture(pingPongOutMap, prevUV).r;
+  // float waveDataPrev = texture(pingPongOutMap, prevUV).r;
+  float waveDataPrev = wave_height_filtered(prevUV, waveSmoothing);
   waveDataPrev *= heightMultiplier;
   vPositionPrev.z += displaceHeight * waveDataPrev * gain(abs(waveDataPrev), displaceGain);
   vPositionPrev.z = limit(vPositionPrev.z, displaceLimit);
   vPositionPrev = modelViewMatrix * vPositionPrev;
 
-  float waveData = texture(pingPongOutMap, vUV).r;
+  // float waveData = texture(pingPongOutMap, vUV).r;
+  float waveData = wave_height_filtered(vUV, waveSmoothing);
   waveData *= heightMultiplier;
   vPosition.z += displaceHeight * waveData * gain(abs(waveData), displaceGain);
   vPosition.z = limit(vPosition.z, displaceLimit);
   vPosition = modelViewMatrix * vPosition;
 
-  float waveDataNext = texture(pingPongOutMap, nextUV).r;
+  // float waveDataNext = texture(pingPongOutMap, nextUV).r;
+  float waveDataNext = wave_height_filtered(nextUV, waveSmoothing);
   waveDataNext *= heightMultiplier;
   vPositionNext.z += displaceHeight * waveDataNext * gain(abs(waveDataNext), displaceGain);
   vPositionNext.z = limit(vPositionNext.z, displaceLimit);
