@@ -1122,6 +1122,16 @@ function next_sequence() {
   update_menu_indicators();
 }
 
+function debounce(fn, delay = 100) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
 function setup_menu() {
   const menu = document.querySelector('#menu');
   menu.onmousedown = (e) => {
@@ -1141,6 +1151,8 @@ function setup_menu() {
   });
   
   menu.querySelector('.fullscreen').onclick = () => {
+    // disallow fullscreen if chrome fullscreen is active (window size is screen size, but browser fullscreen inactive)
+    if (!is_fullscreen() && window.innerWidth === screen.width && window.innerHeight === screen.height) { return; }
     toggle_fullscreen();
   };
   if (!fullscreen_supported()) {
@@ -1199,13 +1211,14 @@ function setup_menu() {
     toggle_stats();
   };
   
+  // fullscreen indicator (don't use browser events, because these don't detect borderless window i.e. in chrome)
   function update_fs_indicator() {
-    menu.querySelector('.fullscreen').classList.toggle('dot-on', is_fullscreen());
+    let chrome_fullscreen = !is_fullscreen() && window.innerWidth === screen.width && window.innerHeight === screen.height;
+    menu.querySelector('.fullscreen').classList.toggle('dot-on', is_fullscreen() || chrome_fullscreen );
   }
-  window.addEventListener('webkitfullscreenchange', update_fs_indicator);
-  window.addEventListener('mozfullscreenchange', update_fs_indicator);
-  window.addEventListener('fullscreenchange', update_fs_indicator);
-  
+  update_fs_indicator = debounce(update_fs_indicator);
+  window.addEventListener('resize', update_fs_indicator);
+
   // Add verify link
   const current_site = window.location.origin + window.location.pathname + (!window.location.pathname.endsWith('/') ? '/' : '');
   const verify_site = env.ENV === 'production' ? 'https://verify.process.studio' : new URL('verify', current_site).href;
