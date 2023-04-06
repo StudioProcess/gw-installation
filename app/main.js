@@ -85,6 +85,7 @@ const EMITTER_MANUAL_BURST_COUNT = [4, 6];
 const EMITTER_OUT_OF_PHASE_EVERY = 90; // seconds
 const WAVE_SPEEDS = [0.2, 0.4, 0.7]; // c parameter (spped of light) in simulation
 const WAVE_SPEED_TRANSITION_TIME = 5000; // time for transitions to another SIM_SPEED (milliseconds)
+const WAVE_SMOOTHING = 1.0; // [0.0, 1.0] apply 3x3 gauss filter to wave height samples
 
 // randomize view params
 const VIEW_X = [-7.5, 7.5];
@@ -200,7 +201,7 @@ const uniforms = {
   displaceGain: {type: "f", value: 0.13, min: 0.0, max: 0.5, step: 0.0001}, // original: value: 0.13, min: 0.0, max: 2.0, step: 0.0001
   displaceHeight: {type: "f", value: 1.0, min: 0.0, max: 3.0, step: 0.0001}, // original: value: 1.0, min: -2.0, max: 2.0, step: 0.0001
   displaceLimit: {type: "f", value: 1.5, min: 0.0, max: 3.0, step: 0.0001},
-  waveSmoothing: {type: "f", value: 1.0, min: 0.0, max: 1.0, step: 0.0001, hideinGui: true},
+  waveSmoothing: {type: "f", value: WAVE_SMOOTHING, min: 0.0, max: 1.0, step: 0.0001},
   
   //
   // computeWaveHeightFS uniforms:
@@ -765,7 +766,7 @@ function set_speed_by_idx(idx, transition_time = WAVE_SPEED_TRANSITION_TIME) {
   speed_anim = animate(uniforms.c.value, WAVE_SPEEDS[idx], transition_time, val => {
     // console.log(val);
     uniforms.c.value = val;
-    gui.children[15].updateDisplay();
+    gui.get('c').updateDisplay();
     // console.log('c', val)
   });
   localStorage.setItem(LS_PREFIX + 'wave_speed', idx);
@@ -947,16 +948,17 @@ function randomize_emitters_once(avoid_view = false) {
     ry = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
   }
   
+  // position left emitter
   uniforms.pointPositions.value[0].x = lx;
   uniforms.pointPositions.value[0].y = ly;
-  gui.children[10].children[0].controllers[0].updateDisplay();
-  gui.children[10].children[0].controllers[1].updateDisplay();
+  gui.get('pointPositions', 0, 'x').updateDisplay();
+  gui.get('pointPositions', 0, 'y').updateDisplay();
 
   // position right emitter
   uniforms.pointPositions.value[1].x = rx;
   uniforms.pointPositions.value[1].y = ry;
-  gui.children[10].children[1].controllers[0].updateDisplay();
-  gui.children[10].children[1].controllers[1].updateDisplay();
+  gui.get('pointPositions', 1, 'x').updateDisplay();
+  gui.get('pointPositions', 1, 'y').updateDisplay();
   
   // randomize period
   const lperiod = rnd(...EMITTER_PERIOD);
@@ -966,8 +968,7 @@ function randomize_emitters_once(avoid_view = false) {
   }
   uniforms.pointPeriods.value[0] = lperiod;
   uniforms.pointPeriods.value[1] = rperiod;
-  gui.children[11].controllers[0].updateDisplay();
-  gui.children[11].controllers[1].updateDisplay();
+  gui.get('pointPeriods').updateDisplay();
   
   log(`🌊 randomize emitters${lperiod !== rperiod ? ' – out-of-phase' : ''} (l=${uniforms.pointPositions.value[0].x.toFixed(2)}|${uniforms.pointPositions.value[0].y.toFixed(2)}, r=${uniforms.pointPositions.value[1].x.toFixed(2)}|${uniforms.pointPositions.value[1].y.toFixed(2)}, period=${lperiod.toFixed(1) + (lperiod !== rperiod ? '|' + rperiod.toFixed(1) : '')})`);
 }
@@ -1022,8 +1023,8 @@ function set_colors(obj) {
   }
   if (background) { uniforms.backgroundColor.value = Array.from(background); } // copy array
   if (line) { uniforms.lineColor.value = Array.from(line); } // copy array
-  gui?.controllers[0].updateDisplay();
-  gui?.controllers[1].updateDisplay();
+  gui?.get('backgroundColor').updateDisplay();
+  gui?.get('lineColor').updateDisplay();
   // set overlay colors
   if (background) {
     document.querySelector('#overlay').style.backgroundColor = `rgb(${background.map(x => x*255).join(',')},0.9)`;

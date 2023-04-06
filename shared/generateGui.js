@@ -1,5 +1,37 @@
 import GUI from 'lil-gui';
 
+// Get Controller by name
+// Adds a function get() to the GUI prototype
+// Takes one or more controller names, where the last one is the actual name of the controller and the preceding ones are names of (nested) folders the controller is in
+GUI.prototype.get = function(...names) {
+  for (const [i, name] of names.entries()) {
+    if (i === names.length-1) { // the last path element
+      // find element
+      let el = this.controllers.find( c => c._name == name );
+      if (el !== undefined) { return el; }
+      el = this.folders.find( f => f._title == name ); // try folders instead
+      if (el === undefined) { 
+        throw { error: `GUI element not found: ${name}` };
+      }
+      return el;
+    }
+    // find folder
+    let folder = this.folders.find( f => f._title == name );
+    if (folder === undefined) { 
+        throw { error: `GUI folder not found: ${name}` };
+    }
+    // recur
+    return folder.get(...names.slice(1));
+  }
+};
+
+// Update display of all controllers
+GUI.prototype.updateDisplay = function(obj) {
+  for (let c of this.controllersRecursive()) {
+    c.updateDisplay();
+  }
+}
+
 export function initGui(uniforms) {
   const keys = Object.keys(uniforms);
 
