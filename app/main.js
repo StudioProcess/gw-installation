@@ -115,7 +115,7 @@ const OVERLAY_TIMER_ON = 20;
 const OVERLAY_RELATIVE_TO_CANVAS = true;
 
 const HIDE_CURSOR_AFTER = 3; // seconds
-const HIDE_MENU_AFTER = 180; // seconds
+const HIDE_MENU_AFTER = 300; // seconds
 
 let W, H, SIMULATION_FPS;
 let renderer, scene, camera;
