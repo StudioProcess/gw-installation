@@ -873,7 +873,7 @@ function randomize_cam() {
     // distances
     d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 ); // distance from old position
     de = emitter_dist(view_x, view_y); // distance to closest emitter
-    // best is smallest de that is >= de_min
+    // best is smallest de that is >= de_min (if de < de_min: move up; if de >= de_min: move down)
     if (best_de === 0 || (de >= de_min && de < best_de) || (de < de_min && de > best_de)) {
       best_de = de;
       best_x = new_x;
@@ -932,11 +932,12 @@ function randomize_emitters_once(avoid_view = false) {
       ly = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
       d = view_dist(lx, ly);
       if (d > best_d) {
+        best_d = d;
         best_x = lx;
         best_y = ly;
       }
       if (++count > RANDOMIZE_RETRY_COUNT) {
-        console.warn(`Breaking out L emitter positioning loop (Achieved d=${d.toFixed(2)} [>= ${d_min.toFixed(2)}])`);
+        console.warn(`Breaking out L emitter positioning loop (Achieved d=${best_d.toFixed(2)} [>= ${d_min.toFixed(2)}])`);
         lx = best_x;
         ly = best_y;
         break;
@@ -949,11 +950,12 @@ function randomize_emitters_once(avoid_view = false) {
       ry = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
       d = view_dist(rx, ry);
       if (d > best_d) {
+        best_d = d;
         best_x = rx;
         best_y = ry;
       }
       if (++count > RANDOMIZE_RETRY_COUNT) {
-        console.warn(`Breaking out R emitter positioning loop (Achieved d=${d.toFixed(2)} [>= ${d_min.toFixed(2)}])`);
+        console.warn(`Breaking out R emitter positioning loop (Achieved d=${best_d.toFixed(2)} [>= ${d_min.toFixed(2)}])`);
         rx = best_x;
         ry = best_y;
         break;
