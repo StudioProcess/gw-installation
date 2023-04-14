@@ -773,16 +773,7 @@ function set_speed_by_idx(idx, transition_time = WAVE_SPEED_TRANSITION_TIME) {
   update_menu_indicators();
 }
 
-let speed_offset = 1;
-function next_speed(offset) {
-  if (offset === undefined) { // bounce speed value up and down, instead of wrapping around
-    offset = speed_offset;
-    if (current_speed + offset >= WAVE_SPEEDS.length-1) {
-      speed_offset = -1;
-    } else if (current_speed + offset <= 0) {
-      speed_offset = 1;
-    }
-  }
+function next_speed(offset = 1) {
   current_speed += offset;
   current_speed %= WAVE_SPEEDS.length;
   if (current_speed < 0) { current_speed += WAVE_SPEEDS.length; }
