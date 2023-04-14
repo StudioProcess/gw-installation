@@ -93,9 +93,9 @@ const VIEW_Y = [-7.5, 7.5];
 const VIEW_Z = [1.3, 3];
 const VIEW_TILT = [0, 30];
 const VIEW_ROTATION = [1000, 1250]; // rotation period in seconds (per full rotation)
-const VIEW_MIN_CHANGE = 4; // minimum amount the camera needs to change position
-const VIEW_MIN_HEIGHT_CHANGE = 0.4; // minimum amount the camera needs to change height
-const VIEW_EMITTER_DIST_FACTOR = 2; // factor for exclusion radius for views around emitters
+const VIEW_MIN_CHANGE = 5; // minimum amount the camera needs to change position
+const VIEW_MIN_HEIGHT_CHANGE = 0.5; // minimum amount the camera needs to change height
+const VIEW_EMITTER_DIST_FACTOR = 2.25; // factor for exclusion radius for views around emitters
 const VIEW_EMITTER_DIST_LIMIT = 10; // limit minimum distance
 const VIEW_EMITTER_DIST_MAX = 10; // maximum distance, so camera isn't placed in in a place with nothing happening
 
@@ -110,7 +110,7 @@ let SIMULATING = true;
 let SCENE_ROTATION_PERIOD = 900;
 
 const LOCK_CAM_TARGET_TO_PLANE = false;
-const RANDOMIZE_RETRY_COUNT = 100; // max tries to get random values that fit conditions (randomize_cam and randomize_emitters_once)
+const RANDOMIZE_RETRY_COUNT = 1000; // max tries to get random values that fit conditions (randomize_cam and randomize_emitters_once)
 
 const OVERLAY_TIMER_PERIOD = 60;
 const OVERLAY_TIMER_ON = 20;
@@ -837,12 +837,17 @@ function randomize_cam() {
   
   // make sure change in height is big enough
   count = 0;
+  let best_h, best_dh = -1;
   while (dh < VIEW_MIN_HEIGHT_CHANGE ) {
     new_h = rnd(...VIEW_Z);
     dh = Math.abs(camera.position.z - new_h);
-    // console.log('dh', dh);
+    if (dh > best_dh) {
+      best_dh = dh;
+      best_h = new_h;
+    }
     if (++count > RANDOMIZE_RETRY_COUNT) {
-      console.warn('Breaking out VIEW_MIN_HEIGHT_CHANGE loop');
+      console.warn(`Breaking out VIEW_MIN_HEIGHT_CHANGE loop (Achieved dh=${best_dh.toFixed(2)} [>= ${VIEW_MIN_HEIGHT_CHANGE}])`);
+      new_h = best_h;
       break;
     }
   }
@@ -859,6 +864,7 @@ function randomize_cam() {
   
   // make sure change distance is big enough + view is far enough from the nearest emitter (but not too far)
   count = 0;
+  let best_x, best_y, best_de = 0;
   while (d < VIEW_MIN_CHANGE || de <= de_min || de > VIEW_EMITTER_DIST_MAX) {
     new_x = rnd(...VIEW_X);
     new_y = rnd(...VIEW_Y);
@@ -867,8 +873,16 @@ function randomize_cam() {
     // distances
     d = Math.sqrt( (camera.position.x - new_x)**2 + (camera.position.y - new_y)**2 ); // distance from old position
     de = emitter_dist(view_x, view_y); // distance to closest emitter
+    // best is smallest de that is >= de_min
+    if (best_de === 0 || (de >= de_min && de < best_de) || (de < de_min && de > best_de)) {
+      best_de = de;
+      best_x = new_x;
+      best_y = new_y;
+    }
     if (++count > RANDOMIZE_RETRY_COUNT) {
-      console.warn('Breaking out VIEW_MIN_CHANGE loop');
+      console.warn(`Breaking out VIEW_MIN_CHANGE loop (Achieved de=${best_de.toFixed(2)} [${de_min.toFixed(2)}, ${VIEW_EMITTER_DIST_MAX}])`);
+      new_x = best_x;
+      new_y = best_y;
       break;
     }
   }
@@ -912,23 +926,36 @@ function randomize_emitters_once(avoid_view = false) {
     let d, count;
     
     d = 0; count = 0;
-    while ( d <= d_min ) {
+    let best_x, best_y, best_d = -1;
+    while ( d < d_min ) {
       lx = rnd(0.0 + EMITTER_BORDER_X[0], 0.5 - EMITTER_BORDER_X[1]);
       ly = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
       d = view_dist(lx, ly);
+      if (d > best_d) {
+        best_x = lx;
+        best_y = ly;
+      }
       if (++count > RANDOMIZE_RETRY_COUNT) {
-        console.warn('Breaking out L emitter positioning loop');
+        console.warn(`Breaking out L emitter positioning loop (Achieved d=${d.toFixed(2)} [>= ${d_min.toFixed(2)}])`);
+        lx = best_x;
+        ly = best_y;
         break;
       }
     }
     
-    d = 0; count = 0;
-    while ( d <= d_min ) {
+    d = 0; count = 0; best_d = -1;
+    while ( d < d_min ) {
       rx = rnd(0.5 + EMITTER_BORDER_X[1], 1.0 - EMITTER_BORDER_X[0]);
       ry = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
       d = view_dist(rx, ry);
+      if (d > best_d) {
+        best_x = rx;
+        best_y = ry;
+      }
       if (++count > RANDOMIZE_RETRY_COUNT) {
-        console.warn('Breaking out R emitter positioning loop');
+        console.warn(`Breaking out R emitter positioning loop (Achieved d=${d.toFixed(2)} [>= ${d_min.toFixed(2)}])`);
+        rx = best_x;
+        ry = best_y;
         break;
       }
     }
