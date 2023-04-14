@@ -911,7 +911,7 @@ function randomize_emitters_once(avoid_view = false) {
   let lx, ly, rx, ry;
   // position left emitter
   if (avoid_view) {
-    // distance to center of camera view (in plane units, not uv)
+    // distance to center of camera view (in plane units, not uv); return value >= 0
     function view_dist(x, y) {
       const e = uv_to_plane(x, y); // emitter position in plane units
       return Math.sqrt( (camera.position.x - e[0])**2 + (camera.position.y - e[1])**2 );
@@ -922,12 +922,11 @@ function randomize_emitters_once(avoid_view = false) {
     try {
       d_min = camera.position.z * Math.tan((camera.fov/180 * Math.PI) / 2) * camera.aspect * VIEW_EMITTER_DIST_FACTOR;
     } catch {} // Ignore any calculation errors
-    d_min = Math.min(d_min, VIEW_EMITTER_DIST_LIMIT); // limit min radius
+    d_min = Math.min(d_min, VIEW_EMITTER_DIST_LIMIT); // limit min radius => [0, VIEW_EMITTER_DIST_LIMIT]
     let d, count;
-    
-    d = 0; count = 0;
+    d = -1; count = 0;
     let best_x, best_y, best_d = -1;
-    while ( d < d_min ) {
+    while ( d < d_min ) { // d_min >= 0
       lx = rnd(0.0 + EMITTER_BORDER_X[0], 0.5 - EMITTER_BORDER_X[1]);
       ly = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
       d = view_dist(lx, ly);
@@ -944,8 +943,8 @@ function randomize_emitters_once(avoid_view = false) {
       }
     }
     
-    d = 0; count = 0; best_d = -1;
-    while ( d < d_min ) {
+    d = -1; count = 0; best_d = -1;
+    while ( d < d_min ) { // d_min >= 0
       rx = rnd(0.5 + EMITTER_BORDER_X[1], 1.0 - EMITTER_BORDER_X[0]);
       ry = rnd(0.0 + EMITTER_BORDER_Y[0], 1.0 - EMITTER_BORDER_Y[1]);
       d = view_dist(rx, ry);
@@ -989,6 +988,9 @@ function randomize_emitters_once(avoid_view = false) {
   uniforms.pointPeriods.value[0] = lperiod;
   uniforms.pointPeriods.value[1] = rperiod;
   gui.get('pointPeriods').updateDisplay();
+  
+  // console.debug('lx=', lx, 'ly=', ly, 'rx=', rx, 'ry=', ry, 'lperiod=', lperiod, 'rperiod=', rperiod);
+  // console.debug('uniforms.pointPositions.value[0].x=', uniforms.pointPositions.value[0].x, 'uniforms.pointPositions.value[0].y=', uniforms.pointPositions.value[0].y, 'uniforms.pointPositions.value[1].x=', uniforms.pointPositions.value[1].x, 'uniforms.pointPositions.value[1].y=', uniforms.pointPositions.value[1].y);
   
   log(`🌊 randomize emitters${lperiod !== rperiod ? ' – out-of-phase' : ''} (l=${uniforms.pointPositions.value[0].x.toFixed(2)}|${uniforms.pointPositions.value[0].y.toFixed(2)}, r=${uniforms.pointPositions.value[1].x.toFixed(2)}|${uniforms.pointPositions.value[1].y.toFixed(2)}, period=${lperiod.toFixed(1) + (lperiod !== rperiod ? '|' + rperiod.toFixed(1) : '')})`);
 }
