@@ -32,7 +32,6 @@
         "vendor/lil-gui.esm.js",
         "vendor/three.module.js",
         "LICENSE",
-        "README.md",
         "hash.sh",
         "index.html",
         "manifest.webmanifest",
