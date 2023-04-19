@@ -13,7 +13,7 @@
 import { generateKeyPairSync, createSign, getCurves, getHashes, createPrivateKey } from 'node:crypto';
 import { readFileSync, writeFileSync, statSync } from 'node:fs';
 import path from 'node:path';
-import glob from 'glob';
+import { glob } from 'glob';
 
 // const config = { named_curve: 'prime256v1', hash: 'sha256' };
 const config = { named_curve: 'secp384r1', hash: 'sha384' };
