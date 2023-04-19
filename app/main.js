@@ -1158,9 +1158,9 @@ function debounce(fn, delay = 100) {
 
 function setup_menu() {
   const menu = document.querySelector('#menu');
-  menu.onmousedown = (e) => {
-    e.stopPropagation();
-  };
+  const stop_prop = (e) => { e.stopPropagation(); };
+  menu.onmousedown = stop_prop;
+  menu.onclick = stop_prop;
   
   let last_hidden = 0;
   document.body.addEventListener('mousedown', () => {
@@ -1614,14 +1614,12 @@ if ( ! ['standalone', 'fullscreen'].includes(display_mode()) ) { // only when no
     install_btn.onclick = () => {
       const div_ios_info = document.querySelector('#ios-install-info');
       div_ios_info.classList.remove('hidden');
-      const on_click = (e) => {
+      const on_mousedown = (e) => {
         div_ios_info.classList.add('hidden');
-        document.body.removeEventListener('click', on_click);
-        div_ios_info.removeEventListener('click', on_click);
+        div_ios_info.removeEventListener('mousedown', on_mousedown);
         e.stopPropagation();
       };
-      document.body.addEventListener('click', on_click);
-      div_ios_info.addEventListener('click', on_click);
+      div_ios_info.addEventListener('mousedown', on_mousedown);
     };
     install_btn.classList.remove('hidden');
   } else {
