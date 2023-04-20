@@ -112,8 +112,8 @@ let SCENE_ROTATION_PERIOD = 900;
 const LOCK_CAM_TARGET_TO_PLANE = false;
 const RANDOMIZE_RETRY_COUNT = 1000; // max tries to get random values that fit conditions (randomize_cam and randomize_emitters_once)
 
-const OVERLAY_TIMER_PERIOD = 60;
-const OVERLAY_TIMER_ON = 20;
+const OVERLAY_TIMER_PERIOD = 60; // can be overridden in local storage (key: LS_PREFIX + 'overlay_timer_period')
+const OVERLAY_TIMER_ON = 30; // can be overridden in local storage (key: LS_PREFIX + 'overlay_timer_on')
 const OVERLAY_RELATIVE_TO_CANVAS = true;
 
 const HIDE_CURSOR_AFTER = 3; // seconds
@@ -523,14 +523,19 @@ function toggle_overlay(force) {
 
 let overlay_timeout = null;
 function toggle_overlay_timer(force) {
+  const timer_on = localStorage.getItem(LS_PREFIX + 'overlay_timer_on') || OVERLAY_TIMER_ON;
+  const timer_period = localStorage.getItem(LS_PREFIX + 'overlay_timer_period') || OVERLAY_TIMER_PERIOD;
+  console.log('timer_on', timer_on);
+  console.log('timer_period', timer_period);
+  
   function show() {
     toggle_overlay(true); // show overlay
-    overlay_timeout = setTimeout(hide, OVERLAY_TIMER_ON * 1000); 
+    overlay_timeout = setTimeout(hide, timer_on * 1000);
   }
   
   function hide() {
     toggle_overlay(false); // hide overlay
-    overlay_timeout = setTimeout(show, (OVERLAY_TIMER_PERIOD - OVERLAY_TIMER_ON) * 1000);
+    overlay_timeout = setTimeout(show, (timer_period - timer_on) * 1000);
   }
   
   if (!overlay_timeout || force === true) { // timer is not active
