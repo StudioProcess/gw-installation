@@ -2,6 +2,7 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: system-ui;
+  overflow: hidden; /* hide scrollbars when canvas overflows */
 }
 
 body {
@@ -11,7 +12,6 @@ body {
   height: 100vh;
   background-color: black;
   color: white;
-  overflow: hidden; /* hide scrollbars */
 }
 
 body.nocursor {

@@ -117,7 +117,7 @@ const OVERLAY_TEXT_BOTTOM = 'Think ahead'; // can be overridden in local storage
 const OVERLAY_HREF = 'https://bernhardhoetzl.com'; // can be overridden in local storage (key: LS_PREFIX + 'overlay_text_href')
 const OVERLAY_TIMER_PERIOD = 60; // can be overridden in local storage (key: LS_PREFIX + 'overlay_timer_period')
 const OVERLAY_TIMER_ON = 30; // can be overridden in local storage (key: LS_PREFIX + 'overlay_timer_on')
-const OVERLAY_RELATIVE_TO_CANVAS = true;
+const OVERLAY_RELATIVE_TO_CANVAS = false;
 
 const HIDE_CURSOR_AFTER = 3; // seconds
 const HIDE_MENU_AFTER = 300; // seconds
