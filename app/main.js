@@ -63,7 +63,7 @@ import {inverseLerpClamped} from "../shared/mathUtils.js";
 
 const RES_INSTALLATION = [3840, 2160, 60];
 const RES_DESKTOP      = [1920, 1080, 60];
-const RES_MOBILE       = [1280,  720, 30];
+const RES_MOBILE       = [1920, 1080, 30];
 
 const PX_RATIO = 1;
 const SW_INSTALL = true;
