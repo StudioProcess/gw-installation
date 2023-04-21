@@ -48,17 +48,6 @@ canvas#three-js {
   #overlay {
     font-size: 7vw;
   }
-  #menu {
-    font-size: 36px !important;
-  }
-  #info {
-    font-size: 18px !important;
-    top: 96px !important;
-  }
-  #stats_js canvas {
-    width: 160px !important;
-    height: 96px !important;
-  }
 }
 
 @font-face {
@@ -105,16 +94,15 @@ canvas#three-js {
 #menu {
   position: absolute;
   font-family: "Inter";
+  font-size: max(12px, 2.2vh);
   font-weight: 500;
   line-height: 2.0;
   left: 0;
   padding: 1em;
   padding-right: 0.5em;
   text-transform: uppercase;
-  /* text-decoration: underline; */
   background-color: rgba(0,0,0,0.85);
   list-style-type: none;
-  /* list-style-type: ">"; */
   margin:0;
 }
 
