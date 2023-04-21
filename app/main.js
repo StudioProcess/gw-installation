@@ -117,7 +117,7 @@ const OVERLAY_TEXT_BOTTOM = 'Think ahead'; // can be overridden in local storage
 const OVERLAY_HREF = 'https://bernhardhoetzl.com'; // can be overridden in local storage (key: LS_PREFIX + 'overlay_text_href')
 const OVERLAY_TIMER_PERIOD = 60; // can be overridden in local storage (key: LS_PREFIX + 'overlay_timer_period')
 const OVERLAY_TIMER_ON = 30; // can be overridden in local storage (key: LS_PREFIX + 'overlay_timer_on')
-const OVERLAY_RELATIVE_TO_CANVAS = false;
+const OVERLAY_RELATIVE_TO_CANVAS = true; // adjust overlay to be inside the canvas (even when screen has black bars)
 
 const HIDE_CURSOR_AFTER = 3; // seconds
 const HIDE_MENU_AFTER = 300; // seconds
@@ -657,11 +657,11 @@ function adjust_overlay() {
   if (!OVERLAY_RELATIVE_TO_CANVAS) { return; }
   const overlay = document.querySelector('#overlay');
   if (overlay_pos_v === 'top') {
-    overlay.style.marginTop = renderer.domElement.offsetTop + 'px';
+    overlay.style.marginTop = Math.max(0, renderer.domElement.offsetTop) + 'px';
     overlay.style.marginBottom = '';
   } else if (overlay_pos_v === 'bottom') {
     overlay.style.marginTop = '';
-    overlay.style.marginBottom = window.innerHeight - renderer.domElement.clientHeight - renderer.domElement.offsetTop + 'px';
+    overlay.style.marginBottom = Math.max(0, window.innerHeight - renderer.domElement.clientHeight - renderer.domElement.offsetTop) + 'px';
   } else {
     overlay.style.marginTop = '';
     overlay.style.marginBottom = '';
