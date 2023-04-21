@@ -112,6 +112,9 @@ let SCENE_ROTATION_PERIOD = 900;
 const LOCK_CAM_TARGET_TO_PLANE = false;
 const RANDOMIZE_RETRY_COUNT = 1000; // max tries to get random values that fit conditions (randomize_cam and randomize_emitters_once)
 
+const OVERLAY_TEXT_TOP = 'bernhardhoetzl.com'; // can be overridden in local storage (key: LS_PREFIX + 'overlay_text_top')
+const OVERLAY_TEXT_BOTTOM = 'Think ahead'; // can be overridden in local storage (key: LS_PREFIX + 'overlay_text_bottom')
+const OVERLAY_HREF = 'https://bernhardhoetzl.com'; // can be overridden in local storage (key: LS_PREFIX + 'overlay_text_href')
 const OVERLAY_TIMER_PERIOD = 60; // can be overridden in local storage (key: LS_PREFIX + 'overlay_timer_period')
 const OVERLAY_TIMER_ON = 30; // can be overridden in local storage (key: LS_PREFIX + 'overlay_timer_on')
 const OVERLAY_RELATIVE_TO_CANVAS = true;
@@ -515,6 +518,11 @@ function toggle_fullscreen() {
 function toggle_overlay(force) {
   const overlay = document.querySelector('#overlay');
   overlay.classList.toggle('hidden', force !== undefined ? !force : undefined);
+  if (! overlay.classList.contains('hidden')) {
+    overlay.querySelector('.top').innerText = localStorage.getItem(LS_PREFIX + 'overlay_text_top') || OVERLAY_TEXT_TOP;
+    overlay.querySelector('.bottom').innerText = localStorage.getItem(LS_PREFIX + 'overlay_text_bottom') || OVERLAY_TEXT_BOTTOM;
+    overlay.querySelector('a').href = localStorage.getItem(LS_PREFIX + 'overlay_href') || OVERLAY_HREF;
+  }
   update_menu_indicators();
   localStorage.setItem(LS_PREFIX + 'overlay', !overlay.classList.contains('hidden'));
   // when showing the overlay, make sure position is correct

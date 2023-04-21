@@ -76,11 +76,11 @@ canvas#three-js {
   user-select: none;
 }
 
-#overlay .url {
+#overlay .top {
   font-weight: 550;
 }
 
-#overlay .claim {
+#overlay .bottom {
   font-weight: 150;
 }
 
