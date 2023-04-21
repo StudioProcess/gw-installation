@@ -5,6 +5,11 @@ html, body {
   overflow: hidden; /* hide scrollbars when canvas overflows */
 }
 
+* {
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+}
+
 body {
   display: flex;
   align-items: center;
@@ -72,8 +77,6 @@ canvas#three-js {
   font-family: "Inter";
   line-height: 1.2;
   padding: 0.5em;
-  -webkit-user-select: none; /* Safari */
-  user-select: none;
 }
 
 #overlay .top {
@@ -118,8 +121,6 @@ canvas#three-js {
 #menu li {
   cursor: pointer;
   padding-right: 1.6em;
-  -webkit-user-select: none; /* Safari */
-  user-select: none;
   position: relative;
 }
 
@@ -275,8 +276,6 @@ canvas#three-js {
   font-size: 2em;
   line-height: 1.2;
   padding: 0.5em;
-  -webkit-user-select: none; /* Safari */
-  user-select: none;
   text-transform: uppercase;
   white-space: pre;
 }
@@ -301,8 +300,6 @@ canvas#three-js {
   font-size: 36px !important;
   line-height: 1.5;
   padding: 1em;
-  -webkit-user-select: none; /* Safari */
-  user-select: none;
 }
 
 #ios-install-info li {
