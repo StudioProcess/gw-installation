@@ -6,8 +6,6 @@
     <title>VERIFY•PROCESS•STUDIO</title>
     <link rel="icon" href="./img/192.png">
     <script src="./vendor/qrcode.js"></script>
-</head>
-<body>
     <style>
         body {
             font-family: system-ui;
@@ -82,9 +80,11 @@
         .ok { color: #00B202; }
         .qrcode { max-width: 150px; }
     </style>
+</head>
+<body>
     <h1 id="headline-top"><a href="./">verify<span>•</span>process<span>•</span>studio<br>verify<span>•</span>process<span>•</span>studio<br>verify<span>•</span>process<span>•</span>studio</a></h1>
-    <input id="txt-url" type="text" placeholder="URL"></input><br>
-    <input id="txt-sig" type="text" placeholder="(Optional) Signature"></input><br>
+    <input id="txt-url" type="text" placeholder="URL"><br>
+    <input id="txt-sig" type="text" placeholder="(Optional) Signature"><br>
     <button id="btn-verify">Verify</button><br>
     <span id="toggle-log">Show log ▶︎</span><br>
     <div id="output" class="hidden"> </div><br>
@@ -158,7 +158,7 @@
                 toggle_log(div_output.classList.contains('hidden'));
             }
         }
-        span_toggle_log.onclick = e => { toggle_log(); };
+        span_toggle_log.onclick = () => { toggle_log(); };
         
         function check_origin(url) {
             return url.toLowerCase().startsWith(origin.toLowerCase());
@@ -243,7 +243,7 @@
         }
         
         function bail() {
-            spinner.classList.add('hidden');
+            div_spinner.classList.add('hidden');
             set_log_output(div_result);
             warn(`⚠️ DATA INCOMPLETE`);
             append_log([
@@ -266,10 +266,10 @@
         }
         
         async function verify() {
-            output.innerHTML = '';
-            result.innerHTML = '';
+            div_output.innerHTML = '';
+            div_result.innerHTML = '';
             set_log_output(div_output);
-            spinner.classList.remove('hidden');
+            div_spinner.classList.remove('hidden');
             if (div_output.classList.contains('hidden')) { first_show_of_log = true; } // reset flag when log closed
             btn_verify.disabled = true;
             headline.className = '';
@@ -351,7 +351,7 @@
             let public_key;
             try {
                 public_key = await util.load_public_key(public_key_url, true);
-            } catch {
+            } catch (e) {
                 if (e.status) {
                     warn(`Cannot load public key (${e.status}${e.statusText ? " " + e.statusText : ""}):`, public_key_url);
                 } else {
@@ -372,7 +372,7 @@
             log('Elapsed time:', util.format_duration(end_ts-start_ts));
             log('Result:', valid ? 'valid' : 'invalid');
             
-            spinner.classList.add('hidden');
+            div_spinner.classList.add('hidden');
             headline.className = 'ok';
             set_log_output(div_result);
             if (valid) {
