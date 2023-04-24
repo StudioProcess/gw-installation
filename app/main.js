@@ -463,7 +463,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
     if (deltaCounter > 1/SIMULATION_FPS) {
       for (let i = 0; i < uniforms.pointPositions.value.length; i++) {
         const period = uniforms.pointPeriods.value[i]; // in secs
-        const onDuration = uniforms.pointOnDurations.value[i]; // in secs
+        // const onDuration = uniforms.pointOnDurations.value[i]; // in secs
         const cycleTime = uniforms.time.value % period; // [0.0, period]
         // uniforms.pointPositions.value[i].z = cycleTime < onDuration ? 1.0 : 0.0;
         
@@ -631,7 +631,6 @@ function set_overlay_pos(pos_h = 'center', pos_v = 'center') {
   if (!pos_v) { pos_v = overlay_pos_v; }
   if (!pos_h) { pos_h = overlay_pos_h; }
   const overlay = document.querySelector('#overlay');
-  const body = document.querySelector('body');
   
   overlay_pos_v = pos_v;
   if (pos_v === 'top') {
@@ -701,7 +700,7 @@ function cycle_overlay_pos() {
 function set_cam_pos(obj) {
   if (obj?.position) { camera.position.fromArray(obj.position); }
   if (obj?.rotation) { camera.rotation.fromArray(obj.rotation); }
-  if (obj?.target) {controls.target.fromArray(obj.target); };
+  if (obj?.target) {controls.target.fromArray(obj.target); }
   // camera.updateProjectionMatrix();
   // controls.update();
   reset_rotation();
@@ -836,7 +835,7 @@ let special_views_idx = -1;
 function randomize_cam() {
   if (rnd_every(SPECIAL_VIEW_EVERY)) {
     special_views_idx += 1;
-    if (special_views_idx >= SPECIAL_VIEWS.length) { special_views_idx = 0 };
+    if (special_views_idx >= SPECIAL_VIEWS.length) { special_views_idx = 0; }
     set_cam_by_idx(SPECIAL_VIEWS[special_views_idx]);
     reset_rotation();
     toggle_rotation( true, rnd(...VIEW_ROTATION), rnd([true, false]) );
@@ -884,7 +883,7 @@ function randomize_cam() {
   let de_min = 0;
   try {
     de_min = new_h * Math.tan((camera.fov/180 * Math.PI) / 2) * camera.aspect * VIEW_EMITTER_DIST_FACTOR;
-  } catch {} // Ignore any calculation errors
+  } catch { /* Ignore any calculation errors */ } 
   de_min = Math.min(de_min, VIEW_EMITTER_DIST_LIMIT); // limit min radius
   
   // make sure change distance is big enough + view is far enough from the nearest emitter (but not too far)
@@ -934,19 +933,19 @@ function randomize_emitters() {
 
 function randomize_emitters_once(avoid_view = false) {
   let lx, ly, rx, ry;
+  // distance to center of camera view (in plane units, not uv); return value >= 0
+  function view_dist(x, y) {
+    const e = uv_to_plane(x, y); // emitter position in plane units
+    return Math.sqrt( (camera.position.x - e[0])**2 + (camera.position.y - e[1])**2 );
+  }
+  
   // position left emitter
   if (avoid_view) {
-    // distance to center of camera view (in plane units, not uv); return value >= 0
-    function view_dist(x, y) {
-      const e = uv_to_plane(x, y); // emitter position in plane units
-      return Math.sqrt( (camera.position.x - e[0])**2 + (camera.position.y - e[1])**2 );
-    }
-    
     // Calculate approximate view radius, based on FOV and view height. Add in an exclusion factor (to compensate for tilt etc.)
     let d_min = 0;
     try {
       d_min = camera.position.z * Math.tan((camera.fov/180 * Math.PI) / 2) * camera.aspect * VIEW_EMITTER_DIST_FACTOR;
-    } catch {} // Ignore any calculation errors
+    } catch { /* Ignore any calculation errors */ } 
     d_min = Math.min(d_min, VIEW_EMITTER_DIST_LIMIT); // limit min radius => [0, VIEW_EMITTER_DIST_LIMIT]
     let d, count;
     d = -1; count = 0;
@@ -1250,11 +1249,11 @@ function setup_menu() {
     });
   };
   
-  menu.querySelector('.speed').onclick = (e) => {
+  menu.querySelector('.speed').onclick = () => {
     next_speed();
   };
   
-  menu.querySelector('.reset').onclick = (e) => {
+  menu.querySelector('.reset').onclick = () => {
     reset_simulation();
   };
   
@@ -1587,7 +1586,7 @@ async function sw_install() {
     registration.onupdatefound = on_sw_update;
     // console.log('Service worker registered');
   } catch (e) {
-    console.log('Service worker registration failed', error);
+    console.log('Service worker registration failed', e);
   }
 }
 
