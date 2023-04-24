@@ -14,6 +14,15 @@ import { generateKeyPairSync, createSign, getCurves, getHashes, createPrivateKey
 import { readFileSync, writeFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { glob } from 'glob';
+import _path_sort from 'path-sort'
+
+// make path_sort order files without folders before file with folders
+function path_sort(array) {
+    array = array.map( f => '/' + f); // prepend /
+    array = _path_sort(array); // sort
+    array = array.map( f => f.slice(1) ); // remove suffix 
+    return array;
+}
 
 // const config = { named_curve: 'prime256v1', hash: 'sha256' };
 const config = { named_curve: 'secp384r1', hash: 'sha384' };
@@ -99,13 +108,12 @@ if (args.flags['-u'] || args.flags['--update'] || new_siginfo) {
         console.log('Ignoring:', ignore.join(', '));
     }
     let files = await glob('**/*', { cwd: folder, dot: true, ignore: ['**/.DS_Store', siginfo.signature_url, ...ignore] });
-    files = files.filter(f => statSync(path.join(folder, f)).isFile()); // only folders
-    files.reverse();
-    if (new_siginfo) { // update sitemap
-        siginfo.sitemap = Array.from( new Set([...siginfo.sitemap, ...files]) );
-    } else { // overwrite sitemap
-        siginfo.sitemap = files;
+    files = files.filter(f => statSync(path.join(folder, f)).isFile()); // only files (no folders)
+    if (new_siginfo) { // new sitemap
+        files = Array.from( new Set([...siginfo.sitemap, ...files]) );
     }
+    files = path_sort(files); // consistent sort by path
+    siginfo.sitemap = files;
     writeFileSync(siginfo_path, JSON.stringify(siginfo, null, 4));
 }
 
