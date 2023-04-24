@@ -292,6 +292,11 @@ function update_info() {
   t += `Display Mode: ${display_mode()}\n`;
   t += `</div>`;
   t += `<div style="margin-top: 8px;">`;
+  t += `Controls: ${controls.enabled ? '● <a id="toggle_controls">Disable</a>' : '○ <a id="toggle_controls">Enable</a>' }\n`;
+  t += `Sequence: ${sequence_running ? '● <a id="toggle_sequence">Stop</a>' : '○ <a id="toggle_sequence">Start</a>' }\n`;
+  t += `Trigger: <a id="rnd_cam">Cam</a> <a id="rnd_emitters">Emts</a> <a id="rnd_burst">Burst</a>\n`;
+  t += `</div>`;
+  t += `<div style="margin-top: 8px;">`;
   t += `Service worker: ${sw_installed ? '● <a id="sw_reinstall">Reinstall</a> <a id="sw_uninstall">Uninstall</a>' : '○ <a id="sw_install">Install</a>' }\n`;
   t += `Environment: ${env.ENV}\n`;
   if (env.ENV === 'production') {
@@ -302,9 +307,16 @@ function update_info() {
   const info = document.querySelector('#info');
   info.innerHTML = t;
   
-  document.querySelector('#sw_install')?.addEventListener('click', () => { sw_install(); });
-  document.querySelector('#sw_uninstall')?.addEventListener('click', () => { sw_uninstall(); });
-  document.querySelector('#sw_reinstall')?.addEventListener('click', () => { sw_reinstall(); });
+  info.querySelector('#sw_install')?.addEventListener('click', () => { sw_install(); });
+  info.querySelector('#sw_uninstall')?.addEventListener('click', () => { sw_uninstall(); });
+  info.querySelector('#sw_reinstall')?.addEventListener('click', () => { sw_reinstall(); });
+  info.querySelector('#toggle_controls')?.addEventListener('click', () => { toggle_controls_enabled(); });
+  info.querySelector('#toggle_sequence')?.addEventListener('click', () => { toggle_sequence(undefined, true); });
+  info.querySelector('#rnd_cam')?.addEventListener('click', () => {    randomize_cam(); toggle_sequence(false); });
+  info.querySelector('#rnd_emitters')?.addEventListener('click', () => { randomize_emitters(); });
+  info.querySelector('#rnd_burst')?.addEventListener('click', () => { randomize_emitters_burst(); });
+  info.onclick = (e) => { e.stopPropagation(); }
+  info.ondblclick = (e) => { e.stopPropagation(); }
 }
 
 
@@ -1146,6 +1158,8 @@ function toggle_sequence(force, emitters_immediate = false) {
   } else {
     toggle_sequence(!sequence_running, emitters_immediate);
   }
+  
+  update_info();
 }
 
 function next_sequence() {
@@ -1407,6 +1421,7 @@ function toggle_controls_enabled(force) {
   } else {
     controls.enabled = !controls.enabled;
   }
+  update_info();
 }
 
 
