@@ -31,14 +31,14 @@
   "author": "Martin Grödl <martin@process.studio> (https://process.studio)",
   "license": "AGPL-3.0",
   "dependencies": {
-    "es-module-shims": "^1.6.3",
+    "es-module-shims": "^1.7.2",
     "lil-gui": "^0.18.1",
     "stats.js": "^0.17.0",
     "three": "^0.150.1"
   },
   "devDependencies": {
     "browser-sync": "^2.29.1",
-    "glob": "^10.2.1",
+    "glob": "^10.2.2",
     "path-sort": "^0.1.0"
   }
 }
