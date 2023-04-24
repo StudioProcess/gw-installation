@@ -1,13 +1,13 @@
 {
     "version": 1,
     "sitemap": [
-        "img/192.png",
-        "vendor/qrcode.js",
         "index.html",
         "public_key.pem",
         "siginfo.json",
         "signature.timestamp",
-        "util.mjs"
+        "util.mjs",
+        "img/192.png",
+        "vendor/qrcode.js"
     ],
     "metadata": {
         "title": "VERIFY•PROCESS•STUDIO",

@@ -77,7 +77,7 @@
         .log { color: black; }
         .warn { color: darkorange; }
         .alert { color: red; }
-        .ok { color: #00B202; }
+        .ok { color: #00c802; }
         .qrcode { max-width: 150px; }
     </style>
 </head>
@@ -99,7 +99,8 @@
         const PUBLIC_KEY_URL = './public_key.pem'; // Relative to this file
         const INITIALLY_SHOW_LOG = false;
         
-        const headline = document.querySelector('#headline-bottom');
+        const headline_top = document.querySelector('#headline-top');
+        const headline_bottom = document.querySelector('#headline-bottom');
         const txt_url = document.querySelector('#txt-url');
         const txt_sig = document.querySelector('#txt-sig');
         const btn_verify = document.querySelector('#btn-verify');
@@ -254,7 +255,8 @@
                 '</ul>'
             ]);
             btn_verify.disabled = false;
-            headline.className = 'warn';
+            headline_top.className = 'warn';
+            headline_bottom.className = 'warn';
             return false;
         }
         
@@ -272,7 +274,8 @@
             div_spinner.classList.remove('hidden');
             if (div_output.classList.contains('hidden')) { first_show_of_log = true; } // reset flag when log closed
             btn_verify.disabled = true;
-            headline.className = '';
+            headline_top.className = '';
+            headline_bottom.className = '';
             
             let start_ts = new Date();
             log('Verification started:', util.ts_local(start_ts));
@@ -373,7 +376,8 @@
             log('Result:', valid ? 'valid' : 'invalid');
             
             div_spinner.classList.add('hidden');
-            headline.className = 'ok';
+            headline_top.className = 'ok';
+            headline_bottom.className = 'ok';
             set_log_output(div_result);
             if (valid) {
                 ok(`✅ SIGNATURE VALID`);
@@ -455,7 +459,8 @@
                 out.push('</table>');
                 append_log(out, 'metadata');
             } else {
-                headline.className = 'alert';
+                headline_top.className = 'alert';
+                headline_bottom.className = 'alert';
                 alert(`❌ SIGNATURE NOT VALID`);
                 append_log([
                     '<ul>',
