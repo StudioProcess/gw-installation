@@ -311,7 +311,8 @@
             }
             
             // Get signature (from input/querystring or siginfo)
-            let sig = txt_sig.value;
+            let sig = txt_sig.value.replace(/\s/g, ''); // remove whitepsace
+            txt_sig.value = sig;
             if (!sig) {
                 update_query_param('sig', null);
                 if (!siginfo.signature_url) {
