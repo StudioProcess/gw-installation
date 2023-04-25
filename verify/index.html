@@ -281,11 +281,12 @@
             log('Verification started:', util.ts_local(start_ts));
             
             try {
-                const url = new URL( txt_url.value.trim() );
+                txt_url.value = txt_url.value.replace(/\s/g, ''); // remove whitespace from url (enables copy/paste from PDF)
+                const url = new URL( txt_url.value );
                 origin = url.origin + url.pathname; // Don't use searchParams and hash
                 if (!origin.endsWith('/')) { origin += '/'; } // make sure the URL ends with a slash, so make_url doesn't remove the last path part
             } catch {
-                warn('Invalid site URL:', txt_url.value.trim());
+                warn('Invalid site URL:', txt_url.value);
                 return bail();
             }
             log('Verifying site:', origin);
@@ -311,7 +312,7 @@
             }
             
             // Get signature (from input/querystring or siginfo)
-            let sig = txt_sig.value.replace(/\s/g, ''); // remove whitepsace
+            let sig = txt_sig.value.replace(/\s/g, ''); // remove whitepsace (enables copy/paste from PDF)
             txt_sig.value = sig;
             if (!sig) {
                 update_query_param('sig', null);
